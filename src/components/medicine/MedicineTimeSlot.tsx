@@ -34,7 +34,7 @@ const MedicineTimeSlot = ({
         className={`w-full ${
           isTaken 
             ? 'bg-green-500 hover:bg-green-600' 
-            : 'bg-red-500 hover:bg-red-600'
+            : `bg-diabetic-${label.toLowerCase()} hover:bg-diabetic-${label.toLowerCase()}/90`
         }`}
       >
         {isTaken ? 'Done' : 'Mark as Taken'}

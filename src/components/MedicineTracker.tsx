@@ -1,17 +1,10 @@
 import React from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Clock, Sun, Sunset, Moon } from 'lucide-react';
+import { Sun, Sunset, Moon } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-
-interface TimeSlot {
-  id: 'morning' | 'afternoon' | 'night';
-  icon: React.ReactNode;
-  label: string;
-  time: string;
-}
+import MedicineTimeSlot from './medicine/MedicineTimeSlot';
+import { TimeSlot } from '@/types/medicine';
 
 const timeSlots: TimeSlot[] = [
   { id: 'morning', icon: <Sun className="w-6 h-6" />, label: 'Morning', time: '08:00' },
@@ -75,25 +68,15 @@ const MedicineTracker = () => {
   return (
     <div className="grid gap-4 md:grid-cols-3">
       {timeSlots.map((slot) => (
-        <Card key={slot.id} className="p-6 animate-slideIn">
-          <div className={`flex items-center justify-between mb-4 text-diabetic-${slot.id}`}>
-            {slot.icon}
-            <Clock className="w-5 h-5" />
-            <span className="font-semibold">{slot.time}</span>
-          </div>
-          <h3 className="text-lg font-semibold mb-4">{slot.label} Medicine</h3>
-          <Button
-            onClick={() => handleMedicineTaken(slot.id)}
-            disabled={isTaken(slot.id)}
-            className={`w-full ${
-              isTaken(slot.id) 
-                ? 'bg-green-500 hover:bg-green-600' 
-                : 'bg-red-500 hover:bg-red-600'
-            }`}
-          >
-            {isTaken(slot.id) ? 'Done' : 'Mark as Taken'}
-          </Button>
-        </Card>
+        <MedicineTimeSlot
+          key={slot.id}
+          icon={slot.icon}
+          time={slot.time}
+          label={slot.label}
+          isTaken={isTaken(slot.id)}
+          onMedicineTaken={() => handleMedicineTaken(slot.id)}
+          colorClass={`text-diabetic-${slot.id}`}
+        />
       ))}
     </div>
   );

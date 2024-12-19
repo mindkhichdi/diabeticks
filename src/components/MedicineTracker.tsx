@@ -8,6 +8,7 @@ import { TimeSlot, MedicineLog } from '@/types/medicine';
 import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { format } from 'date-fns';
 import {
   Table,
   TableBody,
@@ -203,7 +204,7 @@ const MedicineTracker = () => {
                       {log.medicine_time}
                     </TableCell>
                     <TableCell>
-                      {takenAtDate.toLocaleTimeString()}
+                      {format(takenAtDate, 'h:mm a')}
                     </TableCell>
                     <TableCell>
                       <Check className="h-4 w-4 text-green-500" />

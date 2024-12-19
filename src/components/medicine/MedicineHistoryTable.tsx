@@ -29,17 +29,24 @@ const MedicineHistoryTable = ({ logs, selectedDate }: MedicineHistoryTableProps)
     );
   }
 
-  const formatLocalTime = (timestamp: string) => {
-    const date = new Date(timestamp);
-    return date.toLocaleString(undefined, {
+  const formatLocalTime = (utcTimestamp: string) => {
+    console.log('Formatting UTC timestamp:', utcTimestamp);
+    const date = new Date(utcTimestamp);
+    console.log('Converted to Date object:', date);
+    console.log('Local timezone offset:', date.getTimezoneOffset());
+    
+    const localTime = date.toLocaleString(undefined, {
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       year: 'numeric',
       month: 'numeric',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-      second: '2-digit',
       hour12: true
     });
+    
+    console.log('Formatted local time:', localTime);
+    return localTime;
   };
 
   return (

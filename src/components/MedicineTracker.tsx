@@ -45,11 +45,14 @@ const MedicineTracker = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
+      const now = new Date().toISOString();
+      
       const { error } = await supabase
         .from('medicine_logs')
         .insert([{ 
           medicine_time: slotId,
-          user_id: user.id
+          user_id: user.id,
+          taken_at: now
         }]);
       
       if (error) throw error;
@@ -73,7 +76,10 @@ const MedicineTracker = () => {
       console.warn('medicineLogs is not an array:', medicineLogs);
       return false;
     }
-    return medicineLogs.some(log => log.medicine_time === slotId);
+    return medicineLogs.some(log => {
+      const logDate = new Date(log.taken_at).toISOString().split('T')[0];
+      return log.medicine_time === slotId && logDate === today;
+    });
   };
 
   return (

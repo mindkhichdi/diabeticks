@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sun, Sunset, Moon } from 'lucide-react';
+import { Sun, Sunset, Moon, ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -7,6 +7,7 @@ import MedicineTimeSlot from './medicine/MedicineTimeSlot';
 import { TimeSlot, MedicineLog } from '@/types/medicine';
 import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 const timeSlots: TimeSlot[] = [
   { id: 'morning', icon: <Sun className="w-6 h-6" />, label: 'Morning', time: '08:00' },
@@ -17,6 +18,7 @@ const timeSlots: TimeSlot[] = [
 const MedicineTracker = () => {
   const queryClient = useQueryClient();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   
   const isFutureDate = (date: Date) => {
     const today = new Date();
@@ -128,13 +130,34 @@ const MedicineTracker = () => {
   return (
     <div className="space-y-4">
       <Card className="p-4">
-        <Calendar
-          mode="single"
-          selected={selectedDate}
-          onSelect={(date) => setSelectedDate(date || new Date())}
-          disabled={(date) => isFutureDate(date)}
-          className="mb-4"
-        />
+        <div className="flex flex-col space-y-4">
+          <div 
+            className="flex items-center justify-between cursor-pointer"
+            onClick={() => setIsCalendarOpen(!isCalendarOpen)}
+          >
+            <div className="text-lg font-medium">
+              {selectedDate.toLocaleDateString('en-US', { 
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </div>
+            <Button variant="ghost" size="icon">
+              {isCalendarOpen ? <ChevronUp /> : <ChevronDown />}
+            </Button>
+          </div>
+          
+          {isCalendarOpen && (
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={(date) => setSelectedDate(date || new Date())}
+              disabled={(date) => isFutureDate(date)}
+              className="rounded-md border"
+            />
+          )}
+        </div>
       </Card>
 
       <div className="grid gap-4 md:grid-cols-3 bg-white p-4 rounded-lg shadow-sm">

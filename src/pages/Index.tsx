@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MedicineTracker from '@/components/MedicineTracker';
 import ReadingsLog from '@/components/ReadingsLog';
 import { toast } from 'sonner';
+import { Pill, Activity } from 'lucide-react';
 
 const Index = () => {
   useEffect(() => {
@@ -41,12 +42,18 @@ const Index = () => {
       <h1 className="text-3xl font-bold text-primary mb-8">Diabetes Care Assistant</h1>
       
       <Tabs defaultValue="medicine" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="medicine">Medicine Tracking</TabsTrigger>
-          <TabsTrigger value="readings">Blood Sugar Readings</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 mb-8">
+          <TabsTrigger value="medicine" className="space-x-2">
+            <Pill className="w-5 h-5" />
+            <span>Medicine Tracking</span>
+          </TabsTrigger>
+          <TabsTrigger value="readings" className="space-x-2">
+            <Activity className="w-5 h-5" />
+            <span>Blood Sugar Readings</span>
+          </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="medicine" className="space-y-8">
+        <TabsContent value="medicine">
           <section>
             <h2 className="text-2xl font-semibold mb-4">Daily Medicine Tracker</h2>
             <MedicineTracker />

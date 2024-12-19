@@ -22,20 +22,22 @@ const MedicineTracker = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
+      console.log('Current user ID:', user.id);
       console.log('Fetching medicine logs for today:', today);
       
       const { data, error } = await supabase
         .from('medicine_logs')
         .select('*')
-        .eq('taken_at::date', today)
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .gte('taken_at', `${today}T00:00:00`)
+        .lte('taken_at', `${today}T23:59:59`);
       
       if (error) {
         console.error('Error fetching medicine logs:', error);
         throw error;
       }
 
-      console.log('Fetched medicine logs:', data);
+      console.log('Raw medicine logs data:', data);
       return data || [];
     },
   });
@@ -45,17 +47,26 @@ const MedicineTracker = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
+      console.log('Logging medicine for user:', user.id);
       const now = new Date().toISOString();
       
-      const { error } = await supabase
+      const { error, data } = await supabase
         .from('medicine_logs')
         .insert([{ 
           medicine_time: slotId,
           user_id: user.id,
           taken_at: now
-        }]);
+        }])
+        .select()
+        .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error inserting medicine log:', error);
+        throw error;
+      }
+
+      console.log('Successfully logged medicine:', data);
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['medicine-logs'] });
@@ -76,10 +87,22 @@ const MedicineTracker = () => {
       console.warn('medicineLogs is not an array:', medicineLogs);
       return false;
     }
-    return medicineLogs.some(log => {
+    
+    const taken = medicineLogs.some(log => {
       const logDate = new Date(log.taken_at).toISOString().split('T')[0];
-      return log.medicine_time === slotId && logDate === today;
+      const result = log.medicine_time === slotId && logDate === today;
+      console.log(`Checking log:`, {
+        slotId,
+        logMedicineTime: log.medicine_time,
+        logDate,
+        today,
+        isMatch: result
+      });
+      return result;
     });
+
+    console.log(`Medicine status for ${slotId}:`, taken);
+    return taken;
   };
 
   return (

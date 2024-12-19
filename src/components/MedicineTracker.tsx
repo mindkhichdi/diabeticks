@@ -66,7 +66,7 @@ const MedicineTracker = () => {
   };
 
   return (
-    <div className="grid gap-4 md:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-3 bg-white p-4 rounded-lg shadow-sm">
       {timeSlots.map((slot) => (
         <MedicineTimeSlot
           key={slot.id}

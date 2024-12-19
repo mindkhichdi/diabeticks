@@ -21,7 +21,7 @@ const MedicineTimeSlot = ({
   colorClass
 }: MedicineTimeSlotProps) => {
   return (
-    <Card className="p-6 animate-slideIn">
+    <Card className="p-6 border-2 hover:border-primary transition-all duration-200 animate-slideIn">
       <div className={`flex items-center justify-between mb-4 ${colorClass}`}>
         {icon}
         <Clock className="w-5 h-5" />

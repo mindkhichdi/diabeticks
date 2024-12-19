@@ -27,10 +27,14 @@ const MedicineTracker = () => {
   const { data: medicineLogs } = useQuery({
     queryKey: ['medicine-logs', today],
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
+
       const { data, error } = await supabase
         .from('medicine_logs')
         .select('*')
-        .eq('taken_at::date', today);
+        .eq('taken_at::date', today)
+        .eq('user_id', user.id);
       
       if (error) throw error;
       return data;
@@ -40,9 +44,15 @@ const MedicineTracker = () => {
   // Create mutation for logging medicine
   const logMedicine = useMutation({
     mutationFn: async (slotId: string) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
+
       const { error } = await supabase
         .from('medicine_logs')
-        .insert([{ medicine_time: slotId }]);
+        .insert([{ 
+          medicine_time: slotId,
+          user_id: user.id
+        }]);
       
       if (error) throw error;
     },

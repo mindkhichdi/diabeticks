@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Trash2 } from 'lucide-react';
+import BloodSugarTrendChart from './BloodSugarTrendChart';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -135,6 +136,8 @@ const ReadingsLog = () => {
   return (
     <Card className="p-6">
       <h2 className="text-2xl font-semibold mb-6">Blood Sugar Readings</h2>
+      
+      <BloodSugarTrendChart readings={readings} />
       
       <form onSubmit={handleSubmit} className="grid gap-4 mb-6">
         <div className="grid md:grid-cols-2 gap-4">

@@ -4,8 +4,26 @@ import MedicineTracker from '@/components/MedicineTracker';
 import ReadingsLog from '@/components/ReadingsLog';
 import { toast } from 'sonner';
 import { Pill, Activity } from 'lucide-react';
+import { supabase } from "@/integrations/supabase/client";
+import { useState } from 'react';
 
 const Index = () => {
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const generateLogo = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('generate-logo');
+        if (error) throw error;
+        setLogoUrl(data.image);
+      } catch (error) {
+        console.error('Error generating logo:', error);
+      }
+    };
+
+    generateLogo();
+  }, []);
+
   useEffect(() => {
     // Request notification permission
     if ('Notification' in window) {
@@ -39,7 +57,16 @@ const Index = () => {
 
   return (
     <div className="container mx-auto p-4 space-y-8">
-      <h1 className="text-3xl font-bold text-primary mb-8">Diabeticks</h1>
+      <div className="flex items-center justify-center gap-4 mb-8">
+        {logoUrl && (
+          <img 
+            src={logoUrl} 
+            alt="Diabeticks Logo" 
+            className="w-12 h-12 object-contain"
+          />
+        )}
+        <h1 className="text-3xl font-bold text-primary">Diabeticks</h1>
+      </div>
       
       <Tabs defaultValue="medicine" className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-8">

@@ -120,13 +120,13 @@ const MedicineTracker = () => {
 
   return (
     <div className="space-y-4">
-      <Card className="p-4">
+      <Card className="p-6 shadow-lg bg-white/90 backdrop-blur-sm">
         <div className="flex flex-col space-y-4">
           <div 
-            className="flex items-center justify-between cursor-pointer"
+            className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
             onClick={() => setIsCalendarOpen(!isCalendarOpen)}
           >
-            <div className="text-lg font-medium">
+            <div className="text-lg font-semibold text-gray-800">
               {selectedDate.toLocaleDateString('en-US', { 
                 weekday: 'long',
                 year: 'numeric',
@@ -134,23 +134,35 @@ const MedicineTracker = () => {
                 day: 'numeric'
               })}
             </div>
-            <Button variant="ghost" size="icon">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="text-primary hover:text-primary-dark hover:bg-primary-light"
+            >
               {isCalendarOpen ? <ChevronUp /> : <ChevronDown />}
             </Button>
           </div>
           
           {isCalendarOpen && (
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={(date) => setSelectedDate(date || new Date())}
-              className="rounded-md border"
-            />
+            <div className="p-2 bg-white rounded-lg shadow-inner">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={(date) => {
+                  setSelectedDate(date || new Date());
+                  setIsCalendarOpen(false);
+                  toast.info("Date selected: " + date?.toLocaleDateString());
+                }}
+                defaultMonth={selectedDate}
+                className="rounded-md border shadow-sm"
+                disabled={(date) => date > new Date()}
+              />
+            </div>
           )}
         </div>
       </Card>
 
-      <div className="grid gap-4 md:grid-cols-3 bg-white p-4 rounded-lg shadow-sm">
+      <div className="grid gap-4 md:grid-cols-3 bg-white/90 backdrop-blur-sm p-6 rounded-lg shadow-lg">
         {timeSlots.map((slot) => (
           <MedicineTimeSlot
             key={slot.id}
@@ -165,7 +177,7 @@ const MedicineTracker = () => {
         ))}
       </div>
 
-      <Card className="p-4">
+      <Card className="p-6 shadow-lg bg-white/90 backdrop-blur-sm">
         <MedicineHistoryTable logs={medicineLogs} selectedDate={selectedDate} />
       </Card>
     </div>

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import MedicineTracker from '@/components/MedicineTracker';
 import ReadingsLog from '@/components/ReadingsLog';
+import MedicineCalendar from '@/components/MedicineCalendar';
 import { toast } from 'sonner';
 
 const Index = () => {
@@ -42,6 +43,11 @@ const Index = () => {
       <section>
         <h2 className="text-2xl font-semibold mb-4">Daily Medicine Tracker</h2>
         <MedicineTracker />
+      </section>
+
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">Medicine Calendar</h2>
+        <MedicineCalendar />
       </section>
 
       <section className="mt-8">

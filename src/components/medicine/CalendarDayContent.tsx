@@ -9,7 +9,23 @@ interface CalendarDayContentProps {
 }
 
 const CalendarDayContent = ({ date, selectedDate, medicineStatus }: CalendarDayContentProps) => {
-  if (!selectedDate || date.toDateString() !== selectedDate?.toDateString()) {
+  const isSameDate = (date1: Date, date2: Date | undefined): boolean => {
+    if (!date2) return false;
+    return (
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate()
+    );
+  };
+
+  console.log('Rendering CalendarDayContent:', {
+    date: date.toISOString(),
+    selectedDate: selectedDate?.toISOString(),
+    medicineStatus,
+    isSameDate: selectedDate ? isSameDate(date, selectedDate) : false
+  });
+
+  if (!selectedDate || !isSameDate(date, selectedDate)) {
     return <div>{date.getDate()}</div>;
   }
 

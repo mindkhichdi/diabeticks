@@ -20,9 +20,11 @@ import {
 interface Reading {
   id?: string;
   date: string;
-  hba1c?: string;
-  fasting?: string;
-  post_prandial?: string;
+  hba1c?: number | null;
+  fasting?: number | null;
+  post_prandial?: number | null;
+  created_at?: string;
+  user_id?: string | null;
 }
 
 const ReadingsLog = () => {
@@ -60,9 +62,9 @@ const ReadingsLog = () => {
         .from('blood_sugar_readings')
         .insert([{
           date: reading.date,
-          hba1c: reading.hba1c ? parseFloat(reading.hba1c) : null,
-          fasting: reading.fasting ? parseInt(reading.fasting) : null,
-          post_prandial: reading.post_prandial ? parseInt(reading.post_prandial) : null,
+          hba1c: reading.hba1c ? parseFloat(reading.hba1c.toString()) : null,
+          fasting: reading.fasting ? parseInt(reading.fasting.toString()) : null,
+          post_prandial: reading.post_prandial ? parseInt(reading.post_prandial.toString()) : null,
           user_id: user.id
         }]);
       
@@ -133,20 +135,20 @@ const ReadingsLog = () => {
             type="number"
             placeholder="HbA1c (%)"
             value={newReading.hba1c || ''}
-            onChange={(e) => setNewReading({ ...newReading, hba1c: e.target.value })}
+            onChange={(e) => setNewReading({ ...newReading, hba1c: e.target.value ? parseFloat(e.target.value) : null })}
             step="0.1"
           />
           <Input
             type="number"
             placeholder="Fasting (mg/dL)"
             value={newReading.fasting || ''}
-            onChange={(e) => setNewReading({ ...newReading, fasting: e.target.value })}
+            onChange={(e) => setNewReading({ ...newReading, fasting: e.target.value ? parseInt(e.target.value) : null })}
           />
           <Input
             type="number"
             placeholder="Post-prandial (mg/dL)"
             value={newReading.post_prandial || ''}
-            onChange={(e) => setNewReading({ ...newReading, post_prandial: e.target.value })}
+            onChange={(e) => setNewReading({ ...newReading, post_prandial: e.target.value ? parseInt(e.target.value) : null })}
           />
         </div>
         <Button type="submit" className="bg-primary">Add Reading</Button>

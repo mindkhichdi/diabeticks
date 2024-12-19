@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MedicineTracker from '@/components/MedicineTracker';
 import ReadingsLog from '@/components/ReadingsLog';
 import MedicineCalendar from '@/components/MedicineCalendar';
@@ -40,19 +41,28 @@ const Index = () => {
     <div className="container mx-auto p-4 space-y-8">
       <h1 className="text-3xl font-bold text-primary mb-8">Diabetes Care Assistant</h1>
       
-      <section>
-        <h2 className="text-2xl font-semibold mb-4">Daily Medicine Tracker</h2>
-        <MedicineTracker />
-      </section>
+      <Tabs defaultValue="medicine" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="medicine">Medicine Tracking</TabsTrigger>
+          <TabsTrigger value="readings">Blood Sugar Readings</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="medicine" className="space-y-8">
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">Daily Medicine Tracker</h2>
+            <MedicineTracker />
+          </section>
 
-      <section>
-        <h2 className="text-2xl font-semibold mb-4">Medicine Calendar</h2>
-        <MedicineCalendar />
-      </section>
-
-      <section className="mt-8">
-        <ReadingsLog />
-      </section>
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">Medicine Calendar</h2>
+            <MedicineCalendar />
+          </section>
+        </TabsContent>
+        
+        <TabsContent value="readings">
+          <ReadingsLog />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

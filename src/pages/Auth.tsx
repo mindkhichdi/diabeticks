@@ -25,7 +25,6 @@ const AuthPage = () => {
         <Auth
           supabaseClient={supabase}
           appearance={{ theme: ThemeSupa }}
-          providers={["google"]}
           theme="light"
         />
       </Card>

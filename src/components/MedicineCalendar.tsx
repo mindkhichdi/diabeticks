@@ -29,13 +29,20 @@ const MedicineCalendar = () => {
       if (!user) throw new Error('No user found');
 
       const dateStr = selectedDate.toISOString().split('T')[0];
+      console.log('Fetching medicine logs for date:', dateStr);
+      
       const { data, error } = await supabase
         .from('medicine_logs')
         .select('*')
         .eq('taken_at::date', dateStr)
         .eq('user_id', user.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching medicine logs:', error);
+        throw error;
+      }
+
+      console.log('Fetched medicine logs:', data);
 
       const status: MedicineStatus = {
         morning: false,
@@ -54,6 +61,7 @@ const MedicineCalendar = () => {
         logs: data as MedicineLog[]
       };
     },
+    enabled: !!selectedDate,
   });
 
   const renderDayContent = (day: Date) => {

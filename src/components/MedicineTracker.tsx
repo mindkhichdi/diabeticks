@@ -23,7 +23,6 @@ const MedicineTracker = () => {
   const queryClient = useQueryClient();
   const today = new Date().toISOString().split('T')[0];
 
-  // Fetch today's medicine logs
   const { data: medicineLogs } = useQuery({
     queryKey: ['medicine-logs', today],
     queryFn: async () => {
@@ -41,7 +40,6 @@ const MedicineTracker = () => {
     },
   });
 
-  // Create mutation for logging medicine
   const logMedicine = useMutation({
     mutationFn: async (slotId: string) => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -71,7 +69,7 @@ const MedicineTracker = () => {
   };
 
   const isTaken = (slotId: string) => {
-    return medicineLogs?.some(log => log.medicine_time === slotId);
+    return medicineLogs?.some(log => log.medicine_time === slotId) ?? false;
   };
 
   return (
@@ -89,11 +87,11 @@ const MedicineTracker = () => {
             disabled={isTaken(slot.id)}
             className={`w-full ${
               isTaken(slot.id) 
-                ? 'bg-green-500 hover:bg-green-600 border-0' 
-                : 'bg-red-500 hover:bg-red-600 border-0'
+                ? 'bg-green-500 hover:bg-green-600' 
+                : 'bg-red-500 hover:bg-red-600'
             }`}
           >
-            {isTaken(slot.id) ? 'Taken' : 'Mark as Taken'}
+            {isTaken(slot.id) ? 'Done' : 'Mark as Taken'}
           </Button>
         </Card>
       ))}

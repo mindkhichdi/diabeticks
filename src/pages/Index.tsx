@@ -9,15 +9,31 @@ import { useState } from 'react';
 
 const Index = () => {
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoError, setLogoError] = useState<string | null>(null);
 
   useEffect(() => {
     const generateLogo = async () => {
       try {
+        console.log('Calling generate-logo function...');
         const { data, error } = await supabase.functions.invoke('generate-logo');
-        if (error) throw error;
+        
+        if (error) {
+          console.error('Error from Supabase function:', error);
+          setLogoError(error.message);
+          throw error;
+        }
+        
+        if (!data?.image) {
+          console.error('No image data received');
+          throw new Error('No image data received');
+        }
+
+        console.log('Logo generated successfully');
         setLogoUrl(data.image);
       } catch (error) {
         console.error('Error generating logo:', error);
+        setLogoError(error.message);
+        toast.error('Failed to generate logo. Please try again later.');
       }
     };
 
@@ -58,12 +74,14 @@ const Index = () => {
   return (
     <div className="container mx-auto p-4 space-y-8">
       <div className="flex items-center justify-center gap-4 mb-8">
-        {logoUrl && (
+        {logoUrl ? (
           <img 
             src={logoUrl} 
             alt="Diabeticks Logo" 
             className="w-12 h-12 object-contain"
           />
+        ) : !logoError && (
+          <div className="w-12 h-12 bg-gray-100 rounded-full animate-pulse" />
         )}
         <h1 className="text-3xl font-bold text-primary">Diabeticks</h1>
       </div>

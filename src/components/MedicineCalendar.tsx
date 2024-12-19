@@ -25,8 +25,9 @@ const MedicineCalendar = () => {
       const { data, error } = await supabase
         .from('medicine_logs')
         .select('*')
-        .eq('taken_at::date', dateStr)
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .gte('taken_at', `${dateStr}T00:00:00`)
+        .lte('taken_at', `${dateStr}T23:59:59`);
 
       if (error) {
         console.error('Error fetching medicine logs:', error);

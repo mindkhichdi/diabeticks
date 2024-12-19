@@ -22,6 +22,9 @@ const MedicineTimeSlot = ({
   colorClass,
   disabled
 }: MedicineTimeSlotProps) => {
+  // Extract the time period from colorClass (e.g., "text-diabetic-morning" -> "morning")
+  const period = colorClass.split('-').pop();
+  
   return (
     <Card className="p-6 border-2 hover:border-primary transition-all duration-200 animate-slideIn">
       <div className={`flex items-center justify-between mb-4 ${colorClass}`}>
@@ -39,7 +42,7 @@ const MedicineTimeSlot = ({
             ? 'bg-green-500 hover:bg-green-600 cursor-not-allowed' 
             : disabled
             ? 'bg-gray-300 cursor-not-allowed'
-            : 'bg-primary hover:bg-primary/90'
+            : `bg-diabetic-${period} hover:bg-diabetic-${period}/90`
         }`}
       >
         {isTaken ? 'Done' : 'Mark as Taken'}

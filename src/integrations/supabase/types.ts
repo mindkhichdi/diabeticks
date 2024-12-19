@@ -9,7 +9,94 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      blood_sugar_readings: {
+        Row: {
+          created_at: string
+          date: string
+          fasting: number | null
+          hba1c: number | null
+          id: string
+          post_prandial: number | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          fasting?: number | null
+          hba1c?: number | null
+          id?: string
+          post_prandial?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          fasting?: number | null
+          hba1c?: number | null
+          id?: string
+          post_prandial?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blood_sugar_readings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medicine_logs: {
+        Row: {
+          created_at: string
+          id: string
+          medicine_time: string
+          taken_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          medicine_time: string
+          taken_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          medicine_time?: string
+          taken_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medicine_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

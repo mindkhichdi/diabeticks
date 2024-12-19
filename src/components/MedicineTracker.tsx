@@ -20,12 +20,6 @@ const MedicineTracker = () => {
   const queryClient = useQueryClient();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  
-  const isFutureDate = (date: Date) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return date > today;
-  };
 
   const { data: medicineLogs = [] } = useQuery<MedicineLog[]>({
     queryKey: ['medicine-logs', selectedDate.toISOString().split('T')[0]],
@@ -96,10 +90,6 @@ const MedicineTracker = () => {
   });
 
   const handleMedicineTaken = (slotId: string) => {
-    if (isFutureDate(selectedDate)) {
-      toast.error("Cannot mark medicine as taken for future dates");
-      return;
-    }
     logMedicine.mutate(slotId);
     toast.success(`${slotId.charAt(0).toUpperCase() + slotId.slice(1)} medicine marked as taken!`);
   };
@@ -154,7 +144,6 @@ const MedicineTracker = () => {
               mode="single"
               selected={selectedDate}
               onSelect={(date) => setSelectedDate(date || new Date())}
-              disabled={(date) => isFutureDate(date)}
               className="rounded-md border"
             />
           )}
@@ -171,7 +160,7 @@ const MedicineTracker = () => {
             isTaken={isTaken(slot.id)}
             onMedicineTaken={() => handleMedicineTaken(slot.id)}
             colorClass={`text-diabetic-${slot.id}`}
-            disabled={isFutureDate(selectedDate)}
+            disabled={false}
           />
         ))}
       </div>

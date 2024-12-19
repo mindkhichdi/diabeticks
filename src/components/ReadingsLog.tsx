@@ -137,8 +137,6 @@ const ReadingsLog = () => {
     <Card className="p-6">
       <h2 className="text-2xl font-semibold mb-6">Blood Sugar Readings</h2>
       
-      <BloodSugarTrendChart readings={readings} />
-      
       <form onSubmit={handleSubmit} className="grid gap-4 mb-6">
         <div className="grid md:grid-cols-2 gap-4">
           <Input
@@ -170,7 +168,7 @@ const ReadingsLog = () => {
         <Button type="submit" className="bg-primary">Add Reading</Button>
       </form>
 
-      <div className="space-y-4">
+      <div className="space-y-4 mb-6">
         {readings.map((reading) => (
           <Card key={reading.id} className="p-4 bg-primary-light">
             <div className="flex justify-between items-start">
@@ -192,6 +190,8 @@ const ReadingsLog = () => {
           </Card>
         ))}
       </div>
+
+      <BloodSugarTrendChart readings={readings} />
 
       <AlertDialog open={!!readingToDelete} onOpenChange={() => setReadingToDelete(null)}>
         <AlertDialogContent>

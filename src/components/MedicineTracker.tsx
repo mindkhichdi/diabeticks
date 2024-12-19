@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import MedicineTimeSlot from './medicine/MedicineTimeSlot';
-import { TimeSlot } from '@/types/medicine';
+import { TimeSlot, MedicineLog } from '@/types/medicine';
 
 const timeSlots: TimeSlot[] = [
   { id: 'morning', icon: <Sun className="w-6 h-6" />, label: 'Morning', time: '08:00' },
@@ -16,20 +16,27 @@ const MedicineTracker = () => {
   const queryClient = useQueryClient();
   const today = new Date().toISOString().split('T')[0];
 
-  const { data: medicineLogs } = useQuery({
+  const { data: medicineLogs = [] } = useQuery<MedicineLog[]>({
     queryKey: ['medicine-logs', today],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
+      console.log('Fetching medicine logs for today:', today);
+      
       const { data, error } = await supabase
         .from('medicine_logs')
         .select('*')
         .eq('taken_at::date', today)
         .eq('user_id', user.id);
       
-      if (error) throw error;
-      return data;
+      if (error) {
+        console.error('Error fetching medicine logs:', error);
+        throw error;
+      }
+
+      console.log('Fetched medicine logs:', data);
+      return data || [];
     },
   });
 
@@ -62,7 +69,11 @@ const MedicineTracker = () => {
   };
 
   const isTaken = (slotId: string) => {
-    return medicineLogs?.some(log => log.medicine_time === slotId) ?? false;
+    if (!Array.isArray(medicineLogs)) {
+      console.warn('medicineLogs is not an array:', medicineLogs);
+      return false;
+    }
+    return medicineLogs.some(log => log.medicine_time === slotId);
   };
 
   return (

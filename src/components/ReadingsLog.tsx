@@ -23,9 +23,13 @@ const ReadingsLog = () => {
   const { data: readings = [] } = useQuery({
     queryKey: ['blood-sugar-readings'],
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
+
       const { data, error } = await supabase
         .from('blood_sugar_readings')
         .select('*')
+        .eq('user_id', user.id)
         .order('date', { ascending: false });
       
       if (error) throw error;
@@ -36,6 +40,9 @@ const ReadingsLog = () => {
   // Create mutation for adding readings
   const addReading = useMutation({
     mutationFn: async (reading: Reading) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
+
       const { error } = await supabase
         .from('blood_sugar_readings')
         .insert([{
@@ -43,6 +50,7 @@ const ReadingsLog = () => {
           hba1c: reading.hba1c ? parseFloat(reading.hba1c) : null,
           fasting: reading.fasting ? parseInt(reading.fasting) : null,
           post_prandial: reading.post_prandial ? parseInt(reading.post_prandial) : null,
+          user_id: user.id
         }]);
       
       if (error) throw error;

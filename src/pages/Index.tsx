@@ -53,17 +53,9 @@ const Index = () => {
             <MedicineTracker />
           </section>
 
-          <section className="grid md:grid-cols-2 gap-6">
-            <div>
-              <h2 className="text-2xl font-semibold mb-4">Medicine Calendar</h2>
-              <MedicineCalendar />
-            </div>
-            <div className="flex items-start">
-              <div className="w-full bg-white rounded-lg shadow-sm p-4">
-                <h3 className="text-lg font-semibold mb-4">Medicine History</h3>
-                {/* The table will be rendered here by MedicineCalendar component */}
-              </div>
-            </div>
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">Medicine Calendar</h2>
+            <MedicineCalendar />
           </section>
         </TabsContent>
         

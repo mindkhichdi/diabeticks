@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Sun, Sunset, Moon } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import MedicineTimeSlot from './medicine/MedicineTimeSlot';
 import { TimeSlot, MedicineLog } from '@/types/medicine';
+import { Calendar } from "@/components/ui/calendar";
+import { Card } from "@/components/ui/card";
 
 const timeSlots: TimeSlot[] = [
   { id: 'morning', icon: <Sun className="w-6 h-6" />, label: 'Morning', time: '08:00' },
@@ -14,23 +16,36 @@ const timeSlots: TimeSlot[] = [
 
 const MedicineTracker = () => {
   const queryClient = useQueryClient();
-  const today = new Date().toISOString().split('T')[0];
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  
+  const isFutureDate = (date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date > today;
+  };
 
   const { data: medicineLogs = [] } = useQuery<MedicineLog[]>({
-    queryKey: ['medicine-logs', today],
+    queryKey: ['medicine-logs', selectedDate.toISOString().split('T')[0]],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
-      console.log('Current user ID:', user.id);
-      console.log('Fetching medicine logs for today:', today);
+      const startOfDay = new Date(selectedDate);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(selectedDate);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      console.log('Fetching medicine logs for date:', {
+        start: startOfDay.toISOString(),
+        end: endOfDay.toISOString()
+      });
       
       const { data, error } = await supabase
         .from('medicine_logs')
         .select('*')
         .eq('user_id', user.id)
-        .gte('taken_at', `${today}T00:00:00`)
-        .lte('taken_at', `${today}T23:59:59`);
+        .gte('taken_at', startOfDay.toISOString())
+        .lte('taken_at', endOfDay.toISOString());
       
       if (error) {
         console.error('Error fetching medicine logs:', error);
@@ -48,7 +63,7 @@ const MedicineTracker = () => {
       if (!user) throw new Error('No user found');
 
       console.log('Logging medicine for user:', user.id);
-      const now = new Date().toISOString();
+      const now = selectedDate.toISOString();
       
       const { error, data } = await supabase
         .from('medicine_logs')
@@ -78,6 +93,10 @@ const MedicineTracker = () => {
   });
 
   const handleMedicineTaken = (slotId: string) => {
+    if (isFutureDate(selectedDate)) {
+      toast.error("Cannot mark medicine as taken for future dates");
+      return;
+    }
     logMedicine.mutate(slotId);
     toast.success(`${slotId.charAt(0).toUpperCase() + slotId.slice(1)} medicine marked as taken!`);
   };
@@ -90,12 +109,13 @@ const MedicineTracker = () => {
     
     const taken = medicineLogs.some(log => {
       const logDate = new Date(log.taken_at).toISOString().split('T')[0];
-      const result = log.medicine_time === slotId && logDate === today;
+      const selectedDateStr = selectedDate.toISOString().split('T')[0];
+      const result = log.medicine_time === slotId && logDate === selectedDateStr;
       console.log(`Checking log:`, {
         slotId,
         logMedicineTime: log.medicine_time,
         logDate,
-        today,
+        selectedDateStr,
         isMatch: result
       });
       return result;
@@ -106,18 +126,31 @@ const MedicineTracker = () => {
   };
 
   return (
-    <div className="grid gap-4 md:grid-cols-3 bg-white p-4 rounded-lg shadow-sm">
-      {timeSlots.map((slot) => (
-        <MedicineTimeSlot
-          key={slot.id}
-          icon={slot.icon}
-          time={slot.time}
-          label={slot.label}
-          isTaken={isTaken(slot.id)}
-          onMedicineTaken={() => handleMedicineTaken(slot.id)}
-          colorClass={`text-diabetic-${slot.id}`}
+    <div className="space-y-4">
+      <Card className="p-4">
+        <Calendar
+          mode="single"
+          selected={selectedDate}
+          onSelect={(date) => setSelectedDate(date || new Date())}
+          disabled={(date) => isFutureDate(date)}
+          className="mb-4"
         />
-      ))}
+      </Card>
+
+      <div className="grid gap-4 md:grid-cols-3 bg-white p-4 rounded-lg shadow-sm">
+        {timeSlots.map((slot) => (
+          <MedicineTimeSlot
+            key={slot.id}
+            icon={slot.icon}
+            time={slot.time}
+            label={slot.label}
+            isTaken={isTaken(slot.id)}
+            onMedicineTaken={() => handleMedicineTaken(slot.id)}
+            colorClass={`text-diabetic-${slot.id}`}
+            disabled={isFutureDate(selectedDate)}
+          />
+        ))}
+      </div>
     </div>
   );
 };

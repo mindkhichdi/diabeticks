@@ -10,6 +10,7 @@ interface MedicineTimeSlotProps {
   isTaken: boolean;
   onMedicineTaken: () => void;
   colorClass: string;
+  disabled?: boolean;
 }
 
 const MedicineTimeSlot = ({
@@ -18,7 +19,8 @@ const MedicineTimeSlot = ({
   label,
   isTaken,
   onMedicineTaken,
-  colorClass
+  colorClass,
+  disabled
 }: MedicineTimeSlotProps) => {
   return (
     <Card className="p-6 border-2 hover:border-primary transition-all duration-200 animate-slideIn">
@@ -30,11 +32,13 @@ const MedicineTimeSlot = ({
       <h3 className="text-lg font-semibold mb-4">{label} Medicine</h3>
       <Button
         onClick={onMedicineTaken}
-        disabled={isTaken}
+        disabled={isTaken || disabled}
         variant={isTaken ? "success" : "default"}
         className={`w-full ${
           isTaken 
             ? 'bg-green-500 hover:bg-green-600 cursor-not-allowed' 
+            : disabled
+            ? 'bg-gray-300 cursor-not-allowed'
             : 'bg-primary hover:bg-primary/90'
         }`}
       >

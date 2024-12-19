@@ -5,8 +5,20 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Trash2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Reading {
+  id?: string;
   date: string;
   hba1c?: string;
   fasting?: string;
@@ -18,6 +30,7 @@ const ReadingsLog = () => {
   const [newReading, setNewReading] = useState<Reading>({
     date: new Date().toISOString().split('T')[0],
   });
+  const [readingToDelete, setReadingToDelete] = useState<Reading | null>(null);
 
   // Fetch readings
   const { data: readings = [] } = useQuery({
@@ -68,9 +81,40 @@ const ReadingsLog = () => {
     },
   });
 
+  // Delete mutation
+  const deleteReading = useMutation({
+    mutationFn: async (readingId: string) => {
+      const { error } = await supabase
+        .from('blood_sugar_readings')
+        .delete()
+        .eq('id', readingId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blood-sugar-readings'] });
+      toast.success('Reading deleted successfully!');
+      setReadingToDelete(null);
+    },
+    onError: (error) => {
+      console.error('Error deleting reading:', error);
+      toast.error('Failed to delete reading. Please try again.');
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     addReading.mutate(newReading);
+  };
+
+  const handleDelete = (reading: Reading) => {
+    setReadingToDelete(reading);
+  };
+
+  const confirmDelete = () => {
+    if (readingToDelete?.id) {
+      deleteReading.mutate(readingToDelete.id);
+    }
   };
 
   return (
@@ -111,15 +155,42 @@ const ReadingsLog = () => {
       <div className="space-y-4">
         {readings.map((reading) => (
           <Card key={reading.id} className="p-4 bg-primary-light">
-            <div className="grid md:grid-cols-4 gap-4">
-              <p className="font-semibold">{new Date(reading.date).toLocaleDateString()}</p>
-              {reading.hba1c && <p>HbA1c: {reading.hba1c}%</p>}
-              {reading.fasting && <p>Fasting: {reading.fasting} mg/dL</p>}
-              {reading.post_prandial && <p>Post-prandial: {reading.post_prandial} mg/dL</p>}
+            <div className="flex justify-between items-start">
+              <div className="grid md:grid-cols-4 gap-4">
+                <p className="font-semibold">{new Date(reading.date).toLocaleDateString()}</p>
+                {reading.hba1c && <p>HbA1c: {reading.hba1c}%</p>}
+                {reading.fasting && <p>Fasting: {reading.fasting} mg/dL</p>}
+                {reading.post_prandial && <p>Post-prandial: {reading.post_prandial} mg/dL</p>}
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-destructive hover:text-destructive/90"
+                onClick={() => handleDelete(reading)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
           </Card>
         ))}
       </div>
+
+      <AlertDialog open={!!readingToDelete} onOpenChange={() => setReadingToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Reading</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this reading? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 };

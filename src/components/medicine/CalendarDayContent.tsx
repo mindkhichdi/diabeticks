@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, CircleX } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { MedicineStatus } from '@/types/medicine';
 
 interface CalendarDayContentProps {
@@ -28,22 +28,16 @@ const CalendarDayContent = ({ date, selectedDate, medicineStatus }: CalendarDayC
   return (
     <div>
       <div>{date.getDate()}</div>
-      <div className={`mt-1 border-b-2 ${allTaken ? 'border-green-500' : 'border-red-500'}`}>
+      <div className={`mt-1 border-b-2 ${allTaken ? 'border-green-500' : 'border-gray-300'}`}>
         <div className="flex justify-center gap-1">
-          {medicineStatus.morning ? (
+          {medicineStatus.morning && (
             <Check className="h-3 w-3 text-diabetic-morning" />
-          ) : (
-            <CircleX className="h-3 w-3 text-red-500" />
           )}
-          {medicineStatus.afternoon ? (
+          {medicineStatus.afternoon && (
             <Check className="h-3 w-3 text-diabetic-afternoon" />
-          ) : (
-            <CircleX className="h-3 w-3 text-red-500" />
           )}
-          {medicineStatus.night ? (
+          {medicineStatus.night && (
             <Check className="h-3 w-3 text-diabetic-night" />
-          ) : (
-            <CircleX className="h-3 w-3 text-red-500" />
           )}
         </div>
       </div>

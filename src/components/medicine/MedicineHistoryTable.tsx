@@ -16,7 +16,18 @@ interface MedicineHistoryTableProps {
 }
 
 const MedicineHistoryTable = ({ logs, selectedDate }: MedicineHistoryTableProps) => {
-  if (!logs?.length) return null;
+  console.log('Rendering MedicineHistoryTable with logs:', logs);
+  
+  if (!logs?.length) {
+    return (
+      <div className="mt-6">
+        <h4 className="font-semibold mb-4">
+          Medicine Status for {selectedDate.toLocaleDateString()}
+        </h4>
+        <p className="text-gray-500">No medicine logs for this date.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-6">
@@ -26,16 +37,16 @@ const MedicineHistoryTable = ({ logs, selectedDate }: MedicineHistoryTableProps)
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Date</TableHead>
-            <TableHead>Time</TableHead>
+            <TableHead>Time Slot</TableHead>
+            <TableHead>Taken At</TableHead>
             <TableHead>Status</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {logs.map((log, index) => (
             <TableRow key={index}>
-              <TableCell>
-                {new Date(log.taken_at).toLocaleDateString()}
+              <TableCell className="capitalize">
+                {log.medicine_time}
               </TableCell>
               <TableCell>
                 {new Date(log.taken_at).toLocaleTimeString()}

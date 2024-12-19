@@ -51,7 +51,7 @@ const MedicineHistoryTable = ({ logs, selectedDate }: MedicineHistoryTableProps)
                   {log.medicine_time}
                 </TableCell>
                 <TableCell>
-                  {takenAtDate.toLocaleTimeString()}
+                  {log.taken_at}
                 </TableCell>
                 <TableCell>
                   <Check className="h-4 w-4 text-green-500" />

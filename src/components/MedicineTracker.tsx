@@ -1,22 +1,14 @@
 import React, { useState } from 'react';
-import { Sun, Sunset, Moon, ChevronDown, ChevronUp, Check } from 'lucide-react';
+import { Sun, Sunset, Moon, ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import MedicineTimeSlot from './medicine/MedicineTimeSlot';
+import MedicineHistoryTable from './medicine/MedicineHistoryTable';
 import { TimeSlot, MedicineLog } from '@/types/medicine';
 import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { format } from 'date-fns';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 
 const timeSlots: TimeSlot[] = [
   { id: 'morning', icon: <Sun className="w-6 h-6" />, label: 'Morning', time: '08:00' },
@@ -185,38 +177,7 @@ const MedicineTracker = () => {
       </div>
 
       <Card className="p-4">
-        <h3 className="text-lg font-semibold mb-4">Medicine History</h3>
-        {Array.isArray(medicineLogs) && medicineLogs.length > 0 ? (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Time Slot</TableHead>
-                <TableHead>Taken At</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {medicineLogs.map((log, index) => {
-                const takenAtDate = new Date(log.taken_at);
-                return (
-                  <TableRow key={index}>
-                    <TableCell className="capitalize">
-                      {log.medicine_time}
-                    </TableCell>
-                    <TableCell>
-                      {format(takenAtDate, 'h:mm a')}
-                    </TableCell>
-                    <TableCell>
-                      <Check className="h-4 w-4 text-green-500" />
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        ) : (
-          <p className="text-gray-500">No medicine logs for this date.</p>
-        )}
+        <MedicineHistoryTable logs={medicineLogs} selectedDate={selectedDate} />
       </Card>
     </div>
   );

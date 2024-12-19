@@ -87,9 +87,13 @@ const MedicineTracker = () => {
           <Button
             onClick={() => handleMedicineTaken(slot.id)}
             disabled={isTaken(slot.id)}
-            className={`w-full ${isTaken(slot.id) ? 'bg-green-500' : `bg-diabetic-${slot.id}`}`}
+            className={`w-full ${
+              isTaken(slot.id) 
+                ? 'bg-green-500 hover:bg-green-600' 
+                : 'bg-red-500 hover:bg-red-600'
+            }`}
           >
-            {isTaken(slot.id) ? 'Taken ✓' : 'Mark as Taken'}
+            {isTaken(slot.id) ? 'Taken' : 'Mark as Taken'}
           </Button>
         </Card>
       ))}

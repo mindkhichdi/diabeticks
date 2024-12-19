@@ -57,8 +57,8 @@ const MedicineCalendar = () => {
   });
 
   const renderDayContent = (day: Date) => {
-    if (day.toDateString() !== selectedDate?.toDateString()) return null;
-    if (!medicineData) return null;
+    if (!selectedDate || day.toDateString() !== selectedDate?.toDateString()) return null;
+    if (!medicineData?.status) return null;
 
     const allTaken = medicineData.status.morning && 
                     medicineData.status.afternoon && 

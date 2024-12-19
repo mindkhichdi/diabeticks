@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Calendar } from "@/components/ui/calendar";
 import { Check, CircleX } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from '@tanstack/react-query';
 
 interface MedicineStatus {
   morning: boolean;
@@ -9,41 +11,60 @@ interface MedicineStatus {
   night: boolean;
 }
 
-// In a real app, this would come from a database
-const mockMedicineData: Record<string, MedicineStatus> = {
-  [new Date().toISOString().split('T')[0]]: {
-    morning: true,
-    afternoon: false,
-    night: false,
-  },
-  [new Date(Date.now() - 86400000).toISOString().split('T')[0]]: {
-    morning: true,
-    afternoon: true,
-    night: true,
-  },
-};
-
 const MedicineCalendar = () => {
-  const renderDayContent = (day: Date) => {
-    const dateKey = day.toISOString().split('T')[0];
-    const dayData = mockMedicineData[dateKey];
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
-    if (!dayData) return null;
+  const { data: medicineData } = useQuery({
+    queryKey: ['medicine-logs', selectedDate?.toISOString().split('T')[0]],
+    queryFn: async () => {
+      if (!selectedDate) return null;
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
+
+      const dateStr = selectedDate.toISOString().split('T')[0];
+      const { data, error } = await supabase
+        .from('medicine_logs')
+        .select('*')
+        .eq('taken_at::date', dateStr)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      const status: MedicineStatus = {
+        morning: false,
+        afternoon: false,
+        night: false
+      };
+
+      data?.forEach(log => {
+        if (log.medicine_time in status) {
+          status[log.medicine_time as keyof MedicineStatus] = true;
+        }
+      });
+
+      return status;
+    },
+  });
+
+  const renderDayContent = (day: Date) => {
+    if (day.toDateString() !== selectedDate?.toDateString()) return null;
+    if (!medicineData) return null;
 
     return (
       <div className="flex flex-col gap-1 mt-1">
         <div className="flex justify-center gap-1">
-          {dayData.morning ? (
+          {medicineData.morning ? (
             <Check className="h-3 w-3 text-diabetic-morning" />
           ) : (
             <CircleX className="h-3 w-3 text-red-500" />
           )}
-          {dayData.afternoon ? (
+          {medicineData.afternoon ? (
             <Check className="h-3 w-3 text-diabetic-afternoon" />
           ) : (
             <CircleX className="h-3 w-3 text-red-500" />
           )}
-          {dayData.night ? (
+          {medicineData.night ? (
             <Check className="h-3 w-3 text-diabetic-night" />
           ) : (
             <CircleX className="h-3 w-3 text-red-500" />
@@ -59,17 +80,8 @@ const MedicineCalendar = () => {
       <div className="flex justify-center">
         <Calendar
           mode="single"
-          modifiers={{
-            hasMedicine: (date) => {
-              const dateKey = date.toISOString().split('T')[0];
-              return !!mockMedicineData[dateKey];
-            },
-          }}
-          modifiersStyles={{
-            hasMedicine: {
-              fontWeight: 'bold',
-            },
-          }}
+          selected={selectedDate}
+          onSelect={setSelectedDate}
           components={{
             DayContent: ({ date }) => (
               <div>
@@ -94,6 +106,40 @@ const MedicineCalendar = () => {
           <span>Night</span>
         </div>
       </div>
+
+      {selectedDate && medicineData && (
+        <div className="mt-6 p-4 bg-primary-light rounded-lg">
+          <h4 className="font-semibold mb-2">
+            Medicine Status for {selectedDate.toLocaleDateString()}
+          </h4>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span>Morning:</span>
+              {medicineData.morning ? (
+                <Check className="h-4 w-4 text-green-500" />
+              ) : (
+                <CircleX className="h-4 w-4 text-red-500" />
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <span>Afternoon:</span>
+              {medicineData.afternoon ? (
+                <Check className="h-4 w-4 text-green-500" />
+              ) : (
+                <CircleX className="h-4 w-4 text-red-500" />
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <span>Night:</span>
+              {medicineData.night ? (
+                <Check className="h-4 w-4 text-green-500" />
+              ) : (
+                <CircleX className="h-4 w-4 text-red-500" />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </Card>
   );
 };

@@ -89,8 +89,8 @@ const MedicineTracker = () => {
             disabled={isTaken(slot.id)}
             className={`w-full ${
               isTaken(slot.id) 
-                ? 'bg-green-500 hover:bg-green-600' 
-                : 'bg-red-500 hover:bg-red-600'
+                ? 'bg-green-500 hover:bg-green-600 border-0' 
+                : 'bg-red-500 hover:bg-red-600 border-0'
             }`}
           >
             {isTaken(slot.id) ? 'Taken' : 'Mark as Taken'}

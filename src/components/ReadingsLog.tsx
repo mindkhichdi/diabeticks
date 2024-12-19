@@ -35,9 +35,10 @@ const ReadingsLog = () => {
   const [readingToDelete, setReadingToDelete] = useState<Reading | null>(null);
 
   // Fetch readings
-  const { data: readings = [] } = useQuery({
+  const { data: readings = [], refetch } = useQuery({
     queryKey: ['blood-sugar-readings'],
     queryFn: async () => {
+      console.log('Fetching readings...');
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
@@ -47,7 +48,11 @@ const ReadingsLog = () => {
         .eq('user_id', user.id)
         .order('date', { ascending: false });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching readings:', error);
+        throw error;
+      }
+      console.log('Fetched readings:', data);
       return data;
     },
   });
@@ -86,15 +91,21 @@ const ReadingsLog = () => {
   // Delete mutation
   const deleteReading = useMutation({
     mutationFn: async (readingId: string) => {
+      console.log('Deleting reading with ID:', readingId);
       const { error } = await supabase
         .from('blood_sugar_readings')
         .delete()
         .eq('id', readingId);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error deleting reading:', error);
+        throw error;
+      }
+      console.log('Reading deleted successfully');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['blood-sugar-readings'] });
+      refetch(); // Explicitly refetch the data
       toast.success('Reading deleted successfully!');
       setReadingToDelete(null);
     },
@@ -110,11 +121,13 @@ const ReadingsLog = () => {
   };
 
   const handleDelete = (reading: Reading) => {
+    console.log('Setting reading to delete:', reading);
     setReadingToDelete(reading);
   };
 
   const confirmDelete = () => {
     if (readingToDelete?.id) {
+      console.log('Confirming deletion of reading:', readingToDelete);
       deleteReading.mutate(readingToDelete.id);
     }
   };

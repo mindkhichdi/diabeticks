@@ -43,19 +43,22 @@ const MedicineHistoryTable = ({ logs, selectedDate }: MedicineHistoryTableProps)
           </TableRow>
         </TableHeader>
         <TableBody>
-          {logs.map((log, index) => (
-            <TableRow key={index}>
-              <TableCell className="capitalize">
-                {log.medicine_time}
-              </TableCell>
-              <TableCell>
-                {new Date(log.taken_at).toLocaleTimeString()}
-              </TableCell>
-              <TableCell>
-                <Check className="h-4 w-4 text-green-500" />
-              </TableCell>
-            </TableRow>
-          ))}
+          {logs.map((log, index) => {
+            const takenAtDate = new Date(log.taken_at);
+            return (
+              <TableRow key={index}>
+                <TableCell className="capitalize">
+                  {log.medicine_time}
+                </TableCell>
+                <TableCell>
+                  {takenAtDate.toLocaleTimeString()}
+                </TableCell>
+                <TableCell>
+                  <Check className="h-4 w-4 text-green-500" />
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>

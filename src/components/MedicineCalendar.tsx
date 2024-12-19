@@ -19,15 +19,22 @@ const MedicineCalendar = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
-      const dateStr = selectedDate.toISOString().split('T')[0];
-      console.log('Fetching medicine logs for date:', dateStr);
+      const startOfDay = new Date(selectedDate);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(selectedDate);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      console.log('Fetching medicine logs for date range:', {
+        start: startOfDay.toISOString(),
+        end: endOfDay.toISOString()
+      });
       
       const { data, error } = await supabase
         .from('medicine_logs')
         .select('*')
         .eq('user_id', user.id)
-        .gte('taken_at', `${dateStr}T00:00:00`)
-        .lte('taken_at', `${dateStr}T23:59:59`);
+        .gte('taken_at', startOfDay.toISOString())
+        .lte('taken_at', endOfDay.toISOString());
 
       if (error) {
         console.error('Error fetching medicine logs:', error);
@@ -42,7 +49,12 @@ const MedicineCalendar = () => {
         night: false
       };
 
-      data?.forEach(log => {
+      const processedLogs = data?.map(log => ({
+        ...log,
+        taken_at: new Date(log.taken_at).toISOString()
+      }));
+
+      processedLogs?.forEach(log => {
         if (log.medicine_time in status) {
           status[log.medicine_time as keyof MedicineStatus] = true;
         }
@@ -50,7 +62,7 @@ const MedicineCalendar = () => {
 
       return {
         status,
-        logs: data as MedicineLog[]
+        logs: processedLogs as MedicineLog[]
       };
     },
     enabled: !!selectedDate,

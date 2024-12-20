@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sun, Sunset, Moon, ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import confetti from 'canvas-confetti';
 import MedicineTimeSlot from './medicine/MedicineTimeSlot';
 import MedicineHistoryTable from './medicine/MedicineHistoryTable';
 import { TimeSlot, MedicineLog } from '@/types/medicine';
@@ -15,6 +16,49 @@ const timeSlots: TimeSlot[] = [
   { id: 'afternoon', icon: <Sunset className="w-6 h-6" />, label: 'Afternoon', time: '14:00' },
   { id: 'night', icon: <Moon className="w-6 h-6" />, label: 'Night', time: '20:00' },
 ];
+
+const triggerConfetti = () => {
+  const count = 200;
+  const defaults = {
+    origin: { y: 0.7 },
+    zIndex: 999,
+  };
+
+  function fire(particleRatio: number, opts: confetti.Options) {
+    confetti({
+      ...defaults,
+      ...opts,
+      particleCount: Math.floor(count * particleRatio),
+    });
+  }
+
+  fire(0.25, {
+    spread: 26,
+    startVelocity: 55,
+  });
+
+  fire(0.2, {
+    spread: 60,
+  });
+
+  fire(0.35, {
+    spread: 100,
+    decay: 0.91,
+    scalar: 0.8,
+  });
+
+  fire(0.1, {
+    spread: 120,
+    startVelocity: 25,
+    decay: 0.92,
+    scalar: 1.2,
+  });
+
+  fire(0.1, {
+    spread: 120,
+    startVelocity: 45,
+  });
+};
 
 const MedicineTracker = () => {
   const queryClient = useQueryClient();
@@ -104,19 +148,22 @@ const MedicineTracker = () => {
       const logDate = new Date(log.taken_at).toISOString().split('T')[0];
       const selectedDateStr = selectedDate.toISOString().split('T')[0];
       const result = log.medicine_time === slotId && logDate === selectedDateStr;
-      console.log(`Checking log:`, {
-        slotId,
-        logMedicineTime: log.medicine_time,
-        logDate,
-        selectedDateStr,
-        isMatch: result
-      });
       return result;
     });
 
     console.log(`Medicine status for ${slotId}:`, taken);
     return taken;
   };
+
+  // Check if all medicines are taken and trigger confetti
+  useEffect(() => {
+    const allTaken = timeSlots.every(slot => isTaken(slot.id));
+    if (allTaken) {
+      console.log('All medicines taken for the day! Triggering confetti...');
+      triggerConfetti();
+      toast.success('Congratulations! You've taken all your medicines for the day! 🎉');
+    }
+  }, [medicineLogs]);
 
   return (
     <div className="space-y-4">

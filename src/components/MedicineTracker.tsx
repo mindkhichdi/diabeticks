@@ -161,7 +161,7 @@ const MedicineTracker = () => {
     if (allTaken) {
       console.log('All medicines taken for the day! Triggering confetti...');
       triggerConfetti();
-      toast.success('Congratulations! You've taken all your medicines for the day! 🎉');
+      toast.success('Congratulations! You\'ve taken all your medicines for the day! 🎉');
     }
   }, [medicineLogs]);
 

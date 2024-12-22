@@ -71,6 +71,14 @@ const MedicinePreferencesDialog = ({ slotId, defaultName, defaultTime }: Props) 
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
+      // First, try to get the existing preference
+      const { data: existingPreference } = await supabase
+        .from('medicine_preferences')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('slot_id', slotId)
+        .maybeSingle();
+
       // Prepare the data object
       const preferenceData = {
         user_id: user.id,
@@ -81,19 +89,31 @@ const MedicinePreferencesDialog = ({ slotId, defaultName, defaultTime }: Props) 
 
       console.log('Upserting preference data:', preferenceData);
 
-      const { data, error } = await supabase
-        .from('medicine_preferences')
-        .upsert(preferenceData)
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error saving preferences:', error);
-        throw error;
+      let result;
+      if (existingPreference) {
+        // If preference exists, update it
+        result = await supabase
+          .from('medicine_preferences')
+          .update(preferenceData)
+          .eq('id', existingPreference.id)
+          .select()
+          .single();
+      } else {
+        // If no preference exists, insert new one
+        result = await supabase
+          .from('medicine_preferences')
+          .insert(preferenceData)
+          .select()
+          .single();
       }
 
-      console.log('Successfully saved preference:', data);
-      return data;
+      if (result.error) {
+        console.error('Error saving preferences:', result.error);
+        throw result.error;
+      }
+
+      console.log('Successfully saved preference:', result.data);
+      return result.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['medicine-preferences'] });

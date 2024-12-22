@@ -34,7 +34,8 @@ const MedicineCalendar = () => {
         .select('*')
         .eq('user_id', user.id)
         .gte('taken_at', startOfDay.toISOString())
-        .lte('taken_at', endOfDay.toISOString());
+        .lte('taken_at', endOfDay.toISOString())
+        .maybeSingle(); // Changed from .single() to handle no logs case
 
       if (error) {
         console.error('Error fetching medicine logs:', error);
@@ -49,10 +50,10 @@ const MedicineCalendar = () => {
         night: false
       };
 
-      const processedLogs = data?.map(log => ({
+      const processedLogs = data ? [data].map(log => ({
         ...log,
         taken_at: new Date(log.taken_at).toISOString()
-      }));
+      })) : [];
 
       processedLogs?.forEach(log => {
         if (log.medicine_time in status) {

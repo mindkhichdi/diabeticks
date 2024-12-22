@@ -1,11 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from 'react-router-dom';
-import { Activity, Pill, ChartLine, Bell, Shield, Heart } from 'lucide-react';
+import { Activity, Pill, ChartLine, Bell, Shield, Heart, LogIn, UserPlus } from 'lucide-react';
+import { supabase } from "@/integrations/supabase/client";
 
 const Landing = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        navigate('/dashboard');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   const features = [
     {
@@ -42,6 +53,32 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Navigation Bar */}
+      <nav className="border-b">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold text-primary">Diabeticks</h2>
+            <div className="flex gap-4">
+              <Button
+                variant="ghost"
+                className="flex items-center gap-2"
+                onClick={() => navigate('/auth')}
+              >
+                <LogIn className="w-4 h-4" />
+                Sign In
+              </Button>
+              <Button
+                className="flex items-center gap-2"
+                onClick={() => navigate('/auth')}
+              >
+                <UserPlus className="w-4 h-4" />
+                Sign Up
+              </Button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16 md:py-24">
         <div className="text-center mb-16">

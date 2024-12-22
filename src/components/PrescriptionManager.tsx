@@ -38,6 +38,13 @@ const PrescriptionManager = () => {
   // Upload mutation
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
+      // Get the current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError) throw userError;
+      if (!user) throw new Error('No user found');
+
+      console.log('Uploading prescription for user:', user.id);
+
       const timestamp = new Date().getTime();
       const fileExt = file.name.split('.').pop();
       const filePath = `${timestamp}_${crypto.randomUUID()}.${fileExt}`;
@@ -49,7 +56,7 @@ const PrescriptionManager = () => {
 
       if (uploadError) throw uploadError;
 
-      // Create prescription record
+      // Create prescription record with user_id
       const { error: dbError } = await supabase
         .from('prescriptions')
         .insert({
@@ -58,6 +65,7 @@ const PrescriptionManager = () => {
           medicine_name: null, // To be updated after parsing
           dosage: null,
           schedule: null,
+          user_id: user.id, // Add the user_id here
         });
 
       if (dbError) throw dbError;

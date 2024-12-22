@@ -35,19 +35,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
           return;
         }
 
-        // Refresh session if it exists
-        const { data: { session: refreshedSession }, error: refreshError } = 
-          await supabase.auth.refreshSession();
-        
-        console.log("Refreshing session:", { refreshedSession, refreshError });
-
-        if (refreshError) {
-          console.error("Session refresh error:", refreshError);
-          navigate("/auth");
-          return;
-        }
-
-        setSession(refreshedSession);
+        setSession(currentSession);
       } catch (error) {
         console.error("Error initializing session:", error);
         navigate("/auth");
@@ -62,25 +50,18 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", { event, session });
       
-      if (event === 'SIGNED_OUT') {
-        setSession(null);
-        navigate("/auth");
-        toast({
-          title: "Signed out",
-          description: "You have been signed out successfully",
-        });
-        return;
-      }
-
-      if (event === 'TOKEN_REFRESHED') {
-        console.log("Token refreshed:", session);
-        setSession(session);
-        return;
-      }
-
-      if (!session) {
-        navigate("/auth");
-        return;
+      if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+        if (!session) {
+          setSession(null);
+          navigate("/auth");
+          if (event === 'SIGNED_OUT') {
+            toast({
+              title: "Signed out",
+              description: "You have been signed out successfully",
+            });
+          }
+          return;
+        }
       }
 
       setSession(session);

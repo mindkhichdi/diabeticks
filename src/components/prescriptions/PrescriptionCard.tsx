@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/use-toast";
 
 interface PrescriptionCardProps {
   prescription: {
@@ -23,21 +24,48 @@ interface PrescriptionCardProps {
 const PrescriptionCard = ({ prescription, onDelete }: PrescriptionCardProps) => {
   const [viewerOpen, setViewerOpen] = React.useState(false);
   const [fileUrl, setFileUrl] = React.useState<string | null>(null);
+  const { toast } = useToast();
 
   const getFileUrl = async () => {
     try {
-      const { data } = await supabase.storage
-        .from('prescriptions')
-        .createSignedUrl(prescription.file_path, 3600); // URL valid for 1 hour
-
-      if (data?.signedUrl) {
-        setFileUrl(data.signedUrl);
-        return data.signedUrl;
+      console.log('Getting signed URL for file:', prescription.file_path);
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        console.error('No active session found');
+        toast({
+          variant: "destructive",
+          title: "Authentication Error",
+          description: "Please sign in again",
+        });
+        return null;
       }
+
+      const { data, error } = await supabase.storage
+        .from('prescriptions')
+        .createSignedUrl(prescription.file_path, 3600);
+
+      if (error) {
+        console.error('Error getting signed URL:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Could not access the file",
+        });
+        return null;
+      }
+
+      console.log('Successfully got signed URL:', data.signedUrl);
+      return data.signedUrl;
     } catch (error) {
-      console.error('Error getting file URL:', error);
+      console.error('Error in getFileUrl:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to access file",
+      });
+      return null;
     }
-    return null;
   };
 
   const handleView = async () => {

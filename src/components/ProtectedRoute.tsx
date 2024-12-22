@@ -12,39 +12,59 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     // Initialize session from local storage
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      console.log("Getting initial session:", { session, error });
-      if (error) {
-        console.error("Session error:", error);
-        toast({
-          variant: "destructive",
-          title: "Authentication Error",
-          description: "Please sign in again",
-        });
+    const initSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        console.log("Getting initial session:", { session, error });
+        
+        if (error) {
+          console.error("Session error:", error);
+          toast({
+            variant: "destructive",
+            title: "Authentication Error",
+            description: "Please sign in again",
+          });
+          navigate("/auth");
+          return;
+        }
+
+        if (!session) {
+          console.log("No session found, redirecting to auth");
+          navigate("/auth");
+          return;
+        }
+
+        setSession(session);
+      } catch (error) {
+        console.error("Error getting session:", error);
         navigate("/auth");
-        return;
+      } finally {
+        setLoading(false);
       }
-      setSession(session);
-      setLoading(false);
-      if (!session) {
-        navigate("/auth");
-      }
-    });
+    };
+
+    initSession();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", { event, session });
-      setSession(session);
       
       if (event === 'SIGNED_OUT') {
+        setSession(null);
         navigate("/");
         toast({
           title: "Signed out",
           description: "You have been signed out successfully",
         });
-      } else if (!session) {
-        navigate("/auth");
+        return;
       }
+
+      if (!session) {
+        navigate("/auth");
+        return;
+      }
+
+      setSession(session);
     });
 
     return () => {

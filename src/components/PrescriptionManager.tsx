@@ -128,20 +128,20 @@ const PrescriptionManager = () => {
   };
 
   if (isLoading) {
-    return <div>Loading prescriptions...</div>;
+    return <div className="text-center py-4">Loading prescriptions...</div>;
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold">Prescriptions</h2>
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-xl md:text-2xl font-semibold">Prescriptions</h2>
         <UploadButton
           onFileSelect={handleFileSelect}
           isUploading={uploadMutation.isPending}
         />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 md:gap-4">
         {prescriptions?.map((prescription) => (
           <PrescriptionCard
             key={prescription.id}
@@ -152,7 +152,7 @@ const PrescriptionManager = () => {
       </div>
 
       {prescriptions?.length === 0 && (
-        <div className="text-center py-8 text-muted-foreground">
+        <div className="text-center py-6 md:py-8 text-muted-foreground">
           No prescriptions uploaded yet
         </div>
       )}

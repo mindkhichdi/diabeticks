@@ -11,7 +11,7 @@ const UploadButton = ({ onFileSelect, isUploading }: UploadButtonProps) => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   return (
-    <div>
+    <div className="w-full sm:w-auto">
       <input
         type="file"
         ref={fileInputRef}
@@ -22,10 +22,11 @@ const UploadButton = ({ onFileSelect, isUploading }: UploadButtonProps) => {
       <Button
         onClick={() => fileInputRef.current?.click()}
         disabled={isUploading}
-        className="flex items-center gap-2"
+        className="w-full sm:w-auto flex items-center gap-2"
       >
         <Upload className="w-4 h-4" />
-        Upload Prescription
+        <span className="hidden sm:inline">Upload Prescription</span>
+        <span className="sm:hidden">Upload</span>
       </Button>
     </div>
   );

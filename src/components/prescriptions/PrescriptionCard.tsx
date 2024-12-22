@@ -90,38 +90,41 @@ const PrescriptionCard = ({ prescription, onDelete }: PrescriptionCardProps) => 
 
   return (
     <>
-      <Card className="p-4 space-y-4">
-        <div className="flex items-start justify-between">
+      <Card className="p-3 md:p-4 space-y-3 md:space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <FileText className="w-5 h-5 text-primary" />
-            <div>
-              <p className="text-sm text-muted-foreground">
+            <FileText className="w-4 h-4 md:w-5 md:h-5 text-primary flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-sm text-muted-foreground truncate">
                 {new Date(prescription.created_at).toLocaleDateString()}
               </p>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-1 md:gap-2 justify-end">
             <Button
               variant="ghost"
-              size="icon"
+              size="sm"
               onClick={handleView}
               title="View"
+              className="h-8 w-8 md:h-9 md:w-9"
             >
               <Eye className="w-4 h-4" />
             </Button>
             <Button
               variant="ghost"
-              size="icon"
+              size="sm"
               onClick={handleDownload}
               title="Download"
+              className="h-8 w-8 md:h-9 md:w-9"
             >
               <Download className="w-4 h-4" />
             </Button>
             <Button
               variant="ghost"
-              size="icon"
+              size="sm"
               onClick={() => onDelete(prescription)}
               title="Delete"
+              className="h-8 w-8 md:h-9 md:w-9"
             >
               <Trash2 className="w-4 h-4" />
             </Button>
@@ -130,7 +133,7 @@ const PrescriptionCard = ({ prescription, onDelete }: PrescriptionCardProps) => 
       </Card>
 
       <Dialog open={viewerOpen} onOpenChange={setViewerOpen}>
-        <DialogContent className="max-w-4xl h-[80vh]">
+        <DialogContent className="w-[95vw] max-w-4xl h-[80vh] md:h-[85vh]">
           <DialogHeader>
             <DialogTitle>Prescription View</DialogTitle>
           </DialogHeader>

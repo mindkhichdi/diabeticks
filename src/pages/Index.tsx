@@ -56,8 +56,8 @@ const Index = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 space-y-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="container mx-auto px-4 py-4 md:py-8 space-y-6 md:space-y-8">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4 md:mb-8">
         <Logo />
         <Button 
           variant="ghost" 
@@ -70,24 +70,27 @@ const Index = () => {
       </div>
       
       <Tabs defaultValue="medicine" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-8">
+        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 gap-2 mb-6 md:mb-8">
           <TabsTrigger value="medicine" className="space-x-2">
-            <Pill className="w-5 h-5" />
-            <span>Medicine Tracking</span>
+            <Pill className="w-4 h-4 md:w-5 md:h-5" />
+            <span className="hidden sm:inline">Medicine Tracking</span>
+            <span className="sm:hidden">Medicine</span>
           </TabsTrigger>
           <TabsTrigger value="readings" className="space-x-2">
-            <Activity className="w-5 h-5" />
-            <span>Blood Sugar Readings</span>
+            <Activity className="w-4 h-4 md:w-5 md:h-5" />
+            <span className="hidden sm:inline">Blood Sugar Readings</span>
+            <span className="sm:hidden">Readings</span>
           </TabsTrigger>
           <TabsTrigger value="prescriptions" className="space-x-2">
-            <FileText className="w-5 h-5" />
-            <span>Prescriptions</span>
+            <FileText className="w-4 h-4 md:w-5 md:h-5" />
+            <span className="hidden sm:inline">Prescriptions</span>
+            <span className="sm:hidden">Prescriptions</span>
           </TabsTrigger>
         </TabsList>
         
         <TabsContent value="medicine">
           <section>
-            <h2 className="text-2xl font-semibold mb-4">Daily Medicine Tracker</h2>
+            <h2 className="text-xl md:text-2xl font-semibold mb-4">Daily Medicine Tracker</h2>
             <MedicineTracker />
           </section>
         </TabsContent>

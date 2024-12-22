@@ -1,10 +1,9 @@
 import React from 'react';
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Upload, FileText, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import PrescriptionCard from './prescriptions/PrescriptionCard';
+import UploadButton from './prescriptions/UploadButton';
 
 interface Prescription {
   id: string;
@@ -16,7 +15,6 @@ interface Prescription {
 const PrescriptionManager = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   // Fetch prescriptions
   const { data: prescriptions, isLoading } = useQuery({
@@ -35,7 +33,6 @@ const PrescriptionManager = () => {
   // Upload mutation
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
-      // Get the current user
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
       if (!user) throw new Error('No user found');
@@ -46,14 +43,12 @@ const PrescriptionManager = () => {
       const fileExt = file.name.split('.').pop();
       const filePath = `${timestamp}_${crypto.randomUUID()}.${fileExt}`;
 
-      // Upload file to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('prescriptions')
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
-      // Create prescription record with user_id
       const { error: dbError } = await supabase
         .from('prescriptions')
         .insert({
@@ -86,14 +81,12 @@ const PrescriptionManager = () => {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (prescription: Prescription) => {
-      // Delete file from storage
       const { error: storageError } = await supabase.storage
         .from('prescriptions')
         .remove([prescription.file_path]);
 
       if (storageError) throw storageError;
 
-      // Delete record from database
       const { error: dbError } = await supabase
         .from('prescriptions')
         .delete()
@@ -132,11 +125,6 @@ const PrescriptionManager = () => {
     }
 
     uploadMutation.mutate(file);
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  };
-
-  const handleDelete = (prescription: Prescription) => {
-    deleteMutation.mutate(prescription);
   };
 
   if (isLoading) {
@@ -147,47 +135,19 @@ const PrescriptionManager = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Prescriptions</h2>
-        <div>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileSelect}
-            accept=".pdf,image/*"
-            className="hidden"
-          />
-          <Button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploadMutation.isPending}
-            className="flex items-center gap-2"
-          >
-            <Upload className="w-4 h-4" />
-            Upload Prescription
-          </Button>
-        </div>
+        <UploadButton
+          onFileSelect={handleFileSelect}
+          isUploading={uploadMutation.isPending}
+        />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {prescriptions?.map((prescription) => (
-          <Card key={prescription.id} className="p-4 space-y-4">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-primary" />
-                <div>
-                  <p className="text-sm text-muted-foreground">
-                    {new Date(prescription.created_at).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleDelete(prescription)}
-                disabled={deleteMutation.isPending}
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </div>
-          </Card>
+          <PrescriptionCard
+            key={prescription.id}
+            prescription={prescription}
+            onDelete={(p) => deleteMutation.mutate(p)}
+          />
         ))}
       </div>
 

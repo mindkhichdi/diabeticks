@@ -1,11 +1,16 @@
 import React, { useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import MedicineTracker from '@/components/MedicineTracker';
 import ReadingsLog from '@/components/ReadingsLog';
 import { toast } from 'sonner';
-import { Pill, Activity } from 'lucide-react';
+import { Activity, Pill, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
+  const navigate = useNavigate();
+
   useEffect(() => {
     // Request notification permission
     if ('Notification' in window) {
@@ -37,10 +42,29 @@ const Index = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      navigate('/');
+      toast.success('Signed out successfully');
+    } catch (error) {
+      console.error('Error signing out:', error);
+      toast.error('Error signing out');
+    }
+  };
+
   return (
     <div className="container mx-auto p-4 space-y-8">
-      <div className="flex items-center justify-center gap-4 mb-8">
+      <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold text-primary">Diabeticks</h1>
+        <Button 
+          variant="ghost" 
+          onClick={handleSignOut}
+          className="flex items-center gap-2"
+        >
+          <LogOut className="w-4 h-4" />
+          Sign Out
+        </Button>
       </div>
       
       <Tabs defaultValue="medicine" className="w-full">

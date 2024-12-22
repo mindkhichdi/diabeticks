@@ -114,6 +114,47 @@ export type Database = {
           },
         ]
       }
+      prescriptions: {
+        Row: {
+          created_at: string
+          dosage: string | null
+          file_path: string
+          file_type: string
+          id: string
+          medicine_name: string | null
+          schedule: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          dosage?: string | null
+          file_path: string
+          file_type: string
+          id?: string
+          medicine_name?: string | null
+          schedule?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          dosage?: string | null
+          file_path?: string
+          file_type?: string
+          id?: string
+          medicine_name?: string | null
+          schedule?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prescriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string

@@ -3,8 +3,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import MedicineTracker from '@/components/MedicineTracker';
 import ReadingsLog from '@/components/ReadingsLog';
+import PrescriptionManager from '@/components/PrescriptionManager';
 import { toast } from 'sonner';
-import { Activity, Pill, LogOut } from 'lucide-react';
+import { Activity, Pill, LogOut, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import Logo from '@/components/Logo';
@@ -69,7 +70,7 @@ const Index = () => {
       </div>
       
       <Tabs defaultValue="medicine" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-8">
+        <TabsList className="grid w-full grid-cols-3 mb-8">
           <TabsTrigger value="medicine" className="space-x-2">
             <Pill className="w-5 h-5" />
             <span>Medicine Tracking</span>
@@ -77,6 +78,10 @@ const Index = () => {
           <TabsTrigger value="readings" className="space-x-2">
             <Activity className="w-5 h-5" />
             <span>Blood Sugar Readings</span>
+          </TabsTrigger>
+          <TabsTrigger value="prescriptions" className="space-x-2">
+            <FileText className="w-5 h-5" />
+            <span>Prescriptions</span>
           </TabsTrigger>
         </TabsList>
         
@@ -89,6 +94,10 @@ const Index = () => {
         
         <TabsContent value="readings">
           <ReadingsLog />
+        </TabsContent>
+
+        <TabsContent value="prescriptions">
+          <PrescriptionManager />
         </TabsContent>
       </Tabs>
     </div>

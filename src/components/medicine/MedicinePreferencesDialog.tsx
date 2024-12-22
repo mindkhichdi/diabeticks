@@ -43,9 +43,9 @@ const MedicinePreferencesDialog = ({ slotId, defaultName, defaultTime }: Props) 
         .select('*')
         .eq('user_id', user.id)
         .eq('slot_id', slotId)
-        .single();
+        .maybeSingle(); // Changed from .single() to .maybeSingle()
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+      if (error) {
         console.error('Error fetching preferences:', error);
         throw error;
       }

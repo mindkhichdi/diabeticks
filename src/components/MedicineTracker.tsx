@@ -12,9 +12,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 const timeSlots: TimeSlot[] = [
-  { id: 'morning', icon: <Sun className="w-6 h-6" />, label: 'Morning', time: '08:00' },
-  { id: 'afternoon', icon: <Sunset className="w-6 h-6" />, label: 'Afternoon', time: '14:00' },
-  { id: 'night', icon: <Moon className="w-6 h-6" />, label: 'Night', time: '20:00' },
+  { id: 'morning', icon: <Sun className="w-6 h-6" />, label: 'Morning Medicine', time: '08:00' },
+  { id: 'afternoon', icon: <Sunset className="w-6 h-6" />, label: 'Afternoon Medicine', time: '14:00' },
+  { id: 'night', icon: <Moon className="w-6 h-6" />, label: 'Night Medicine', time: '20:00' },
 ];
 
 const triggerConfetti = () => {
@@ -220,6 +220,7 @@ const MedicineTracker = () => {
             onMedicineTaken={() => handleMedicineTaken(slot.id)}
             colorClass={`text-diabetic-${slot.id}`}
             disabled={false}
+            slotId={slot.id}
           />
         ))}
       </div>

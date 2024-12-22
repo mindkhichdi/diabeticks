@@ -1,7 +1,10 @@
 import React from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Clock } from 'lucide-react';
+import MedicinePreferencesDialog from './MedicinePreferencesDialog';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from "@/integrations/supabase/client";
 
 interface MedicineTimeSlotProps {
   icon: React.ReactNode;
@@ -11,6 +14,7 @@ interface MedicineTimeSlotProps {
   onMedicineTaken: () => void;
   colorClass: string;
   disabled?: boolean;
+  slotId: string;
 }
 
 const MedicineTimeSlot = ({
@@ -20,19 +24,46 @@ const MedicineTimeSlot = ({
   isTaken,
   onMedicineTaken,
   colorClass,
-  disabled
+  disabled,
+  slotId
 }: MedicineTimeSlotProps) => {
-  // Extract the time period from colorClass (e.g., "text-diabetic-morning" -> "morning")
-  const period = colorClass.split('-').pop();
-  
+  const { data: preference } = useQuery({
+    queryKey: ['medicine-preferences', slotId],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
+
+      const { data, error } = await supabase
+        .from('medicine_preferences')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('slot_id', slotId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
+
+      return data;
+    },
+  });
+
+  const displayName = preference?.custom_name || label;
+  const displayTime = preference?.custom_time || time;
+
   return (
     <Card className="p-6 border-2 hover:border-primary transition-all duration-200 animate-slideIn">
       <div className={`flex items-center justify-between mb-4 ${colorClass}`}>
         {icon}
         <Clock className="w-5 h-5" />
-        <span className="font-semibold">{time}</span>
+        <span className="font-semibold">{displayTime}</span>
+        <MedicinePreferencesDialog
+          slotId={slotId}
+          defaultName={label}
+          defaultTime={time}
+        />
       </div>
-      <h3 className="text-lg font-semibold mb-4">{label} Medicine</h3>
+      <h3 className="text-lg font-semibold mb-4">{displayName}</h3>
       <Button
         onClick={onMedicineTaken}
         disabled={isTaken || disabled}
@@ -42,7 +73,7 @@ const MedicineTimeSlot = ({
             ? 'bg-green-500 hover:bg-green-600 cursor-not-allowed' 
             : disabled
             ? 'bg-gray-300 cursor-not-allowed'
-            : `bg-diabetic-${period} hover:bg-diabetic-${period}/90`
+            : `bg-diabetic-${slotId} hover:bg-diabetic-${slotId}/90`
         }`}
       >
         {isTaken ? 'Done' : 'Mark as Taken'}

@@ -79,6 +79,41 @@ export type Database = {
           },
         ]
       }
+      medicine_preferences: {
+        Row: {
+          created_at: string
+          custom_name: string | null
+          custom_time: string | null
+          id: string
+          slot_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          custom_name?: string | null
+          custom_time?: string | null
+          id?: string
+          slot_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          custom_name?: string | null
+          custom_time?: string | null
+          id?: string
+          slot_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medicine_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string

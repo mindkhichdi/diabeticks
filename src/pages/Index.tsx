@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { Activity, Pill, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
+import Logo from '@/components/Logo';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -56,7 +57,7 @@ const Index = () => {
   return (
     <div className="container mx-auto p-4 space-y-8">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-primary">Diabeticks</h1>
+        <Logo />
         <Button 
           variant="ghost" 
           onClick={handleSignOut}

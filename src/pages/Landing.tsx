@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { useNavigate } from 'react-router-dom';
 import { Activity, Pill, ChartLine, Bell, Shield, Heart, LogIn, UserPlus } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
+import Logo from '@/components/Logo';
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -66,7 +67,7 @@ const Landing = () => {
       <nav className="border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-primary">Diabeticks</h2>
+            <Logo size={28} />
             <div className="flex gap-4">
               <Button
                 variant="ghost"

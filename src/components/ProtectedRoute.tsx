@@ -11,14 +11,15 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Initialize session from local storage
+    // Initialize session
     const initSession = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        console.log("Getting initial session:", { session, error });
-        
-        if (error) {
-          console.error("Session error:", error);
+        // Get the current session
+        const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
+        console.log("Getting initial session:", { currentSession, sessionError });
+
+        if (sessionError) {
+          console.error("Session error:", sessionError);
           toast({
             variant: "destructive",
             title: "Authentication Error",
@@ -28,15 +29,27 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
           return;
         }
 
-        if (!session) {
+        if (!currentSession) {
           console.log("No session found, redirecting to auth");
           navigate("/auth");
           return;
         }
 
-        setSession(session);
+        // Refresh session if it exists
+        const { data: { session: refreshedSession }, error: refreshError } = 
+          await supabase.auth.refreshSession();
+        
+        console.log("Refreshing session:", { refreshedSession, refreshError });
+
+        if (refreshError) {
+          console.error("Session refresh error:", refreshError);
+          navigate("/auth");
+          return;
+        }
+
+        setSession(refreshedSession);
       } catch (error) {
-        console.error("Error getting session:", error);
+        console.error("Error initializing session:", error);
         navigate("/auth");
       } finally {
         setLoading(false);
@@ -49,13 +62,19 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", { event, session });
       
-      if (event === 'SIGNED_OUT') {
+      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
         setSession(null);
-        navigate("/");
+        navigate("/auth");
         toast({
           title: "Signed out",
           description: "You have been signed out successfully",
         });
+        return;
+      }
+
+      if (event === 'TOKEN_REFRESHED') {
+        console.log("Token refreshed:", session);
+        setSession(session);
         return;
       }
 

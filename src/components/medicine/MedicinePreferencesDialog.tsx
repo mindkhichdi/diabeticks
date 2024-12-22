@@ -43,7 +43,7 @@ const MedicinePreferencesDialog = ({ slotId, defaultName, defaultTime }: Props) 
         .select('*')
         .eq('user_id', user.id)
         .eq('slot_id', slotId)
-        .maybeSingle(); // Changed from .single() to .maybeSingle()
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching preferences:', error);
@@ -71,19 +71,29 @@ const MedicinePreferencesDialog = ({ slotId, defaultName, defaultTime }: Props) 
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
-      const { error } = await supabase
+      // Prepare the data object
+      const preferenceData = {
+        user_id: user.id,
+        slot_id: slotId,
+        custom_name: customName.trim() || null,
+        custom_time: customTime || null,
+      };
+
+      console.log('Upserting preference data:', preferenceData);
+
+      const { data, error } = await supabase
         .from('medicine_preferences')
-        .upsert({
-          user_id: user.id,
-          slot_id: slotId,
-          custom_name: customName || null,
-          custom_time: customTime || null,
-        });
+        .upsert(preferenceData)
+        .select()
+        .single();
 
       if (error) {
         console.error('Error saving preferences:', error);
         throw error;
       }
+
+      console.log('Successfully saved preference:', data);
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['medicine-preferences'] });
@@ -135,8 +145,11 @@ const MedicinePreferencesDialog = ({ slotId, defaultName, defaultTime }: Props) 
             <Button variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={() => savePreferences.mutate()}>
-              Save
+            <Button 
+              onClick={() => savePreferences.mutate()}
+              disabled={savePreferences.isPending}
+            >
+              {savePreferences.isPending ? 'Saving...' : 'Save'}
             </Button>
           </div>
         </div>

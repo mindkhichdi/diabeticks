@@ -25,9 +25,9 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#9b87f5",
-          dark: "#7E69AB",
-          light: "#F1F0FB",
+          DEFAULT: "#F97316", // Bright orange
+          dark: "#EA580C",    // Darker orange
+          light: "#FED7AA",   // Light orange
         },
         diabetic: {
           morning: "#FFB84C",

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import MedicineTracker from '@/components/MedicineTracker';
@@ -9,11 +9,29 @@ import { Activity, Pill, LogOut, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import Logo from '@/components/Logo';
+import ConfettiAnimation from '@/components/ConfettiAnimation';
 
 const Index = () => {
   const navigate = useNavigate();
+  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
+    // Check if this is the user's first visit
+    const checkFirstVisit = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const lastVisitKey = `last_visit_${session.user.id}`;
+      const lastVisit = localStorage.getItem(lastVisitKey);
+
+      if (!lastVisit) {
+        setShowConfetti(true);
+        localStorage.setItem(lastVisitKey, new Date().toISOString());
+      }
+    };
+
+    checkFirstVisit();
+
     // Request notification permission
     if ('Notification' in window) {
       Notification.requestPermission();
@@ -40,7 +58,7 @@ const Index = () => {
       });
     };
 
-    const interval = setInterval(checkTime, 60000); // Check every minute
+    const interval = setInterval(checkTime, 60000);
     return () => clearInterval(interval);
   }, []);
 
@@ -57,6 +75,10 @@ const Index = () => {
 
   return (
     <div className="container mx-auto px-4 py-4 md:py-8 space-y-6 md:space-y-8">
+      {showConfetti && (
+        <ConfettiAnimation onComplete={() => setShowConfetti(false)} />
+      )}
+      
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4 md:mb-8">
         <Logo />
         <Button 

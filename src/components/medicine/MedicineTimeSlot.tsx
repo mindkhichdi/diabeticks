@@ -33,17 +33,21 @@ const MedicineTimeSlot = ({
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
+      console.log('Fetching medicine preferences for slot:', slotId);
+      
       const { data, error } = await supabase
         .from('medicine_preferences')
         .select('*')
         .eq('user_id', user.id)
         .eq('slot_id', slotId)
-        .single();
+        .maybeSingle(); // Changed from .single() to handle no preferences case
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
+        console.error('Error fetching preferences:', error);
         throw error;
       }
 
+      console.log('Fetched preference:', data);
       return data;
     },
   });

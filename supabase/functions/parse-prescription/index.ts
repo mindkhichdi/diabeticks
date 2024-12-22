@@ -26,7 +26,7 @@ serve(async (req) => {
 
     // Use GPT-4 Vision to analyze the prescription
     const completion = await openai.createChatCompletion({
-      model: "gpt-4-vision-preview",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "user",

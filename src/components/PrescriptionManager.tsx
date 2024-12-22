@@ -10,9 +10,6 @@ interface Prescription {
   id: string;
   file_path: string;
   file_type: string;
-  medicine_name: string | null;
-  dosage: string | null;
-  schedule: string | null;
   created_at: string;
 }
 
@@ -62,10 +59,7 @@ const PrescriptionManager = () => {
         .insert({
           file_path: filePath,
           file_type: file.type,
-          medicine_name: null, // To be updated after parsing
-          dosage: null,
-          schedule: null,
-          user_id: user.id, // Add the user_id here
+          user_id: user.id,
         });
 
       if (dbError) throw dbError;
@@ -179,9 +173,6 @@ const PrescriptionManager = () => {
               <div className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-primary" />
                 <div>
-                  <p className="font-medium">
-                    {prescription.medicine_name || 'Processing...'}
-                  </p>
                   <p className="text-sm text-muted-foreground">
                     {new Date(prescription.created_at).toLocaleDateString()}
                   </p>
@@ -196,12 +187,6 @@ const PrescriptionManager = () => {
                 <Trash2 className="w-4 h-4" />
               </Button>
             </div>
-            {prescription.dosage && (
-              <p className="text-sm">Dosage: {prescription.dosage}</p>
-            )}
-            {prescription.schedule && (
-              <p className="text-sm">Schedule: {prescription.schedule}</p>
-            )}
           </Card>
         ))}
       </div>

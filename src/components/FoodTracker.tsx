@@ -21,7 +21,8 @@ import {
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
-import { Utensils, Trash2 } from 'lucide-react';
+import { Utensils, Trash2, Coffee, Apple, Bread, Check } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface FoodLog {
   id: string;
@@ -29,12 +30,14 @@ interface FoodLog {
   food_item: string;
   quantity: string;
   date: string;
+  calories?: number;
 }
 
 interface FoodLogForm {
   meal_type: string;
   food_item: string;
   quantity: string;
+  calories?: number;
 }
 
 const FoodTracker = () => {
@@ -118,17 +121,71 @@ const FoodTracker = () => {
   };
 
   const mealTypes = [
-    { value: 'breakfast', label: 'Breakfast' },
-    { value: 'lunch', label: 'Lunch' },
-    { value: 'snacks', label: 'Snacks' },
-    { value: 'dinner', label: 'Dinner' },
+    { value: 'breakfast', label: 'Breakfast', icon: Coffee, color: 'bg-orange-100', calories: 0 },
+    { value: 'lunch', label: 'Lunch', icon: Utensils, color: 'bg-blue-100', calories: 0 },
+    { value: 'snacks', label: 'Snacks', icon: Apple, color: 'bg-rose-100', calories: 0 },
+    { value: 'dinner', label: 'Dinner', icon: Bread, color: 'bg-stone-200', calories: 0 },
   ];
+
+  // Calculate calories for each meal type
+  const mealCalories = mealTypes.map(type => ({
+    ...type,
+    calories: foodLogs?.filter(log => log.meal_type === type.value)
+      .reduce((sum, log) => sum + (log.calories || 0), 0) || 0
+  }));
+
+  const totalCalories = mealCalories.reduce((sum, meal) => sum + meal.calories, 0);
+  const targetCalories = 1780; // Example target, could be made configurable
 
   return (
     <div className="space-y-6">
+      {/* Today's Overview */}
+      <div className="rounded-lg bg-white p-4 shadow-sm border">
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <h3 className="text-lg font-semibold">Today</h3>
+            <p className="text-sm text-muted-foreground">
+              {format(new Date(), 'EEEE, MMMM d, yyyy')}
+            </p>
+          </div>
+          <div className="text-right">
+            <div className="text-sm text-muted-foreground">Daily Goal</div>
+            <div className="font-semibold">
+              <span className="text-orange-500">{totalCalories}</span>
+              <span className="text-muted-foreground">/{targetCalories} cal</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid gap-3">
+          {mealCalories.map((meal) => (
+            <div
+              key={meal.value}
+              className={cn(
+                "p-4 rounded-lg flex items-center justify-between",
+                meal.color
+              )}
+            >
+              <div className="flex items-center gap-3">
+                {foodLogs?.some(log => log.meal_type === meal.value) && (
+                  <Check className="w-5 h-5 text-green-600" />
+                )}
+                <meal.icon className="w-5 h-5" />
+                <span className="font-medium">{meal.label}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold">{meal.calories}</span>
+                <span className="text-sm text-muted-foreground">cal</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Add Food Form */}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <FormField
               control={form.control}
               name="meal_type"
@@ -181,6 +238,25 @@ const FoodTracker = () => {
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name="calories"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Calories</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="number" 
+                      placeholder="Enter calories" 
+                      {...field}
+                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
 
           <Button type="submit" className="w-full md:w-auto">
@@ -190,6 +266,7 @@ const FoodTracker = () => {
         </form>
       </Form>
 
+      {/* Food Logs List */}
       <div className="space-y-4">
         {isLoading ? (
           <p>Loading food logs...</p>
@@ -214,6 +291,11 @@ const FoodTracker = () => {
                           <span className="text-muted-foreground ml-2">
                             ({log.quantity})
                           </span>
+                          {log.calories && (
+                            <span className="text-muted-foreground ml-2">
+                              {log.calories} cal
+                            </span>
+                          )}
                         </div>
                         <Button
                           variant="ghost"

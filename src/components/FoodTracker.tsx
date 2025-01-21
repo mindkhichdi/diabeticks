@@ -21,7 +21,7 @@ import {
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
-import { Utensils, Trash2, Coffee, Apple, Pizza, Check, Camera } from 'lucide-react';
+import { Utensils, Trash2, Coffee, Apple, Pizza, Camera } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface FoodLog {
@@ -45,6 +45,42 @@ const FoodTracker = () => {
   const form = useForm<FoodLogForm>();
   const today = format(new Date(), 'yyyy-MM-dd');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageCapture = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await fetch('/api/analyze-food-image', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to analyze image');
+      }
+
+      const data = await response.json();
+      if (data.calories) {
+        form.setValue('calories', data.calories);
+        toast.success('Calories extracted from image');
+      } else {
+        toast.error('Could not detect calories from image');
+      }
+    } catch (error) {
+      console.error('Error analyzing image:', error);
+      toast.error('Failed to analyze image');
+    }
+  };
 
   const { data: foodLogs, isLoading } = useQuery({
     queryKey: ['foodLogs', today],

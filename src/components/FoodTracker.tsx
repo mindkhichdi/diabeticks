@@ -30,7 +30,7 @@ interface FoodLog {
   food_item: string;
   quantity: string;
   date: string;
-  calories?: number;
+  calories?: string;
 }
 
 interface FoodLogForm {
@@ -79,6 +79,7 @@ const FoodTracker = () => {
       const { error } = await supabase.from('food_logs').insert([
         {
           ...values,
+          calories: values.calories?.toString(), // Convert number to string
           date: today,
           user_id: session.session.user.id,
         },
@@ -131,7 +132,7 @@ const FoodTracker = () => {
   const mealCalories = mealTypes.map(type => ({
     ...type,
     calories: foodLogs?.filter(log => log.meal_type === type.value)
-      .reduce((sum, log) => sum + (log.calories || 0), 0) || 0
+      .reduce((sum, log) => sum + (parseInt(log.calories || '0', 10)), 0) || 0
   }));
 
   const totalCalories = mealCalories.reduce((sum, meal) => sum + meal.calories, 0);

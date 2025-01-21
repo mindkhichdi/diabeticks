@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
+import { Configuration, OpenAIApi } from "https://esm.sh/openai@3.3.0"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,10 +18,6 @@ serve(async (req) => {
     if (!image) {
       throw new Error('No image provided')
     }
-
-    const openai = new Configuration({
-      apiKey: Deno.env.get('OPENAI_API_KEY'),
-    })
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',

@@ -45,10 +45,16 @@ const FoodTracker = () => {
   const { data: foodLogs, isLoading } = useQuery({
     queryKey: ['foodLogs', today],
     queryFn: async () => {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session) {
+        throw new Error('No session found');
+      }
+
       const { data, error } = await supabase
         .from('food_logs')
         .select('*')
         .eq('date', today)
+        .eq('user_id', session.session.user.id)
         .order('created_at', { ascending: true });
 
       if (error) {
@@ -62,10 +68,16 @@ const FoodTracker = () => {
 
   const addFoodLogMutation = useMutation({
     mutationFn: async (values: FoodLogForm) => {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session) {
+        throw new Error('No session found');
+      }
+
       const { error } = await supabase.from('food_logs').insert([
         {
           ...values,
           date: today,
+          user_id: session.session.user.id,
         },
       ]);
 

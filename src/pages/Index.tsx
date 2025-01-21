@@ -75,69 +75,75 @@ const Index = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-4 md:py-8 space-y-6 md:space-y-8">
-      {showConfetti && (
-        <ConfettiAnimation onComplete={() => setShowConfetti(false)} />
-      )}
-      
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4 md:mb-8">
-        <Logo />
-        <Button 
-          variant="ghost" 
-          onClick={handleSignOut}
-          className="flex items-center gap-2"
-        >
-          <LogOut className="w-4 h-4" />
-          Sign Out
-        </Button>
+    <div className="min-h-screen flex flex-col w-full">
+      <div className="container mx-auto px-4 py-4 md:py-8">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4 md:mb-8">
+          <Logo />
+          <Button 
+            variant="ghost" 
+            onClick={handleSignOut}
+            className="flex items-center gap-2"
+          >
+            <LogOut className="w-4 h-4" />
+            Sign Out
+          </Button>
+        </div>
       </div>
-      
-      <Tabs defaultValue="medicine" className="w-full">
-        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-4 gap-2 mb-6 md:mb-8">
-          <TabsTrigger value="medicine" className="space-x-2">
-            <Pill className="w-4 h-4 md:w-5 md:h-5" />
-            <span className="hidden sm:inline">Medicine Tracking</span>
-            <span className="sm:hidden">Medicine</span>
-          </TabsTrigger>
-          <TabsTrigger value="readings" className="space-x-2">
-            <Activity className="w-4 h-4 md:w-5 md:h-5" />
-            <span className="hidden sm:inline">Blood Sugar Readings</span>
-            <span className="sm:hidden">Readings</span>
-          </TabsTrigger>
-          <TabsTrigger value="prescriptions" className="space-x-2">
-            <FileText className="w-4 h-4 md:w-5 md:h-5" />
-            <span className="hidden sm:inline">Prescriptions</span>
-            <span className="sm:hidden">Prescriptions</span>
-          </TabsTrigger>
-          <TabsTrigger value="food" className="space-x-2">
-            <Utensils className="w-4 h-4 md:w-5 md:h-5" />
-            <span className="hidden sm:inline">Food Tracking</span>
-            <span className="sm:hidden">Food</span>
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="medicine">
-          <section>
-            <h2 className="text-xl md:text-2xl font-semibold mb-4">Daily Medicine Tracker</h2>
-            <MedicineTracker />
-          </section>
-        </TabsContent>
-        
-        <TabsContent value="readings">
-          <ReadingsLog />
-        </TabsContent>
 
-        <TabsContent value="prescriptions">
-          <PrescriptionManager />
-        </TabsContent>
+      <div className="flex-1 container mx-auto px-4">
+        {showConfetti && (
+          <ConfettiAnimation onComplete={() => setShowConfetti(false)} />
+        )}
+        
+        <Tabs defaultValue="medicine" className="w-full">
+          <TabsList className="flex flex-wrap w-full gap-2 mb-6 md:mb-8">
+            <TabsTrigger value="medicine" className="flex-1 min-w-[120px] space-x-2">
+              <Pill className="w-4 h-4 md:w-5 md:h-5" />
+              <span className="hidden sm:inline">Medicine Tracking</span>
+              <span className="sm:hidden">Medicine</span>
+            </TabsTrigger>
+            <TabsTrigger value="readings" className="flex-1 min-w-[120px] space-x-2">
+              <Activity className="w-4 h-4 md:w-5 md:h-5" />
+              <span className="hidden sm:inline">Blood Sugar Readings</span>
+              <span className="sm:hidden">Readings</span>
+            </TabsTrigger>
+            <TabsTrigger value="prescriptions" className="flex-1 min-w-[120px] space-x-2">
+              <FileText className="w-4 h-4 md:w-5 md:h-5" />
+              <span className="hidden sm:inline">Prescriptions</span>
+              <span className="sm:hidden">Prescriptions</span>
+            </TabsTrigger>
+            <TabsTrigger value="food" className="flex-1 min-w-[120px] space-x-2">
+              <Utensils className="w-4 h-4 md:w-5 md:h-5" />
+              <span className="hidden sm:inline">Food Tracking</span>
+              <span className="sm:hidden">Food</span>
+            </TabsTrigger>
+          </TabsList>
+          
+          <div className="overflow-x-hidden">
+            <TabsContent value="medicine">
+              <section>
+                <h2 className="text-xl md:text-2xl font-semibold mb-4">Daily Medicine Tracker</h2>
+                <MedicineTracker />
+              </section>
+            </TabsContent>
+            
+            <TabsContent value="readings">
+              <ReadingsLog />
+            </TabsContent>
 
-        <TabsContent value="food">
-          <section>
-            <h2 className="text-xl md:text-2xl font-semibold mb-4">Food Intake Tracker</h2>
-            <FoodTracker />
-          </section>
-        </TabsContent>
-      </Tabs>
+            <TabsContent value="prescriptions">
+              <PrescriptionManager />
+            </TabsContent>
+
+            <TabsContent value="food">
+              <section>
+                <h2 className="text-xl md:text-2xl font-semibold mb-4">Food Intake Tracker</h2>
+                <FoodTracker />
+              </section>
+            </TabsContent>
+          </div>
+        </Tabs>
+      </div>
     </div>
   );
 };

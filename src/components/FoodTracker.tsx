@@ -21,7 +21,7 @@ import {
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
-import { Utensils, Trash2, Coffee, Apple, Bread, Check } from 'lucide-react';
+import { Utensils, Trash2, Coffee, Apple, Pizza, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface FoodLog {
@@ -124,7 +124,7 @@ const FoodTracker = () => {
     { value: 'breakfast', label: 'Breakfast', icon: Coffee, color: 'bg-orange-100', calories: 0 },
     { value: 'lunch', label: 'Lunch', icon: Utensils, color: 'bg-blue-100', calories: 0 },
     { value: 'snacks', label: 'Snacks', icon: Apple, color: 'bg-rose-100', calories: 0 },
-    { value: 'dinner', label: 'Dinner', icon: Bread, color: 'bg-stone-200', calories: 0 },
+    { value: 'dinner', label: 'Dinner', icon: Pizza, color: 'bg-stone-200', calories: 0 },
   ];
 
   // Calculate calories for each meal type

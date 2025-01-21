@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -21,7 +21,7 @@ import {
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
-import { Utensils, Trash2, Coffee, Apple, Pizza, Check } from 'lucide-react';
+import { Utensils, Trash2, Coffee, Apple, Pizza, Check, Camera } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface FoodLog {
@@ -44,6 +44,7 @@ const FoodTracker = () => {
   const queryClient = useQueryClient();
   const form = useForm<FoodLogForm>();
   const today = format(new Date(), 'yyyy-MM-dd');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: foodLogs, isLoading } = useQuery({
     queryKey: ['foodLogs', today],
@@ -128,7 +129,44 @@ const FoodTracker = () => {
     { value: 'dinner', label: 'Dinner', icon: Pizza, color: 'bg-stone-200', calories: 0 },
   ];
 
-  // Calculate calories for each meal type
+  const analyzeFoodImage = async (file: File) => {
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await fetch('/functions/v1/analyze-food-image', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to analyze image');
+      }
+
+      const data = await response.json();
+      if (data.calories) {
+        form.setValue('calories', data.calories);
+        toast.success('Calories detected from image!');
+      } else {
+        toast.error('Could not detect calories from image');
+      }
+    } catch (error) {
+      console.error('Error analyzing food image:', error);
+      toast.error('Failed to analyze food image');
+    }
+  };
+
+  const handleImageCapture = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      analyzeFoodImage(file);
+    }
+  };
+
   const mealCalories = mealTypes.map(type => ({
     ...type,
     calories: foodLogs?.filter(log => log.meal_type === type.value)
@@ -246,14 +284,33 @@ const FoodTracker = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Calories</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="number" 
-                      placeholder="Enter calories" 
-                      {...field}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                  <div className="flex gap-2">
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        placeholder="Enter calories" 
+                        {...field}
+                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                      />
+                    </FormControl>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={handleImageCapture}
+                      className="flex-shrink-0"
+                    >
+                      <Camera className="h-4 w-4" />
+                    </Button>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      accept="image/*"
+                      capture="environment"
+                      onChange={handleFileChange}
+                      className="hidden"
                     />
-                  </FormControl>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}

@@ -123,49 +123,39 @@ const FoodTracker = () => {
   };
 
   const mealTypes = [
-    { value: 'breakfast', label: 'Breakfast', icon: Coffee, color: 'bg-orange-100', calories: 0 },
-    { value: 'lunch', label: 'Lunch', icon: Utensils, color: 'bg-blue-100', calories: 0 },
-    { value: 'snacks', label: 'Snacks', icon: Apple, color: 'bg-rose-100', calories: 0 },
-    { value: 'dinner', label: 'Dinner', icon: Pizza, color: 'bg-stone-200', calories: 0 },
+    { 
+      value: 'breakfast', 
+      label: 'Breakfast', 
+      icon: Coffee, 
+      color: 'bg-gradient-to-r from-orange-400 to-orange-300',
+      textColor: 'text-orange-900',
+      borderColor: 'border-orange-200'
+    },
+    { 
+      value: 'lunch', 
+      label: 'Lunch', 
+      icon: Utensils, 
+      color: 'bg-gradient-to-r from-blue-400 to-blue-300',
+      textColor: 'text-blue-900',
+      borderColor: 'border-blue-200'
+    },
+    { 
+      value: 'snacks', 
+      label: 'Snacks', 
+      icon: Apple, 
+      color: 'bg-gradient-to-r from-purple-400 to-purple-300',
+      textColor: 'text-purple-900',
+      borderColor: 'border-purple-200'
+    },
+    { 
+      value: 'dinner', 
+      label: 'Dinner', 
+      icon: Pizza, 
+      color: 'bg-gradient-to-r from-emerald-400 to-emerald-300',
+      textColor: 'text-emerald-900',
+      borderColor: 'border-emerald-200'
+    },
   ];
-
-  const analyzeFoodImage = async (file: File) => {
-    try {
-      const formData = new FormData();
-      formData.append('image', file);
-
-      const response = await fetch('/functions/v1/analyze-food-image', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to analyze image');
-      }
-
-      const data = await response.json();
-      if (data.calories) {
-        form.setValue('calories', data.calories);
-        toast.success('Calories detected from image!');
-      } else {
-        toast.error('Could not detect calories from image');
-      }
-    } catch (error) {
-      console.error('Error analyzing food image:', error);
-      toast.error('Failed to analyze food image');
-    }
-  };
-
-  const handleImageCapture = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      analyzeFoodImage(file);
-    }
-  };
 
   const mealCalories = mealTypes.map(type => ({
     ...type,
@@ -174,13 +164,13 @@ const FoodTracker = () => {
   }));
 
   const totalCalories = mealCalories.reduce((sum, meal) => sum + meal.calories, 0);
-  const targetCalories = 1780; // Example target, could be made configurable
+  const targetCalories = 1780;
 
   return (
     <div className="space-y-6">
       {/* Today's Overview */}
       <div className="rounded-lg bg-white p-4 shadow-sm border">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
             <h3 className="text-lg font-semibold">Today</h3>
             <p className="text-sm text-muted-foreground">
@@ -196,28 +186,66 @@ const FoodTracker = () => {
           </div>
         </div>
 
-        <div className="grid gap-3">
-          {mealCalories.map((meal) => (
-            <div
-              key={meal.value}
-              className={cn(
-                "p-4 rounded-lg flex items-center justify-between",
-                meal.color
-              )}
-            >
-              <div className="flex items-center gap-3">
-                {foodLogs?.some(log => log.meal_type === meal.value) && (
-                  <Check className="w-5 h-5 text-green-600" />
+        <div className="grid gap-6">
+          {mealTypes.map((meal) => {
+            const mealLogs = foodLogs?.filter(log => log.meal_type === meal.value);
+            const totalMealCalories = mealLogs?.reduce((sum, log) => sum + (parseInt(log.calories || '0', 10)), 0) || 0;
+
+            return (
+              <div key={meal.value} className="space-y-3">
+                <div className={cn(
+                  "p-4 rounded-lg flex items-center justify-between transition-all",
+                  meal.color,
+                  "shadow-sm hover:shadow-md"
+                )}>
+                  <div className="flex items-center gap-3">
+                    <meal.icon className={cn("w-5 h-5", meal.textColor)} />
+                    <span className={cn("font-medium", meal.textColor)}>{meal.label}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={cn("font-semibold", meal.textColor)}>{totalMealCalories}</span>
+                    <span className={cn("text-sm", meal.textColor)}>cal</span>
+                  </div>
+                </div>
+
+                {mealLogs && mealLogs.length > 0 ? (
+                  <div className="grid gap-2 pl-4">
+                    {mealLogs.map((log) => (
+                      <div
+                        key={log.id}
+                        className={cn(
+                          "flex items-center justify-between p-3 rounded-lg border",
+                          meal.borderColor,
+                          "bg-white/50 backdrop-blur-sm"
+                        )}
+                      >
+                        <div>
+                          <span className="font-medium">{log.food_item}</span>
+                          <span className="text-muted-foreground ml-2">
+                            ({log.quantity})
+                          </span>
+                          {log.calories && (
+                            <span className="text-muted-foreground ml-2">
+                              {log.calories} cal
+                            </span>
+                          )}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => deleteFoodLogMutation.mutate(log.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-sm pl-4">No food items logged</p>
                 )}
-                <meal.icon className="w-5 h-5" />
-                <span className="font-medium">{meal.label}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="font-semibold">{meal.calories}</span>
-                <span className="text-sm text-muted-foreground">cal</span>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

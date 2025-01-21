@@ -49,6 +49,7 @@ export type Database = {
       }
       food_logs: {
         Row: {
+          calories: string | null
           created_at: string
           date: string
           food_item: string
@@ -58,6 +59,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          calories?: string | null
           created_at?: string
           date?: string
           food_item: string
@@ -67,6 +69,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          calories?: string | null
           created_at?: string
           date?: string
           food_item?: string

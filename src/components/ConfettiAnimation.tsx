@@ -9,26 +9,53 @@ const ConfettiAnimation = ({ onComplete }: ConfettiAnimationProps) => {
   const [animationData, setAnimationData] = useState<any>(null);
 
   useEffect(() => {
-    // Fetch the Lottie animation data
-    fetch("https://lottie.host/55f199c6-5788-4699-947b-24c33ff0c462/gCvMieluW7.json")
+    // Fetch the Lottie animation data from a public URL
+    fetch("https://assets5.lottiefiles.com/packages/lf20_u4yrau.json")
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        // Check if we've already read the response body
-        if (response.bodyUsed) {
-          throw new Error('Response body has already been consumed');
         }
         return response.json();
       })
       .then(data => setAnimationData(data))
       .catch(error => {
         console.error("Error loading animation:", error);
-        // Fallback to a default animation or handle the error gracefully
-        fetch("/confetti-fallback.json")
-          .then(response => response.json())
-          .then(data => setAnimationData(data))
-          .catch(err => console.error("Error loading fallback animation:", err));
+        // Use a simple confetti animation as fallback
+        setAnimationData({
+          v: "5.5.7",
+          fr: 30,
+          ip: 0,
+          op: 60,
+          w: 512,
+          h: 512,
+          nm: "Simple Confetti",
+          ddd: 0,
+          assets: [],
+          layers: [{
+            ty: 4,
+            sr: 1,
+            st: 0,
+            op: 60,
+            ip: 0,
+            hd: false,
+            ddd: 0,
+            bm: 0,
+            hasMask: false,
+            ao: 0,
+            ks: {
+              o: { a: 1, k: [{ t: 0, s: [100], e: [0] }, { t: 60 }] },
+              p: { a: 1, k: [{ t: 0, s: [256, 256], e: [256, 512] }, { t: 60 }] }
+            },
+            shapes: [{
+              ty: "el",
+              d: 1,
+              s: { a: 0, k: [20, 20] },
+              p: { a: 0, k: [0, 0] },
+              nm: "Confetti Particle",
+              c: { a: 0, k: [1, 0.5, 0] }
+            }]
+          }]
+        });
       });
   }, []);
 

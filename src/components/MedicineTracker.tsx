@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sun, Sunset, Moon, ChevronDown, ChevronUp } from 'lucide-react';
+import { Sun, Sunset, Moon } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -7,9 +7,9 @@ import confetti from 'canvas-confetti';
 import MedicineTimeSlot from './medicine/MedicineTimeSlot';
 import MedicineHistoryTable from './medicine/MedicineHistoryTable';
 import { TimeSlot, MedicineLog } from '@/types/medicine';
-import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const timeSlots: TimeSlot[] = [
   { id: 'morning', icon: <Sun className="w-6 h-6" />, label: 'Morning Medicine', time: '08:00' },
@@ -63,7 +63,6 @@ const triggerConfetti = () => {
 const MedicineTracker = () => {
   const queryClient = useQueryClient();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const { data: medicineLogs = [] } = useQuery<MedicineLog[]>({
     queryKey: ['medicine-logs', selectedDate.toISOString().split('T')[0]],
@@ -155,7 +154,6 @@ const MedicineTracker = () => {
     return taken;
   };
 
-  // Check if all medicines are taken and trigger confetti
   useEffect(() => {
     const allTaken = timeSlots.every(slot => isTaken(slot.id));
     if (allTaken) {
@@ -169,10 +167,7 @@ const MedicineTracker = () => {
     <div className="space-y-4">
       <Card className="p-6 shadow-lg bg-white/90 backdrop-blur-sm">
         <div className="flex flex-col space-y-4">
-          <div 
-            className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
-            onClick={() => setIsCalendarOpen(!isCalendarOpen)}
-          >
+          <div className="flex items-center justify-between">
             <div className="text-lg font-semibold text-gray-800">
               {selectedDate.toLocaleDateString('en-US', { 
                 weekday: 'long',
@@ -181,31 +176,18 @@ const MedicineTracker = () => {
                 day: 'numeric'
               })}
             </div>
-            <Button 
-              variant="ghost" 
-              size="icon"
-              className="text-primary hover:text-primary-dark hover:bg-primary-light"
-            >
-              {isCalendarOpen ? <ChevronUp /> : <ChevronDown />}
-            </Button>
+            <Input
+              type="date"
+              value={selectedDate.toISOString().split('T')[0]}
+              onChange={(e) => {
+                const newDate = new Date(e.target.value);
+                setSelectedDate(newDate);
+                toast.info("Date selected: " + newDate.toLocaleDateString());
+              }}
+              max={new Date().toISOString().split('T')[0]}
+              className="w-auto"
+            />
           </div>
-          
-          {isCalendarOpen && (
-            <div className="p-2 bg-white rounded-lg shadow-inner">
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={(date) => {
-                  setSelectedDate(date || new Date());
-                  setIsCalendarOpen(false);
-                  toast.info("Date selected: " + date?.toLocaleDateString());
-                }}
-                defaultMonth={selectedDate}
-                className="rounded-md border shadow-sm"
-                disabled={(date) => date > new Date()}
-              />
-            </div>
-          )}
         </div>
       </Card>
 

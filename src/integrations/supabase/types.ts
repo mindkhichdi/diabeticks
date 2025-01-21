@@ -47,6 +47,44 @@ export type Database = {
           },
         ]
       }
+      food_logs: {
+        Row: {
+          created_at: string
+          date: string
+          food_item: string
+          id: string
+          meal_type: string
+          quantity: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          food_item: string
+          id?: string
+          meal_type: string
+          quantity: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          food_item?: string
+          id?: string
+          meal_type?: string
+          quantity?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "food_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       medicine_logs: {
         Row: {
           created_at: string

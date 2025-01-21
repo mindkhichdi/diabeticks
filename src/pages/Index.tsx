@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import MedicineTracker from '@/components/MedicineTracker';
 import ReadingsLog from '@/components/ReadingsLog';
 import PrescriptionManager from '@/components/PrescriptionManager';
+import FoodTracker from '@/components/FoodTracker';
 import { toast } from 'sonner';
-import { Activity, Pill, LogOut, FileText } from 'lucide-react';
+import { Activity, Pill, LogOut, FileText, Utensils } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import Logo from '@/components/Logo';
@@ -92,7 +93,7 @@ const Index = () => {
       </div>
       
       <Tabs defaultValue="medicine" className="w-full">
-        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 gap-2 mb-6 md:mb-8">
+        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-4 gap-2 mb-6 md:mb-8">
           <TabsTrigger value="medicine" className="space-x-2">
             <Pill className="w-4 h-4 md:w-5 md:h-5" />
             <span className="hidden sm:inline">Medicine Tracking</span>
@@ -107,6 +108,11 @@ const Index = () => {
             <FileText className="w-4 h-4 md:w-5 md:h-5" />
             <span className="hidden sm:inline">Prescriptions</span>
             <span className="sm:hidden">Prescriptions</span>
+          </TabsTrigger>
+          <TabsTrigger value="food" className="space-x-2">
+            <Utensils className="w-4 h-4 md:w-5 md:h-5" />
+            <span className="hidden sm:inline">Food Tracking</span>
+            <span className="sm:hidden">Food</span>
           </TabsTrigger>
         </TabsList>
         
@@ -123,6 +129,13 @@ const Index = () => {
 
         <TabsContent value="prescriptions">
           <PrescriptionManager />
+        </TabsContent>
+
+        <TabsContent value="food">
+          <section>
+            <h2 className="text-xl md:text-2xl font-semibold mb-4">Food Intake Tracker</h2>
+            <FoodTracker />
+          </section>
         </TabsContent>
       </Tabs>
     </div>

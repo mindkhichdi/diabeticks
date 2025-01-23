@@ -110,6 +110,12 @@ const FoodTracker = () => {
         .single();
 
       if (error) throw error;
+      
+      // Update target calories from profile
+      if (data) {
+        setTargetCalories(data.daily_calories_goal || 1780);
+      }
+      
       return data;
     },
   });
@@ -178,12 +184,24 @@ const FoodTracker = () => {
     { proteins: 0, carbs: 0, fats: 0 }
   ) || { proteins: 0, carbs: 0, fats: 0 };
 
+  const handleGoalsUpdate = (newGoals: { calories: number; proteins: number; carbs: number; fats: number }) => {
+    setTargetCalories(newGoals.calories);
+    queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+  };
+
   return (
     <div className="space-y-6">
       <DailyGoal
         targetCalories={targetCalories}
         totalCalories={totalCalories}
         onTargetChange={setTargetCalories}
+        onGoalsUpdate={handleGoalsUpdate}
+        currentGoals={{
+          calories: targetCalories,
+          proteins: userProfile?.daily_protein_goal || 150,
+          carbs: userProfile?.daily_carbs_goal || 200,
+          fats: userProfile?.daily_fats_goal || 70,
+        }}
       />
 
       <MacronutrientProgress

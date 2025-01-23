@@ -7,6 +7,7 @@ import DailyGoal from './food/DailyGoal';
 import AddFoodForm from './food/AddFoodForm';
 import MealSection from './food/MealSection';
 import { toast } from 'sonner';
+import MacronutrientProgress from './food/MacronutrientProgress';
 
 interface FoodLog {
   id: string;
@@ -15,6 +16,9 @@ interface FoodLog {
   quantity: string;
   date: string;
   calories?: string;
+  proteins?: number;
+  carbs?: number;
+  fats?: number;
 }
 
 interface FoodLogForm {
@@ -22,6 +26,9 @@ interface FoodLogForm {
   food_item: string;
   quantity: string;
   calories?: number;
+  proteins?: number;
+  carbs?: number;
+  fats?: number;
 }
 
 const FoodTracker = () => {
@@ -88,6 +95,25 @@ const FoodTracker = () => {
     },
   });
 
+  const { data: userProfile } = useQuery({
+    queryKey: ['userProfile'],
+    queryFn: async () => {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session) {
+        throw new Error('No session found');
+      }
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', session.session.user.id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const addFoodLogMutation = useMutation({
     mutationFn: async (values: FoodLogForm) => {
       const { data: session } = await supabase.auth.getSession();
@@ -143,12 +169,30 @@ const FoodTracker = () => {
 
   const totalCalories = mealCalories.reduce((sum, meal) => sum + meal.calories, 0);
 
+  const macroTotals = foodLogs?.reduce(
+    (acc, log) => ({
+      proteins: acc.proteins + (log.proteins || 0),
+      carbs: acc.carbs + (log.carbs || 0),
+      fats: acc.fats + (log.fats || 0),
+    }),
+    { proteins: 0, carbs: 0, fats: 0 }
+  ) || { proteins: 0, carbs: 0, fats: 0 };
+
   return (
     <div className="space-y-6">
       <DailyGoal
         targetCalories={targetCalories}
         totalCalories={totalCalories}
         onTargetChange={setTargetCalories}
+      />
+
+      <MacronutrientProgress
+        current={macroTotals}
+        goals={{
+          proteins: userProfile?.daily_protein_goal || 150,
+          carbs: userProfile?.daily_carbs_goal || 200,
+          fats: userProfile?.daily_fats_goal || 70,
+        }}
       />
 
       <AddFoodForm

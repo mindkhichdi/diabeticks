@@ -50,31 +50,40 @@ export type Database = {
       food_logs: {
         Row: {
           calories: string | null
+          carbs: number | null
           created_at: string
           date: string
+          fats: number | null
           food_item: string
           id: string
           meal_type: string
+          proteins: number | null
           quantity: string
           user_id: string | null
         }
         Insert: {
           calories?: string | null
+          carbs?: number | null
           created_at?: string
           date?: string
+          fats?: number | null
           food_item: string
           id?: string
           meal_type: string
+          proteins?: number | null
           quantity: string
           user_id?: string | null
         }
         Update: {
           calories?: string | null
+          carbs?: number | null
           created_at?: string
           date?: string
+          fats?: number | null
           food_item?: string
           id?: string
           meal_type?: string
+          proteins?: number | null
           quantity?: string
           user_id?: string | null
         }
@@ -199,16 +208,25 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          daily_carbs_goal: number | null
+          daily_fats_goal: number | null
+          daily_protein_goal: number | null
           email: string | null
           id: string
         }
         Insert: {
           created_at?: string
+          daily_carbs_goal?: number | null
+          daily_fats_goal?: number | null
+          daily_protein_goal?: number | null
           email?: string | null
           id: string
         }
         Update: {
           created_at?: string
+          daily_carbs_goal?: number | null
+          daily_fats_goal?: number | null
+          daily_protein_goal?: number | null
           email?: string | null
           id?: string
         }

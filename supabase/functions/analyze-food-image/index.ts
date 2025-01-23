@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { Configuration, OpenAIApi } from "https://esm.sh/openai@3.3.0"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -33,7 +33,7 @@ serve(async (req) => {
             content: [
               {
                 type: "text",
-                text: "Please analyze this nutrition label image and extract only the calorie count. Return just the number.",
+                text: "Analyze this food image and extract the following nutritional information in JSON format: calories, proteins (in g), carbs (in g), and fats (in g). Return ONLY the JSON object with these 4 numeric values, nothing else.",
               },
               {
                 type: "image_url",
@@ -48,10 +48,10 @@ serve(async (req) => {
     })
 
     const data = await response.json()
-    const calories = parseInt(data.choices[0].message.content.trim(), 10)
+    const nutritionInfo = JSON.parse(data.choices[0].message.content)
 
     return new Response(
-      JSON.stringify({ calories }),
+      JSON.stringify(nutritionInfo),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error) {

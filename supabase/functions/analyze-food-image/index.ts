@@ -33,7 +33,7 @@ serve(async (req) => {
             content: [
               {
                 type: "text",
-                text: "Analyze this food image and extract the following nutritional information in JSON format: calories, proteins (in g), carbs (in g), and fats (in g). Return ONLY the JSON object with these 4 numeric values, nothing else.",
+                text: "Analyze this food image and extract the following information in JSON format: food_item (name of the food), calories (numeric), proteins (in g), carbs (in g), and fats (in g). Return ONLY the JSON object with these 5 values, nothing else.",
               },
               {
                 type: "image_url",

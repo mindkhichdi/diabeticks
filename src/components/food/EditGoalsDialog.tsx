@@ -30,6 +30,7 @@ const EditGoalsDialog = ({ currentGoals, onGoalsUpdate }: EditGoalsDialogProps) 
       const { error } = await supabase
         .from('profiles')
         .update({
+          daily_calories_goal: goals.calories,
           daily_protein_goal: goals.proteins,
           daily_carbs_goal: goals.carbs,
           daily_fats_goal: goals.fats,

@@ -49,9 +49,13 @@ const PrescriptionManager = () => {
 
       if (uploadError) throw uploadError;
 
+      // Generate a UUID for the prescription record
+      const prescriptionId = crypto.randomUUID();
+
       const { error: dbError } = await supabase
         .from('prescriptions')
         .insert({
+          id: prescriptionId,
           file_path: filePath,
           file_type: file.type,
           user_id: user.id,

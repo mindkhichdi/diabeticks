@@ -5,8 +5,9 @@ import MedicineTracker from '@/components/MedicineTracker';
 import ReadingsLog from '@/components/ReadingsLog';
 import PrescriptionManager from '@/components/PrescriptionManager';
 import FoodTracker from '@/components/FoodTracker';
+import FitnessTracker from '@/components/FitnessTracker';
 import { toast } from 'sonner';
-import { Activity, Pill, LogOut, FileText, Utensils } from 'lucide-react';
+import { Activity, Pill, LogOut, FileText, Utensils, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import Logo from '@/components/Logo';
@@ -76,8 +77,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col w-full">
-      <div className="container mx-auto px-4 py-4 md:py-8">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4 md:mb-8">
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
           <Logo />
           <Button 
             variant="ghost" 
@@ -90,36 +91,13 @@ const Index = () => {
         </div>
       </div>
 
-      <div className="flex-1 container mx-auto px-4">
+      <div className="flex-1 container mx-auto px-4 pb-20">
         {showConfetti && (
           <ConfettiAnimation onComplete={() => setShowConfetti(false)} />
         )}
         
         <Tabs defaultValue="medicine" className="w-full">
-          <TabsList className="flex flex-wrap w-full gap-2 mb-6 md:mb-8">
-            <TabsTrigger value="medicine" className="flex-1 min-w-[120px] space-x-2">
-              <Pill className="w-4 h-4 md:w-5 md:h-5" />
-              <span className="hidden sm:inline">Medicine Tracking</span>
-              <span className="sm:hidden">Medicine</span>
-            </TabsTrigger>
-            <TabsTrigger value="readings" className="flex-1 min-w-[120px] space-x-2">
-              <Activity className="w-4 h-4 md:w-5 md:h-5" />
-              <span className="hidden sm:inline">Blood Sugar Readings</span>
-              <span className="sm:hidden">Readings</span>
-            </TabsTrigger>
-            <TabsTrigger value="prescriptions" className="flex-1 min-w-[120px] space-x-2">
-              <FileText className="w-4 h-4 md:w-5 md:h-5" />
-              <span className="hidden sm:inline">Prescriptions</span>
-              <span className="sm:hidden">Prescriptions</span>
-            </TabsTrigger>
-            <TabsTrigger value="food" className="flex-1 min-w-[120px] space-x-2">
-              <Utensils className="w-4 h-4 md:w-5 md:h-5" />
-              <span className="hidden sm:inline">Food Tracking</span>
-              <span className="sm:hidden">Food</span>
-            </TabsTrigger>
-          </TabsList>
-          
-          <div className="overflow-x-hidden">
+          <div className="overflow-x-hidden mb-16">
             <TabsContent value="medicine">
               <section>
                 <h2 className="text-xl md:text-2xl font-semibold mb-4">Daily Medicine Tracker</h2>
@@ -141,7 +119,37 @@ const Index = () => {
                 <FoodTracker />
               </section>
             </TabsContent>
+
+            <TabsContent value="fitness">
+              <section>
+                <h2 className="text-xl md:text-2xl font-semibold mb-4">Fitness Tracker</h2>
+                <FitnessTracker />
+              </section>
+            </TabsContent>
           </div>
+
+          <TabsList className="fixed bottom-0 left-0 right-0 w-full flex justify-around bg-white border-t border-gray-200 p-2 z-50">
+            <TabsTrigger value="medicine" className="flex flex-col items-center gap-1">
+              <Pill className="w-5 h-5" />
+              <span className="text-xs">Medicine</span>
+            </TabsTrigger>
+            <TabsTrigger value="readings" className="flex flex-col items-center gap-1">
+              <Heart className="w-5 h-5" />
+              <span className="text-xs">Readings</span>
+            </TabsTrigger>
+            <TabsTrigger value="prescriptions" className="flex flex-col items-center gap-1">
+              <FileText className="w-5 h-5" />
+              <span className="text-xs">Scripts</span>
+            </TabsTrigger>
+            <TabsTrigger value="food" className="flex flex-col items-center gap-1">
+              <Utensils className="w-5 h-5" />
+              <span className="text-xs">Food</span>
+            </TabsTrigger>
+            <TabsTrigger value="fitness" className="flex flex-col items-center gap-1">
+              <Activity className="w-5 h-5" />
+              <span className="text-xs">Fitness</span>
+            </TabsTrigger>
+          </TabsList>
         </Tabs>
       </div>
     </div>

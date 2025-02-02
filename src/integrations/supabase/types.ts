@@ -47,6 +47,50 @@ export type Database = {
           },
         ]
       }
+      fitness_logs: {
+        Row: {
+          activity_type: string
+          calories_burned: number
+          created_at: string
+          date: string | null
+          distance_km: number | null
+          duration_minutes: number
+          id: string
+          steps: number | null
+          user_id: string | null
+        }
+        Insert: {
+          activity_type: string
+          calories_burned: number
+          created_at?: string
+          date?: string | null
+          distance_km?: number | null
+          duration_minutes: number
+          id?: string
+          steps?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          activity_type?: string
+          calories_burned?: number
+          created_at?: string
+          date?: string | null
+          distance_km?: number | null
+          duration_minutes?: number
+          id?: string
+          steps?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fitness_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       food_logs: {
         Row: {
           calories: string | null

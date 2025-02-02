@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Activity, Dumbbell, Run, Walking, Bike } from 'lucide-react';
+import { Activity, Dumbbell, Running, PersonStanding, Bike } from 'lucide-react';
 import { format } from 'date-fns';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,8 +26,8 @@ interface FitnessLog {
 }
 
 const activities = [
-  { value: 'walking', label: 'Walking', icon: Walking, caloriesPerMinute: 4 },
-  { value: 'running', label: 'Running', icon: Run, caloriesPerMinute: 11.5 },
+  { value: 'walking', label: 'Walking', icon: PersonStanding, caloriesPerMinute: 4 },
+  { value: 'running', label: 'Running', icon: Running, caloriesPerMinute: 11.5 },
   { value: 'cycling', label: 'Cycling', icon: Bike, caloriesPerMinute: 7.5 },
   { value: 'strength', label: 'Strength Training', icon: Dumbbell, caloriesPerMinute: 6 },
 ];

@@ -12,15 +12,13 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import Logo from '@/components/Logo';
 import ConfettiAnimation from '@/components/ConfettiAnimation';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
-import { useLanguage } from '@/contexts/LanguageContext';
 
 const Index = () => {
   const navigate = useNavigate();
   const [showConfetti, setShowConfetti] = useState(false);
-  const { t } = useLanguage();
 
   useEffect(() => {
+    // Check if this is the user's first visit
     const checkFirstVisit = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
@@ -36,10 +34,12 @@ const Index = () => {
 
     checkFirstVisit();
 
+    // Request notification permission
     if ('Notification' in window) {
       Notification.requestPermission();
     }
 
+    // Set up medicine reminders
     const checkTime = () => {
       const now = new Date();
       const times = [
@@ -80,21 +80,18 @@ const Index = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
           <Logo />
-          <div className="flex items-center gap-2">
-            <LanguageSwitcher />
-            <Button 
-              variant="ghost" 
-              onClick={handleSignOut}
-              className="flex items-center gap-2"
-            >
-              <LogOut className="w-4 h-4" />
-              {t('signOut')}
-            </Button>
-          </div>
+          <Button 
+            variant="ghost" 
+            onClick={handleSignOut}
+            className="flex items-center gap-2"
+          >
+            <LogOut className="w-4 h-4" />
+            Sign Out
+          </Button>
         </div>
       </div>
 
-      <div className="flex-1 container mx-auto px-4 pb-24">
+      <div className="flex-1 container mx-auto px-4 pb-20">
         {showConfetti && (
           <ConfettiAnimation onComplete={() => setShowConfetti(false)} />
         )}
@@ -103,7 +100,7 @@ const Index = () => {
           <div className="overflow-x-hidden mb-16">
             <TabsContent value="medicine">
               <section>
-                <h2 className="text-xl md:text-2xl font-semibold mb-4">{t('medicineDailyTracker')}</h2>
+                <h2 className="text-xl md:text-2xl font-semibold mb-4">Daily Medicine Tracker</h2>
                 <MedicineTracker />
               </section>
             </TabsContent>
@@ -118,54 +115,39 @@ const Index = () => {
 
             <TabsContent value="food">
               <section>
-                <h2 className="text-xl md:text-2xl font-semibold mb-4">{t('foodIntakeTracker')}</h2>
+                <h2 className="text-xl md:text-2xl font-semibold mb-4">Food Intake Tracker</h2>
                 <FoodTracker />
               </section>
             </TabsContent>
 
             <TabsContent value="fitness">
               <section>
-                <h2 className="text-xl md:text-2xl font-semibold mb-4">{t('fitnessTracker')}</h2>
+                <h2 className="text-xl md:text-2xl font-semibold mb-4">Fitness Tracker</h2>
                 <FitnessTracker />
               </section>
             </TabsContent>
           </div>
 
-          <TabsList className="fixed bottom-0 left-0 right-0 w-full flex justify-around bg-background border-t border-primary/20 p-0 z-50 shadow-lg rounded-none">
-            <TabsTrigger 
-              value="medicine" 
-              className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] rounded-none hover:bg-primary/20 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
-            >
-              <Pill className="w-6 h-6" />
-              <span className="text-xs font-medium">{t('medicine')}</span>
+          <TabsList className="fixed bottom-0 left-0 right-0 w-full flex justify-around bg-white border-t border-gray-200 p-2 z-50">
+            <TabsTrigger value="medicine" className="flex flex-col items-center gap-1">
+              <Pill className="w-5 h-5" />
+              <span className="text-xs">Medicine</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="readings" 
-              className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] rounded-none hover:bg-primary/20 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
-            >
-              <Heart className="w-6 h-6" />
-              <span className="text-xs font-medium">{t('readings')}</span>
+            <TabsTrigger value="readings" className="flex flex-col items-center gap-1">
+              <Heart className="w-5 h-5" />
+              <span className="text-xs">Readings</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="prescriptions" 
-              className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] rounded-none hover:bg-primary/20 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
-            >
-              <FileText className="w-6 h-6" />
-              <span className="text-xs font-medium">{t('scripts')}</span>
+            <TabsTrigger value="prescriptions" className="flex flex-col items-center gap-1">
+              <FileText className="w-5 h-5" />
+              <span className="text-xs">Scripts</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="food" 
-              className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] rounded-none hover:bg-primary/20 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
-            >
-              <Utensils className="w-6 h-6" />
-              <span className="text-xs font-medium">{t('food')}</span>
+            <TabsTrigger value="food" className="flex flex-col items-center gap-1">
+              <Utensils className="w-5 h-5" />
+              <span className="text-xs">Food</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="fitness" 
-              className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] rounded-none hover:bg-primary/20 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
-            >
-              <Activity className="w-6 h-6" />
-              <span className="text-xs font-medium">{t('fitness')}</span>
+            <TabsTrigger value="fitness" className="flex flex-col items-center gap-1">
+              <Activity className="w-5 h-5" />
+              <span className="text-xs">Fitness</span>
             </TabsTrigger>
           </TabsList>
         </Tabs>

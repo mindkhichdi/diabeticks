@@ -258,7 +258,6 @@ export type Database = {
           daily_protein_goal: number | null
           email: string | null
           id: string
-          preferred_language: string
         }
         Insert: {
           created_at?: string
@@ -268,7 +267,6 @@ export type Database = {
           daily_protein_goal?: number | null
           email?: string | null
           id: string
-          preferred_language?: string
         }
         Update: {
           created_at?: string
@@ -278,7 +276,6 @@ export type Database = {
           daily_protein_goal?: number | null
           email?: string | null
           id?: string
-          preferred_language?: string
         }
         Relationships: []
       }

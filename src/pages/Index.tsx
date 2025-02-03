@@ -18,7 +18,6 @@ const Index = () => {
   const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
-    // Check if this is the user's first visit
     const checkFirstVisit = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
@@ -34,12 +33,10 @@ const Index = () => {
 
     checkFirstVisit();
 
-    // Request notification permission
     if ('Notification' in window) {
       Notification.requestPermission();
     }
 
-    // Set up medicine reminders
     const checkTime = () => {
       const now = new Date();
       const times = [
@@ -128,38 +125,38 @@ const Index = () => {
             </TabsContent>
           </div>
 
-          <TabsList className="fixed bottom-0 left-0 right-0 w-full flex justify-around bg-white border-t border-gray-200 p-0 z-50 shadow-lg">
+          <TabsList className="fixed bottom-0 left-0 right-0 w-full flex justify-around bg-background border-t border-primary/20 p-0 z-50 shadow-lg">
             <TabsTrigger 
               value="medicine" 
-              className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] hover:bg-primary/5 data-[state=active]:bg-primary/10"
+              className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] hover:bg-primary/20 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               <Pill className="w-6 h-6" />
               <span className="text-xs font-medium">Medicine</span>
             </TabsTrigger>
             <TabsTrigger 
               value="readings" 
-              className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] hover:bg-primary/5 data-[state=active]:bg-primary/10"
+              className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] hover:bg-primary/20 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               <Heart className="w-6 h-6" />
               <span className="text-xs font-medium">Readings</span>
             </TabsTrigger>
             <TabsTrigger 
               value="prescriptions" 
-              className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] hover:bg-primary/5 data-[state=active]:bg-primary/10"
+              className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] hover:bg-primary/20 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               <FileText className="w-6 h-6" />
               <span className="text-xs font-medium">Scripts</span>
             </TabsTrigger>
             <TabsTrigger 
               value="food" 
-              className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] hover:bg-primary/5 data-[state=active]:bg-primary/10"
+              className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] hover:bg-primary/20 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               <Utensils className="w-6 h-6" />
               <span className="text-xs font-medium">Food</span>
             </TabsTrigger>
             <TabsTrigger 
               value="fitness" 
-              className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] hover:bg-primary/5 data-[state=active]:bg-primary/10"
+              className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] hover:bg-primary/20 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               <Activity className="w-6 h-6" />
               <span className="text-xs font-medium">Fitness</span>

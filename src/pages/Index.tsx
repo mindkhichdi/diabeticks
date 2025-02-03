@@ -12,10 +12,13 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import Logo from '@/components/Logo';
 import ConfettiAnimation from '@/components/ConfettiAnimation';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Index = () => {
   const navigate = useNavigate();
   const [showConfetti, setShowConfetti] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const checkFirstVisit = async () => {
@@ -77,14 +80,17 @@ const Index = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
           <Logo />
-          <Button 
-            variant="ghost" 
-            onClick={handleSignOut}
-            className="flex items-center gap-2"
-          >
-            <LogOut className="w-4 h-4" />
-            Sign Out
-          </Button>
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            <Button 
+              variant="ghost" 
+              onClick={handleSignOut}
+              className="flex items-center gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              {t('signOut')}
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -97,7 +103,7 @@ const Index = () => {
           <div className="overflow-x-hidden mb-16">
             <TabsContent value="medicine">
               <section>
-                <h2 className="text-xl md:text-2xl font-semibold mb-4">Daily Medicine Tracker</h2>
+                <h2 className="text-xl md:text-2xl font-semibold mb-4">{t('medicineDailyTracker')}</h2>
                 <MedicineTracker />
               </section>
             </TabsContent>
@@ -112,14 +118,14 @@ const Index = () => {
 
             <TabsContent value="food">
               <section>
-                <h2 className="text-xl md:text-2xl font-semibold mb-4">Food Intake Tracker</h2>
+                <h2 className="text-xl md:text-2xl font-semibold mb-4">{t('foodIntakeTracker')}</h2>
                 <FoodTracker />
               </section>
             </TabsContent>
 
             <TabsContent value="fitness">
               <section>
-                <h2 className="text-xl md:text-2xl font-semibold mb-4">Fitness Tracker</h2>
+                <h2 className="text-xl md:text-2xl font-semibold mb-4">{t('fitnessTracker')}</h2>
                 <FitnessTracker />
               </section>
             </TabsContent>
@@ -131,35 +137,35 @@ const Index = () => {
               className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] rounded-none hover:bg-primary/20 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
             >
               <Pill className="w-6 h-6" />
-              <span className="text-xs font-medium">Medicine</span>
+              <span className="text-xs font-medium">{t('medicine')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="readings" 
               className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] rounded-none hover:bg-primary/20 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
             >
               <Heart className="w-6 h-6" />
-              <span className="text-xs font-medium">Readings</span>
+              <span className="text-xs font-medium">{t('readings')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="prescriptions" 
               className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] rounded-none hover:bg-primary/20 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
             >
               <FileText className="w-6 h-6" />
-              <span className="text-xs font-medium">Scripts</span>
+              <span className="text-xs font-medium">{t('scripts')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="food" 
               className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] rounded-none hover:bg-primary/20 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
             >
               <Utensils className="w-6 h-6" />
-              <span className="text-xs font-medium">Food</span>
+              <span className="text-xs font-medium">{t('food')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="fitness" 
               className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] rounded-none hover:bg-primary/20 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
             >
               <Activity className="w-6 h-6" />
-              <span className="text-xs font-medium">Fitness</span>
+              <span className="text-xs font-medium">{t('fitness')}</span>
             </TabsTrigger>
           </TabsList>
         </Tabs>

@@ -91,7 +91,7 @@ const Index = () => {
         </div>
       </div>
 
-      <div className="flex-1 container mx-auto px-4 pb-20">
+      <div className="flex-1 container mx-auto px-4 pb-24">
         {showConfetti && (
           <ConfettiAnimation onComplete={() => setShowConfetti(false)} />
         )}
@@ -128,26 +128,41 @@ const Index = () => {
             </TabsContent>
           </div>
 
-          <TabsList className="fixed bottom-0 left-0 right-0 w-full flex justify-around bg-white border-t border-gray-200 p-2 z-50">
-            <TabsTrigger value="medicine" className="flex flex-col items-center gap-1">
-              <Pill className="w-5 h-5" />
-              <span className="text-xs">Medicine</span>
+          <TabsList className="fixed bottom-0 left-0 right-0 w-full flex justify-around bg-white border-t border-gray-200 p-0 z-50 shadow-lg">
+            <TabsTrigger 
+              value="medicine" 
+              className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] hover:bg-primary/5 data-[state=active]:bg-primary/10"
+            >
+              <Pill className="w-6 h-6" />
+              <span className="text-xs font-medium">Medicine</span>
             </TabsTrigger>
-            <TabsTrigger value="readings" className="flex flex-col items-center gap-1">
-              <Heart className="w-5 h-5" />
-              <span className="text-xs">Readings</span>
+            <TabsTrigger 
+              value="readings" 
+              className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] hover:bg-primary/5 data-[state=active]:bg-primary/10"
+            >
+              <Heart className="w-6 h-6" />
+              <span className="text-xs font-medium">Readings</span>
             </TabsTrigger>
-            <TabsTrigger value="prescriptions" className="flex flex-col items-center gap-1">
-              <FileText className="w-5 h-5" />
-              <span className="text-xs">Scripts</span>
+            <TabsTrigger 
+              value="prescriptions" 
+              className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] hover:bg-primary/5 data-[state=active]:bg-primary/10"
+            >
+              <FileText className="w-6 h-6" />
+              <span className="text-xs font-medium">Scripts</span>
             </TabsTrigger>
-            <TabsTrigger value="food" className="flex flex-col items-center gap-1">
-              <Utensils className="w-5 h-5" />
-              <span className="text-xs">Food</span>
+            <TabsTrigger 
+              value="food" 
+              className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] hover:bg-primary/5 data-[state=active]:bg-primary/10"
+            >
+              <Utensils className="w-6 h-6" />
+              <span className="text-xs font-medium">Food</span>
             </TabsTrigger>
-            <TabsTrigger value="fitness" className="flex flex-col items-center gap-1">
-              <Activity className="w-5 h-5" />
-              <span className="text-xs">Fitness</span>
+            <TabsTrigger 
+              value="fitness" 
+              className="flex flex-col items-center gap-1 py-3 px-4 w-full h-full min-h-[4.5rem] hover:bg-primary/5 data-[state=active]:bg-primary/10"
+            >
+              <Activity className="w-6 h-6" />
+              <span className="text-xs font-medium">Fitness</span>
             </TabsTrigger>
           </TabsList>
         </Tabs>

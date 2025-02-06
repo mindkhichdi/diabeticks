@@ -49,34 +49,52 @@ export type Database = {
       }
       fitness_logs: {
         Row: {
+          active_energy_kcal: number | null
           activity_type: string
           calories_burned: number
           created_at: string
           date: string | null
+          device_source: string | null
+          device_sync_id: string | null
           distance_km: number | null
           duration_minutes: number
+          elevation_gain: number | null
+          heart_rate_avg: number | null
+          heart_rate_max: number | null
           id: string
           steps: number | null
           user_id: string | null
         }
         Insert: {
+          active_energy_kcal?: number | null
           activity_type: string
           calories_burned: number
           created_at?: string
           date?: string | null
+          device_source?: string | null
+          device_sync_id?: string | null
           distance_km?: number | null
           duration_minutes: number
+          elevation_gain?: number | null
+          heart_rate_avg?: number | null
+          heart_rate_max?: number | null
           id?: string
           steps?: number | null
           user_id?: string | null
         }
         Update: {
+          active_energy_kcal?: number | null
           activity_type?: string
           calories_burned?: number
           created_at?: string
           date?: string | null
+          device_source?: string | null
+          device_sync_id?: string | null
           distance_km?: number | null
           duration_minutes?: number
+          elevation_gain?: number | null
+          heart_rate_avg?: number | null
+          heart_rate_max?: number | null
           id?: string
           steps?: number | null
           user_id?: string | null

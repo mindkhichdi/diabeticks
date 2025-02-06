@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Activity, Dumbbell, PersonStanding, Bike } from 'lucide-react';
+import { Activity, Dumbbell, PersonStanding, Bike, Heart, ArrowUp } from 'lucide-react';
 import { format } from 'date-fns';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from 'sonner';
+import DeviceSync from './fitness/DeviceSync';
 import {
   Select,
   SelectContent,
@@ -23,6 +24,10 @@ interface FitnessLog {
   steps?: number;
   distance_km?: number;
   date: string;
+  device_source?: string;
+  heart_rate_avg?: number;
+  heart_rate_max?: number;
+  elevation_gain?: number;
 }
 
 const activities = [
@@ -127,6 +132,11 @@ const FitnessTracker = () => {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl md:text-2xl font-semibold">Fitness Tracker</h2>
+        <DeviceSync />
+      </div>
+
       <Card className="p-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
@@ -193,12 +203,36 @@ const FitnessTracker = () => {
                 <div className="flex items-center gap-3">
                   {activity && <activity.icon className="w-5 h-5" />}
                   <div>
-                    <h3 className="font-medium">{activity?.label}</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-medium">{activity?.label}</h3>
+                      {log.device_source && (
+                        <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                          {log.device_source}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-sm text-gray-500">
                       {log.duration_minutes} minutes • {log.calories_burned} calories
                       {log.steps && ` • ${log.steps} steps`}
                       {log.distance_km && ` • ${log.distance_km} km`}
                     </p>
+                    {(log.heart_rate_avg || log.elevation_gain) && (
+                      <p className="text-sm text-gray-500 mt-1">
+                        {log.heart_rate_avg && (
+                          <span className="flex items-center gap-1">
+                            <Heart className="w-3 h-3" />
+                            Avg HR: {log.heart_rate_avg} bpm
+                            {log.heart_rate_max && ` (Max: ${log.heart_rate_max} bpm)`}
+                          </span>
+                        )}
+                        {log.elevation_gain && (
+                          <span className="flex items-center gap-1 mt-1">
+                            <ArrowUp className="w-3 h-3" />
+                            Elevation: {log.elevation_gain}m
+                          </span>
+                        )}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <Button

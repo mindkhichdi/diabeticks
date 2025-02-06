@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Sync } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 
 interface HealthKitData {
   startDate: string;
@@ -124,7 +124,7 @@ const DeviceSync = () => {
         onClick={handleAppleHealthSync}
         className="flex items-center gap-2"
       >
-        <Sync className="w-4 h-4" />
+        <RefreshCw className="w-4 h-4" />
         Sync Apple Health
       </Button>
       <Button
@@ -132,7 +132,7 @@ const DeviceSync = () => {
         onClick={handleSamsungHealthSync}
         className="flex items-center gap-2"
       >
-        <Sync className="w-4 h-4" />
+        <RefreshCw className="w-4 h-4" />
         Sync Samsung Health
       </Button>
     </div>

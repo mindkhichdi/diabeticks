@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -122,7 +123,6 @@ const Index = () => {
 
             <TabsContent value="fitness">
               <section>
-                <h2 className="text-xl md:text-2xl font-semibold mb-4">Fitness Tracker</h2>
                 <FitnessTracker />
               </section>
             </TabsContent>

@@ -6,6 +6,12 @@ import { addMonths, format, startOfMonth, endOfMonth, eachDayOfInterval, isSameD
 import { ChevronLeft, ChevronRight, Activity, Bike, PersonStanding, Dumbbell } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
@@ -26,6 +32,7 @@ interface ActivityLog {
 
 const ActivityHeatmap = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   
   const { data: activities } = useQuery({
     queryKey: ['fitnessLogs', format(currentMonth, 'yyyy-MM')],
@@ -91,33 +98,37 @@ const ActivityHeatmap = () => {
     totalDistance: 0
   });
 
+  const selectedDateActivities = activities?.filter(a => 
+    selectedDate && isSameDay(new Date(a.date), selectedDate)
+  ) || [];
+
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-card p-4 rounded-lg">
-          <div className="text-sm text-muted-foreground">Total Activities</div>
-          <div className="text-2xl font-bold">{monthStats?.totalActivities || 0}</div>
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <div className="bg-card p-3 rounded-lg">
+          <div className="text-xs text-muted-foreground">Total Activities</div>
+          <div className="text-xl font-bold">{monthStats?.totalActivities || 0}</div>
         </div>
-        <div className="bg-card p-4 rounded-lg">
-          <div className="text-sm text-muted-foreground">Calories Burned</div>
-          <div className="text-2xl font-bold">{monthStats?.totalCalories || 0}</div>
+        <div className="bg-card p-3 rounded-lg">
+          <div className="text-xs text-muted-foreground">Calories Burned</div>
+          <div className="text-xl font-bold">{monthStats?.totalCalories || 0}</div>
         </div>
-        <div className="bg-card p-4 rounded-lg">
-          <div className="text-sm text-muted-foreground">Active Minutes</div>
-          <div className="text-2xl font-bold">{monthStats?.totalMinutes || 0}</div>
+        <div className="bg-card p-3 rounded-lg">
+          <div className="text-xs text-muted-foreground">Active Minutes</div>
+          <div className="text-xl font-bold">{monthStats?.totalMinutes || 0}</div>
         </div>
-        <div className="bg-card p-4 rounded-lg">
-          <div className="text-sm text-muted-foreground">Distance (km)</div>
-          <div className="text-2xl font-bold">{monthStats?.totalDistance.toFixed(1) || 0}</div>
+        <div className="bg-card p-3 rounded-lg">
+          <div className="text-xs text-muted-foreground">Distance (km)</div>
+          <div className="text-xl font-bold">{monthStats?.totalDistance.toFixed(1) || 0}</div>
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-2">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold">
             {format(currentMonth, 'MMMM yyyy')}
           </h3>
-          <div className="flex gap-2">
+          <div className="flex gap-1">
             <Button
               variant="outline"
               size="icon"
@@ -135,9 +146,9 @@ const ActivityHeatmap = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-7 gap-1">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <div key={day} className="text-center text-sm text-muted-foreground">
+            <div key={day} className="text-center text-xs text-muted-foreground">
               {day}
             </div>
           ))}
@@ -152,11 +163,12 @@ const ActivityHeatmap = () => {
             );
 
             return (
-              <HoverCard key={day.toISOString()}>
+              <HoverCard key={day.toISOString()} openDelay={200}>
                 <HoverCardTrigger asChild>
-                  <div 
+                  <button
+                    onClick={() => setSelectedDate(day)}
                     className={cn(
-                      "aspect-square rounded-md flex items-center justify-center cursor-pointer",
+                      "aspect-square rounded-sm border border-border flex items-center justify-center cursor-pointer hover:border-primary transition-colors",
                       dayActivities.length > 0 
                         ? getActivityIntensity(totalCalories)
                         : "bg-muted"
@@ -165,10 +177,10 @@ const ActivityHeatmap = () => {
                     {dayActivities.length > 0 && (
                       getActivityIcon(dayActivities[0].activity_type)
                     )}
-                  </div>
+                  </button>
                 </HoverCardTrigger>
-                <HoverCardContent className="w-80">
-                  <div className="space-y-2">
+                <HoverCardContent className="w-64 p-2">
+                  <div className="space-y-1">
                     <p className="text-sm font-medium">
                       {format(day, 'MMMM d, yyyy')}
                     </p>
@@ -177,7 +189,7 @@ const ActivityHeatmap = () => {
                         {dayActivities.map(activity => (
                           <div 
                             key={activity.id}
-                            className="text-sm flex items-center gap-2"
+                            className="text-xs flex items-center gap-1"
                           >
                             {getActivityIcon(activity.activity_type)}
                             <span className="capitalize">{activity.activity_type}</span>
@@ -190,7 +202,7 @@ const ActivityHeatmap = () => {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-sm text-muted-foreground">No activities recorded</p>
+                      <p className="text-xs text-muted-foreground">No activities recorded</p>
                     )}
                   </div>
                 </HoverCardContent>
@@ -199,8 +211,44 @@ const ActivityHeatmap = () => {
           })}
         </div>
       </div>
+
+      <Dialog open={!!selectedDate} onOpenChange={() => setSelectedDate(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {selectedDate ? format(selectedDate, 'MMMM d, yyyy') : 'Activities'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {selectedDateActivities.length > 0 ? (
+              selectedDateActivities.map(activity => (
+                <div 
+                  key={activity.id}
+                  className="bg-muted p-3 rounded-lg space-y-2"
+                >
+                  <div className="flex items-center gap-2">
+                    {getActivityIcon(activity.activity_type)}
+                    <span className="font-medium capitalize">{activity.activity_type}</span>
+                  </div>
+                  <div className="text-sm text-muted-foreground space-y-1">
+                    <p>Duration: {activity.duration_minutes} minutes</p>
+                    <p>Calories: {activity.calories_burned}</p>
+                    {activity.distance_km && <p>Distance: {activity.distance_km} km</p>}
+                    {activity.steps && <p>Steps: {activity.steps}</p>}
+                    {activity.heart_rate_avg && <p>Avg Heart Rate: {activity.heart_rate_avg} bpm</p>}
+                    {activity.device_source && <p>Source: {activity.device_source}</p>}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-center text-muted-foreground">No activities recorded for this date</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
 export default ActivityHeatmap;
+

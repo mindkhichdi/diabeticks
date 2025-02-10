@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from 'sonner';
 import DeviceSync from './fitness/DeviceSync';
+import ActivityHeatmap from './fitness/ActivityHeatmap';
 import {
   Select,
   SelectContent,
@@ -136,6 +137,8 @@ const FitnessTracker = () => {
         <h2 className="text-xl md:text-2xl font-semibold">Fitness Tracker</h2>
         <DeviceSync />
       </div>
+
+      <ActivityHeatmap />
 
       <Card className="p-6">
         <form onSubmit={handleSubmit} className="space-y-4">

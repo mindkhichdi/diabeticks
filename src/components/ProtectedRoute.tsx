@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -50,16 +51,24 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", { event, session });
       
-      if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+      if (event === 'SIGNED_OUT' || !session) {
+        setSession(null);
+        navigate("/auth");
+        if (event === 'SIGNED_OUT') {
+          toast({
+            title: "Signed out",
+            description: "You have been signed out successfully",
+          });
+        }
+        return;
+      }
+
+      // Check if this is a token refresh
+      if (event === 'TOKEN_REFRESHED') {
+        console.log("Token refreshed:", session);
         if (!session) {
-          setSession(null);
+          console.log("No session after token refresh, redirecting to auth");
           navigate("/auth");
-          if (event === 'SIGNED_OUT') {
-            toast({
-              title: "Signed out",
-              description: "You have been signed out successfully",
-            });
-          }
           return;
         }
       }

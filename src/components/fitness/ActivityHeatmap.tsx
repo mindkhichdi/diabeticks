@@ -64,14 +64,14 @@ const ActivityHeatmap = () => {
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'cycling':
-        return <Bike className="w-3 h-3" />;
+        return <Bike className="w-2 h-2" />;
       case 'running':
       case 'walking':
-        return <PersonStanding className="w-3 h-3" />;
+        return <PersonStanding className="w-2 h-2" />;
       case 'strength':
-        return <Dumbbell className="w-3 h-3" />;
+        return <Dumbbell className="w-2 h-2" />;
       default:
-        return <Activity className="w-3 h-3" />;
+        return <Activity className="w-2 h-2" />;
     }
   };
 
@@ -104,22 +104,22 @@ const ActivityHeatmap = () => {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-        <div className="bg-card p-3 rounded-lg">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="bg-white p-3 rounded-lg shadow-lg border border-primary/20">
           <div className="text-xs text-muted-foreground">Total Activities</div>
-          <div className="text-xl font-bold">{monthStats?.totalActivities || 0}</div>
+          <div className="text-xl font-bold text-primary">{monthStats?.totalActivities || 0}</div>
         </div>
-        <div className="bg-card p-3 rounded-lg">
+        <div className="bg-white p-3 rounded-lg shadow-lg border border-primary/20">
           <div className="text-xs text-muted-foreground">Calories Burned</div>
-          <div className="text-xl font-bold">{monthStats?.totalCalories || 0}</div>
+          <div className="text-xl font-bold text-primary">{monthStats?.totalCalories || 0}</div>
         </div>
-        <div className="bg-card p-3 rounded-lg">
+        <div className="bg-white p-3 rounded-lg shadow-lg border border-primary/20">
           <div className="text-xs text-muted-foreground">Active Minutes</div>
-          <div className="text-xl font-bold">{monthStats?.totalMinutes || 0}</div>
+          <div className="text-xl font-bold text-primary">{monthStats?.totalMinutes || 0}</div>
         </div>
-        <div className="bg-card p-3 rounded-lg">
+        <div className="bg-white p-3 rounded-lg shadow-lg border border-primary/20">
           <div className="text-xs text-muted-foreground">Distance (km)</div>
-          <div className="text-xl font-bold">{monthStats?.totalDistance.toFixed(1) || 0}</div>
+          <div className="text-xl font-bold text-primary">{monthStats?.totalDistance.toFixed(1) || 0}</div>
         </div>
       </div>
 
@@ -146,9 +146,9 @@ const ActivityHeatmap = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-7 gap-1">
+        <div className="grid grid-cols-7 gap-0.5 text-xs">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <div key={day} className="text-center text-xs text-muted-foreground">
+            <div key={day} className="text-center text-muted-foreground p-1">
               {day}
             </div>
           ))}
@@ -168,12 +168,15 @@ const ActivityHeatmap = () => {
                   <button
                     onClick={() => setSelectedDate(day)}
                     className={cn(
-                      "aspect-square rounded-sm border border-border flex items-center justify-center cursor-pointer hover:border-primary transition-colors",
+                      "aspect-square h-6 rounded-sm border border-border flex items-center justify-center cursor-pointer hover:border-primary transition-colors relative",
                       dayActivities.length > 0 
                         ? getActivityIntensity(totalCalories)
                         : "bg-muted"
                     )}
                   >
+                    <span className="absolute top-0 left-0 text-[8px] text-muted-foreground p-0.5">
+                      {format(day, 'd')}
+                    </span>
                     {dayActivities.length > 0 && (
                       getActivityIcon(dayActivities[0].activity_type)
                     )}

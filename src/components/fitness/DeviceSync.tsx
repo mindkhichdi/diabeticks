@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,135 +7,149 @@ import { toast } from 'sonner';
 import { RefreshCw } from 'lucide-react';
 
 interface HealthKitData {
-  startDate: string;
-  endDate: string;
-  device: string;
-  activityType: string;
-  duration: number;
-  calories: number;
-  distance?: number;
-  steps?: number;
-  heartRateAvg?: number;
-  heartRateMax?: number;
-  elevationGain?: number;
+  workouts: {
+    startDate: string;
+    endDate: string;
+    activityType: string;
+    duration: number;
+    activeEnergyBurned: number;
+    distance?: number;
+    stepCount?: number;
+    heartRateAvg?: number;
+    heartRateMax?: number;
+    elevationAscended?: number;
+  }[];
 }
 
 const DeviceSync = () => {
   const queryClient = useQueryClient();
 
-  const syncMutation = useMutation({
-    mutationFn: async (data: HealthKitData) => {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session.session) throw new Error('No session found');
+  // Check if we're on a mobile device
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-      const syncId = `${data.device}_${data.startDate}`;
-      
-      const { error } = await supabase
-        .from('fitness_logs')
-        .upsert({
-          user_id: session.session.user.id,
-          activity_type: data.activityType,
-          duration_minutes: Math.round(data.duration / 60),
-          calories_burned: Math.round(data.calories),
-          steps: data.steps,
-          distance_km: data.distance,
-          date: data.startDate.split('T')[0],
-          device_source: data.device,
-          heart_rate_avg: data.heartRateAvg,
-          heart_rate_max: data.heartRateMax,
-          elevation_gain: data.elevationGain,
-          device_sync_id: syncId,
-        });
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['fitnessLogs'] });
-      toast.success('Activity synced successfully');
-    },
-    onError: (error) => {
-      console.error('Error syncing activity:', error);
-      toast.error('Failed to sync activity');
-    },
-  });
+  useEffect(() => {
+    // Auto-sync on mobile devices when component mounts
+    if (isMobile) {
+      const autoSync = async () => {
+        if ('webkit' in window && 'messageHandlers' in (window as any).webkit) {
+          await handleAppleHealthSync();
+        } else if ('Android' in window) {
+          await handleAndroidFitSync();
+        }
+      };
+      autoSync();
+    }
+  }, []);
 
   const handleAppleHealthSync = async () => {
-    if (!('webkit' in window)) {
-      toast.error('Apple HealthKit is only available on iOS devices');
-      return;
-    }
-
     try {
-      // Request HealthKit authorization
-      const response = await fetch('https://zxzpyrsglniohutwzhlq.supabase.co/functions/v1/healthkit-auth');
-      if (!response.ok) throw new Error('Failed to authorize HealthKit');
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('No session found');
 
-      // Mock data for demonstration
-      // In real implementation, this would come from HealthKit
-      const mockActivity = {
-        startDate: new Date().toISOString(),
-        endDate: new Date().toISOString(),
-        device: 'Apple Watch',
-        activityType: 'running',
-        duration: 1800, // 30 minutes in seconds
-        calories: 250,
-        distance: 5,
-        steps: 6000,
-        heartRateAvg: 140,
-        heartRateMax: 165,
-        elevationGain: 50,
+      // Request HealthKit data through native bridge
+      // This is a mock of what the native app would provide
+      const healthData: HealthKitData = {
+        workouts: [{
+          startDate: new Date().toISOString(),
+          endDate: new Date().toISOString(),
+          activityType: 'running',
+          duration: 1800,
+          activeEnergyBurned: 250,
+          distance: 5,
+          stepCount: 6000,
+          heartRateAvg: 140,
+          heartRateMax: 165,
+          elevationAscended: 50,
+        }]
       };
 
-      await syncMutation.mutateAsync(mockActivity);
+      const response = await fetch('https://zxzpyrsglniohutwzhlq.supabase.co/functions/v1/healthkit-auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify(healthData),
+      });
+
+      if (!response.ok) throw new Error('Failed to sync with Apple Health');
+
+      const result = await response.json();
+      queryClient.invalidateQueries({ queryKey: ['fitnessLogs'] });
+      toast.success(`Successfully synced ${result.workouts_synced} workouts from Apple Health`);
     } catch (error) {
       console.error('Error syncing with Apple Health:', error);
       toast.error('Failed to sync with Apple Health');
     }
   };
 
-  const handleSamsungHealthSync = async () => {
+  const handleAndroidFitSync = async () => {
     try {
-      // Mock data for demonstration
-      // In real implementation, this would come from Samsung Health
-      const mockActivity = {
-        startDate: new Date().toISOString(),
-        endDate: new Date().toISOString(),
-        device: 'Galaxy Watch',
-        activityType: 'walking',
-        duration: 3600, // 60 minutes in seconds
-        calories: 300,
-        distance: 4,
-        steps: 8000,
-        heartRateAvg: 120,
-        heartRateMax: 140,
-        elevationGain: 30,
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('No session found');
+
+      // This would be replaced with actual Google Fit API data
+      const fitData = {
+        workouts: [{
+          startDate: new Date().toISOString(),
+          endDate: new Date().toISOString(),
+          activityType: 'walking',
+          duration: 3600,
+          activeEnergyBurned: 300,
+          distance: 4,
+          stepCount: 8000,
+          heartRateAvg: 120,
+          heartRateMax: 140,
+          elevationAscended: 30,
+        }]
       };
 
-      await syncMutation.mutateAsync(mockActivity);
+      const response = await fetch('https://zxzpyrsglniohutwzhlq.supabase.co/functions/v1/healthkit-auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+          'x-source': 'android',
+        },
+        body: JSON.stringify(fitData),
+      });
+
+      if (!response.ok) throw new Error('Failed to sync with Google Fit');
+
+      const result = await response.json();
+      queryClient.invalidateQueries({ queryKey: ['fitnessLogs'] });
+      toast.success(`Successfully synced ${result.workouts_synced} workouts from Google Fit`);
     } catch (error) {
-      console.error('Error syncing with Samsung Health:', error);
-      toast.error('Failed to sync with Samsung Health');
+      console.error('Error syncing with Google Fit:', error);
+      toast.error('Failed to sync with Google Fit');
     }
   };
 
+  if (!isMobile) {
+    return null;
+  }
+
   return (
     <div className="flex gap-2">
-      <Button
-        variant="outline"
-        onClick={handleAppleHealthSync}
-        className="flex items-center gap-2"
-      >
-        <RefreshCw className="w-4 h-4" />
-        Sync Apple Health
-      </Button>
-      <Button
-        variant="outline"
-        onClick={handleSamsungHealthSync}
-        className="flex items-center gap-2"
-      >
-        <RefreshCw className="w-4 h-4" />
-        Sync Samsung Health
-      </Button>
+      {'webkit' in window && 'messageHandlers' in (window as any).webkit ? (
+        <Button
+          variant="outline"
+          onClick={handleAppleHealthSync}
+          className="flex items-center gap-2"
+        >
+          <RefreshCw className="w-4 h-4" />
+          Sync Apple Health
+        </Button>
+      ) : 'Android' in window ? (
+        <Button
+          variant="outline"
+          onClick={handleAndroidFitSync}
+          className="flex items-center gap-2"
+        >
+          <RefreshCw className="w-4 h-4" />
+          Sync Google Fit
+        </Button>
+      ) : null}
     </div>
   );
 };

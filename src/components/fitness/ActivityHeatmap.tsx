@@ -103,28 +103,28 @@ const ActivityHeatmap = () => {
   ) || [];
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white p-4 rounded-xl shadow-lg border border-primary/20">
-          <div className="text-sm font-medium text-muted-foreground mb-1">Total Activities</div>
+    <div className="container mx-auto max-w-5xl space-y-6 pb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="bg-white p-3 rounded-lg shadow-md border border-primary/20">
+          <div className="text-sm font-medium text-muted-foreground">Total Activities</div>
           <div className="text-2xl font-bold text-primary">{monthStats?.totalActivities || 0}</div>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-lg border border-primary/20">
-          <div className="text-sm font-medium text-muted-foreground mb-1">Calories Burned</div>
+        <div className="bg-white p-3 rounded-lg shadow-md border border-primary/20">
+          <div className="text-sm font-medium text-muted-foreground">Calories Burned</div>
           <div className="text-2xl font-bold text-primary">{monthStats?.totalCalories || 0}</div>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-lg border border-primary/20">
-          <div className="text-sm font-medium text-muted-foreground mb-1">Active Minutes</div>
+        <div className="bg-white p-3 rounded-lg shadow-md border border-primary/20">
+          <div className="text-sm font-medium text-muted-foreground">Active Minutes</div>
           <div className="text-2xl font-bold text-primary">{monthStats?.totalMinutes || 0}</div>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-lg border border-primary/20">
-          <div className="text-sm font-medium text-muted-foreground mb-1">Distance (km)</div>
+        <div className="bg-white p-3 rounded-lg shadow-md border border-primary/20">
+          <div className="text-sm font-medium text-muted-foreground">Distance (km)</div>
           <div className="text-2xl font-bold text-primary">{monthStats?.totalDistance.toFixed(1) || 0}</div>
         </div>
       </div>
 
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
+      <div className="bg-white p-4 rounded-lg shadow-md">
+        <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">
             {format(currentMonth, 'MMMM yyyy')}
           </h3>
@@ -146,13 +146,15 @@ const ActivityHeatmap = () => {
           </div>
         </div>
 
-        <div className="inline-grid grid-cols-7 gap-px bg-border rounded-lg p-1">
+        <div className="grid grid-cols-7 text-center text-sm mb-1">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <div key={day} className="text-center text-xs text-muted-foreground p-1">
+            <div key={day} className="text-muted-foreground">
               {day}
             </div>
           ))}
-          
+        </div>
+        
+        <div className="grid grid-cols-7 gap-1">
           {daysInMonth.map(day => {
             const dayActivities = activities?.filter(a => 
               isSameDay(new Date(a.date), day)
@@ -168,7 +170,7 @@ const ActivityHeatmap = () => {
                   <button
                     onClick={() => setSelectedDate(day)}
                     className={cn(
-                      "w-8 h-8 rounded flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all relative",
+                      "aspect-square w-full rounded-sm flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all relative",
                       dayActivities.length > 0 
                         ? getActivityIntensity(totalCalories)
                         : "bg-muted hover:bg-muted/80"

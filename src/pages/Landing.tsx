@@ -81,7 +81,7 @@ const Landing = () => {
           <h1 className="text-4xl md:text-6xl font-bold text-primary mb-6">
             Diabeticks
           </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+          <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto text-orange-600">
             Your personal diabetes management companion. Track medicines, monitor blood sugar, and take control of your health journey.
           </p>
           <div className="flex gap-4 justify-center">

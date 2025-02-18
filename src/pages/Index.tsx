@@ -115,7 +115,7 @@ const Index = () => {
 
             <TabsContent value="food">
               <section>
-                <h2 className="text-xl md:text-2xl font-semibold mb-4">Food Intake Tracker</h2>
+                <h2 className="text-xl md:text-2xl font-semibold mb-4 text-orange-600">Food Intake Tracker</h2>
                 <FoodTracker />
               </section>
             </TabsContent>

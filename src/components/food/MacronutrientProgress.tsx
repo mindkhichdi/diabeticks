@@ -1,6 +1,5 @@
 import React from 'react';
 import { Progress } from '@/components/ui/progress';
-
 interface MacronutrientProgressProps {
   current: {
     proteins: number;
@@ -13,15 +12,15 @@ interface MacronutrientProgressProps {
     fats: number;
   };
 }
-
-const MacronutrientProgress: React.FC<MacronutrientProgressProps> = ({ current, goals }) => {
+const MacronutrientProgress: React.FC<MacronutrientProgressProps> = ({
+  current,
+  goals
+}) => {
   const calculatePercentage = (current: number, goal: number) => {
-    return Math.min(Math.round((current / goal) * 100), 100);
+    return Math.min(Math.round(current / goal * 100), 100);
   };
-
-  return (
-    <div className="space-y-4 bg-white p-4 rounded-lg shadow-sm border">
-      <h3 className="font-semibold text-lg mb-4">Macronutrients Progress</h3>
+  return <div className="space-y-4 bg-white p-4 rounded-lg shadow-sm border">
+      <h3 className="font-semibold text-lg mb-4 text-orange-600">Macronutrients Progress</h3>
       
       <div className="space-y-4">
         <div className="space-y-2">
@@ -30,7 +29,9 @@ const MacronutrientProgress: React.FC<MacronutrientProgressProps> = ({ current, 
             <span className="text-muted-foreground">{current.proteins}g / {goals.proteins}g</span>
           </div>
           <Progress value={calculatePercentage(current.proteins, goals.proteins)} className="bg-blue-100">
-            <div className="h-full bg-blue-500 transition-all" style={{ width: `${calculatePercentage(current.proteins, goals.proteins)}%` }} />
+            <div className="h-full bg-blue-500 transition-all" style={{
+            width: `${calculatePercentage(current.proteins, goals.proteins)}%`
+          }} />
           </Progress>
         </div>
 
@@ -40,7 +41,9 @@ const MacronutrientProgress: React.FC<MacronutrientProgressProps> = ({ current, 
             <span className="text-muted-foreground">{current.carbs}g / {goals.carbs}g</span>
           </div>
           <Progress value={calculatePercentage(current.carbs, goals.carbs)} className="bg-green-100">
-            <div className="h-full bg-green-500 transition-all" style={{ width: `${calculatePercentage(current.carbs, goals.carbs)}%` }} />
+            <div className="h-full bg-green-500 transition-all" style={{
+            width: `${calculatePercentage(current.carbs, goals.carbs)}%`
+          }} />
           </Progress>
         </div>
 
@@ -50,12 +53,12 @@ const MacronutrientProgress: React.FC<MacronutrientProgressProps> = ({ current, 
             <span className="text-muted-foreground">{current.fats}g / {goals.fats}g</span>
           </div>
           <Progress value={calculatePercentage(current.fats, goals.fats)} className="bg-yellow-100">
-            <div className="h-full bg-yellow-500 transition-all" style={{ width: `${calculatePercentage(current.fats, goals.fats)}%` }} />
+            <div className="h-full bg-yellow-500 transition-all" style={{
+            width: `${calculatePercentage(current.fats, goals.fats)}%`
+          }} />
           </Progress>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default MacronutrientProgress;

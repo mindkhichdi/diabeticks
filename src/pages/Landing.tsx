@@ -62,11 +62,11 @@ const Landing = () => {
           <div className="flex justify-between items-center">
             <Logo size={28} />
             <div className="flex gap-4">
-              <Button variant="ghost" className="flex items-center gap-2" onClick={() => navigate('/auth')}>
+              <Button variant="ghost" onClick={() => navigate('/auth')} className="flex items-center gap-2 bg-green-600 hover:bg-green-500 text-slate-50">
                 <LogIn className="w-4 h-4" />
                 Sign In
               </Button>
-              <Button className="flex items-center gap-2" onClick={() => navigate('/auth')}>
+              <Button onClick={() => navigate('/auth')} className="flex items-center gap-2 text-slate-50">
                 <UserPlus className="w-4 h-4" />
                 Sign Up
               </Button>
@@ -88,7 +88,7 @@ const Landing = () => {
             <Button size="lg" className="bg-primary hover:bg-primary-dark text-white" onClick={() => navigate('/auth')}>
               Get Started
             </Button>
-            <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary-light" onClick={() => navigate('/auth')}>
+            <Button size="lg" variant="outline" onClick={() => navigate('/auth')} className="border-primary text-primary hover:bg-primary-light bg-green-600 hover:bg-green-500 text-slate-50">
               Sign In
             </Button>
           </div>

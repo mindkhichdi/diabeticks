@@ -86,7 +86,7 @@ const Index = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
           <Logo />
-          <Button variant="ghost" onClick={handleSignOut} className="flex items-center gap-2">
+          <Button variant="ghost" onClick={handleSignOut} className="flex items-center gap-2 bg-orange-600 hover:bg-orange-500 text-slate-50">
             <LogOut className="w-4 h-4" />
             Sign Out
           </Button>

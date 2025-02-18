@@ -1,40 +1,29 @@
 import React from 'react';
 import { Check } from 'lucide-react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { MedicineLog } from '@/types/medicine';
-
 interface MedicineHistoryTableProps {
   logs: MedicineLog[];
   selectedDate: Date;
 }
-
-const MedicineHistoryTable = ({ logs, selectedDate }: MedicineHistoryTableProps) => {
+const MedicineHistoryTable = ({
+  logs,
+  selectedDate
+}: MedicineHistoryTableProps) => {
   console.log('Rendering MedicineHistoryTable with logs:', logs);
-  
   if (!logs?.length) {
-    return (
-      <div className="mt-6">
+    return <div className="mt-6">
         <h4 className="font-semibold mb-4">
           Medicine Status for {selectedDate.toLocaleDateString()}
         </h4>
         <p className="text-gray-500">No medicine logs for this date.</p>
-      </div>
-    );
+      </div>;
   }
-
   const formatLocalTime = (utcTimestamp: string) => {
     console.log('Formatting UTC timestamp:', utcTimestamp);
     const date = new Date(utcTimestamp);
     console.log('Converted to Date object:', date);
     console.log('Local timezone offset:', date.getTimezoneOffset());
-    
     const localTime = date.toLocaleString(undefined, {
       timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       year: 'numeric',
@@ -44,14 +33,11 @@ const MedicineHistoryTable = ({ logs, selectedDate }: MedicineHistoryTableProps)
       minute: '2-digit',
       hour12: true
     });
-    
     console.log('Formatted local time:', localTime);
     return localTime;
   };
-
-  return (
-    <div className="mt-6">
-      <h4 className="font-semibold mb-4">
+  return <div className="mt-6">
+      <h4 className="font-semibold mb-4 text-orange-600">
         Medicine Status for {selectedDate.toLocaleDateString()}
       </h4>
       <Table>
@@ -63,8 +49,7 @@ const MedicineHistoryTable = ({ logs, selectedDate }: MedicineHistoryTableProps)
           </TableRow>
         </TableHeader>
         <TableBody>
-          {logs.map((log, index) => (
-            <TableRow key={index}>
+          {logs.map((log, index) => <TableRow key={index}>
               <TableCell className="capitalize">
                 {log.medicine_time}
               </TableCell>
@@ -74,12 +59,9 @@ const MedicineHistoryTable = ({ logs, selectedDate }: MedicineHistoryTableProps)
               <TableCell>
                 <Check className="h-4 w-4 text-green-500" />
               </TableCell>
-            </TableRow>
-          ))}
+            </TableRow>)}
         </TableBody>
       </Table>
-    </div>
-  );
+    </div>;
 };
-
 export default MedicineHistoryTable;

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -13,26 +12,25 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import Logo from '@/components/Logo';
 import ConfettiAnimation from '@/components/ConfettiAnimation';
-
 const Index = () => {
   const navigate = useNavigate();
   const [showConfetti, setShowConfetti] = useState(false);
-
   useEffect(() => {
     // Check if this is the user's first visit
     const checkFirstVisit = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: {
+          session
+        }
+      } = await supabase.auth.getSession();
       if (!session) return;
-
       const lastVisitKey = `last_visit_${session.user.id}`;
       const lastVisit = localStorage.getItem(lastVisitKey);
-
       if (!lastVisit) {
         setShowConfetti(true);
         localStorage.setItem(lastVisitKey, new Date().toISOString());
       }
     };
-
     checkFirstVisit();
 
     // Request notification permission
@@ -43,28 +41,37 @@ const Index = () => {
     // Set up medicine reminders
     const checkTime = () => {
       const now = new Date();
-      const times = [
-        { hour: 7, min: 50, label: 'morning' },
-        { hour: 13, min: 50, label: 'afternoon' },
-        { hour: 19, min: 50, label: 'night' }
-      ];
-
-      times.forEach(({ hour, min, label }) => {
+      const times = [{
+        hour: 7,
+        min: 50,
+        label: 'morning'
+      }, {
+        hour: 13,
+        min: 50,
+        label: 'afternoon'
+      }, {
+        hour: 19,
+        min: 50,
+        label: 'night'
+      }];
+      times.forEach(({
+        hour,
+        min,
+        label
+      }) => {
         if (now.getHours() === hour && now.getMinutes() === min) {
           toast.info(`Time to take your ${label} medicine in 10 minutes!`);
           if ('Notification' in window && Notification.permission === 'granted') {
             new Notification(`Medicine Reminder`, {
-              body: `Time to take your ${label} medicine in 10 minutes!`,
+              body: `Time to take your ${label} medicine in 10 minutes!`
             });
           }
         }
       });
     };
-
     const interval = setInterval(checkTime, 60000);
     return () => clearInterval(interval);
   }, []);
-
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();
@@ -75,17 +82,11 @@ const Index = () => {
       toast.error('Error signing out');
     }
   };
-
-  return (
-    <div className="min-h-screen flex flex-col w-full">
+  return <div className="min-h-screen flex flex-col w-full">
       <div className="container mx-auto px-4 py-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
           <Logo />
-          <Button 
-            variant="ghost" 
-            onClick={handleSignOut}
-            className="flex items-center gap-2"
-          >
+          <Button variant="ghost" onClick={handleSignOut} className="flex items-center gap-2">
             <LogOut className="w-4 h-4" />
             Sign Out
           </Button>
@@ -93,15 +94,13 @@ const Index = () => {
       </div>
 
       <div className="flex-1 container mx-auto px-4 pb-20">
-        {showConfetti && (
-          <ConfettiAnimation onComplete={() => setShowConfetti(false)} />
-        )}
+        {showConfetti && <ConfettiAnimation onComplete={() => setShowConfetti(false)} />}
         
         <Tabs defaultValue="medicine" className="w-full">
           <div className="overflow-x-hidden mb-16">
             <TabsContent value="medicine">
               <section>
-                <h2 className="text-xl md:text-2xl font-semibold mb-4">Daily Medicine Tracker</h2>
+                <h2 className="text-xl md:text-2xl font-semibold mb-4 text-orange-600">Daily Medicine Tracker</h2>
                 <MedicineTracker />
               </section>
             </TabsContent>
@@ -152,8 +151,6 @@ const Index = () => {
           </TabsList>
         </Tabs>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;

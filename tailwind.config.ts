@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -23,27 +22,12 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "#FAFAFA",
+        background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#009688", // Teal for primary actions
-          dark: "#00796B",    // Darker teal
-          light: "#B2DFDB",   // Light teal
-        },
-        glucose: {
-          normal: "#AED581",  // Light Green
-          elevated: "#FF7043", // Coral
-          low: "#42A5F5",     // Soft Blue
-        },
-        alert: {
-          critical: "#FF7043", // Coral
-          warning: "#FFEB3B",  // Sunny Yellow
-        },
-        chart: {
-          primary: "#009688", // Teal
-          secondary: "#CE93D8", // Lavender
-          healthy: "#AED581",   // Light Green
-          risk: "#FF7043",      // Coral
+          DEFAULT: "#F97316", // Bright orange
+          dark: "#EA580C",    // Darker orange
+          light: "#FED7AA",   // Light orange
         },
         diabetic: {
           morning: "#FFB84C",

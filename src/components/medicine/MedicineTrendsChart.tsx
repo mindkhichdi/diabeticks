@@ -40,18 +40,31 @@ const MedicineTrendsChart = ({ selectedMonth = new Date() }: MedicineTrendsChart
       
       if (!user) throw new Error('No user found');
       
+      // Set time to beginning and end of day to ensure we get all logs for the month
+      const startDate = new Date(firstDay);
+      startDate.setUTCHours(0, 0, 0, 0);
+      
+      const endDate = new Date(lastDay);
+      endDate.setUTCHours(23, 59, 59, 999);
+      
+      console.log('Fetching medicine logs for month:', {
+        start: startDate.toISOString(),
+        end: endDate.toISOString()
+      });
+      
       const { data, error } = await supabase
         .from('medicine_logs')
         .select('*')
         .eq('user_id', user.id)
-        .gte('taken_at', firstDay.toISOString())
-        .lte('taken_at', lastDay.toISOString());
+        .gte('taken_at', startDate.toISOString())
+        .lte('taken_at', endDate.toISOString());
         
       if (error) {
         console.error('Error fetching medicine logs:', error);
         throw error;
       }
       
+      console.log('Raw medicine month logs data:', data);
       return data || [];
     }
   });
@@ -75,10 +88,11 @@ const MedicineTrendsChart = ({ selectedMonth = new Date() }: MedicineTrendsChart
     }
     
     // If no logs, return the initialized data
-    if (!medicineLogs) return adherenceData;
+    if (!medicineLogs || !Array.isArray(medicineLogs)) return adherenceData;
     
     // Update data based on medicine logs
     medicineLogs.forEach(log => {
+      // Get the date part only from the taken_at timestamp
       const logDate = new Date(log.taken_at).toISOString().split('T')[0];
       const dayRecord = adherenceData.find(day => day.date === logDate);
       
@@ -102,8 +116,19 @@ const MedicineTrendsChart = ({ selectedMonth = new Date() }: MedicineTrendsChart
   const calculateOverallAdherence = (): number => {
     if (adherenceData.length === 0) return 0;
     
-    const totalDoses = adherenceData.length * 3; // 3 doses per day
-    const takenDoses = adherenceData.reduce((sum, day) => {
+    const today = new Date();
+    const isCurrentMonth = today.getMonth() === selectedMonth.getMonth() && 
+                           today.getFullYear() === selectedMonth.getFullYear();
+    
+    // Only count days up to today for current month
+    const relevantDays = isCurrentMonth 
+      ? adherenceData.filter(day => new Date(day.date) <= today)
+      : adherenceData;
+    
+    if (relevantDays.length === 0) return 0;
+    
+    const totalDoses = relevantDays.length * 3; // 3 doses per day
+    const takenDoses = relevantDays.reduce((sum, day) => {
       return sum + [day.morning, day.afternoon, day.night].filter(Boolean).length;
     }, 0);
     
@@ -200,7 +225,9 @@ const MedicineTrendsChart = ({ selectedMonth = new Date() }: MedicineTrendsChart
           <TooltipProvider>
             {adherenceData.map((day, index) => {
               const dayNumber = index + 1;
-              const isPast = new Date(day.date) <= new Date();
+              const currentDate = new Date();
+              const dayDate = new Date(day.date);
+              const isPast = dayDate <= currentDate;
               
               return (
                 <Tooltip key={day.date}>

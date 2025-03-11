@@ -76,6 +76,7 @@ const MedicineTrendsChart = ({ selectedMonth = new Date() }: MedicineTrendsChart
     // Initialize data for each day in the month
     for (let day = 1; day <= daysInMonth; day++) {
       const currentDate = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), day);
+      // Important: Use UTC methods to avoid timezone issues
       const dateString = currentDate.toISOString().split('T')[0];
       
       adherenceData.push({
@@ -92,9 +93,16 @@ const MedicineTrendsChart = ({ selectedMonth = new Date() }: MedicineTrendsChart
     
     // Update data based on medicine logs
     medicineLogs.forEach(log => {
-      // Get the date part only from the taken_at timestamp
-      const logDate = new Date(log.taken_at).toISOString().split('T')[0];
-      const dayRecord = adherenceData.find(day => day.date === logDate);
+      // Get the correct date by taking the date part from the log's taken_at timestamp
+      const logDate = new Date(log.taken_at);
+      // Format to YYYY-MM-DD in the local timezone to match the date strings in adherenceData
+      const localDateString = new Date(
+        logDate.getFullYear(), 
+        logDate.getMonth(), 
+        logDate.getDate()
+      ).toISOString().split('T')[0];
+      
+      const dayRecord = adherenceData.find(day => day.date === localDateString);
       
       if (dayRecord) {
         if (log.medicine_time === 'morning') dayRecord.morning = true;
@@ -187,9 +195,7 @@ const MedicineTrendsChart = ({ selectedMonth = new Date() }: MedicineTrendsChart
   }
 
   // Calculate the offset for the first day of the month
-  // This is crucial for correctly positioning day cells in the calendar grid
   const getFirstDayOffset = () => {
-    // The getDay() method returns the day of the week (0-6, where 0 is Sunday)
     return firstDay.getDay();
   };
 
@@ -230,27 +236,28 @@ const MedicineTrendsChart = ({ selectedMonth = new Date() }: MedicineTrendsChart
           
           {/* Days of the month with adherence indicators */}
           <TooltipProvider>
-            {adherenceData.map((day, index) => {
-              const dayNumber = index + 1;
+            {adherenceData.map((dayData, index) => {
+              const dayNumber = index + 1; // Correct day number based on array index
               const currentDate = new Date();
-              const dayDate = new Date(day.date);
+              // Create date object for this day
+              const dayDate = new Date(dayData.date);
               const isPast = dayDate <= currentDate;
               
               return (
-                <Tooltip key={day.date}>
+                <Tooltip key={dayData.date}>
                   <TooltipTrigger asChild>
                     <div 
                       className={`
                         h-10 rounded-md flex flex-col items-center justify-center cursor-pointer border
-                        ${isPast ? getAdherenceBgClass(day.adherenceRate) : 'bg-gray-50 opacity-50'}
+                        ${isPast ? getAdherenceBgClass(dayData.adherenceRate) : 'bg-gray-50 opacity-50'}
                       `}
                     >
                       <div className="text-xs font-medium">{dayNumber}</div>
                       {isPast && (
                         <div className="flex mt-1">
-                          {day.morning && <div className="w-1 h-1 rounded-full bg-diabetic-morning mx-0.5"></div>}
-                          {day.afternoon && <div className="w-1 h-1 rounded-full bg-diabetic-afternoon mx-0.5"></div>}
-                          {day.night && <div className="w-1 h-1 rounded-full bg-diabetic-night mx-0.5"></div>}
+                          {dayData.morning && <div className="w-1 h-1 rounded-full bg-diabetic-morning mx-0.5"></div>}
+                          {dayData.afternoon && <div className="w-1 h-1 rounded-full bg-diabetic-afternoon mx-0.5"></div>}
+                          {dayData.night && <div className="w-1 h-1 rounded-full bg-diabetic-night mx-0.5"></div>}
                         </div>
                       )}
                     </div>
@@ -258,27 +265,27 @@ const MedicineTrendsChart = ({ selectedMonth = new Date() }: MedicineTrendsChart
                   <TooltipContent>
                     <div className="p-1">
                       <div className="font-medium">
-                        {new Date(day.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                        {new Date(dayData.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                       </div>
                       <div className="flex flex-col text-sm mt-1">
                         <div className="flex items-center gap-1">
                           <div className="w-2 h-2 bg-diabetic-morning rounded-full"></div>
                           <span>Morning: </span>
-                          {day.morning ? 
+                          {dayData.morning ? 
                             <CheckCircle className="h-3 w-3 text-green-500" /> : 
                             <XCircle className="h-3 w-3 text-red-500" />}
                         </div>
                         <div className="flex items-center gap-1">
                           <div className="w-2 h-2 bg-diabetic-afternoon rounded-full"></div>
                           <span>Afternoon: </span>
-                          {day.afternoon ? 
+                          {dayData.afternoon ? 
                             <CheckCircle className="h-3 w-3 text-green-500" /> : 
                             <XCircle className="h-3 w-3 text-red-500" />}
                         </div>
                         <div className="flex items-center gap-1">
                           <div className="w-2 h-2 bg-diabetic-night rounded-full"></div>
                           <span>Night: </span>
-                          {day.night ? 
+                          {dayData.night ? 
                             <CheckCircle className="h-3 w-3 text-green-500" /> : 
                             <XCircle className="h-3 w-3 text-red-500" />}
                         </div>
@@ -291,7 +298,7 @@ const MedicineTrendsChart = ({ selectedMonth = new Date() }: MedicineTrendsChart
           </TooltipProvider>
           
           {/* Add empty cells for days after the last day of the month */}
-          {Array.from({ length: 6 - ((daysInMonth + getFirstDayOffset()) % 7) }).map((_, i) => (
+          {Array.from({ length: (7 - ((daysInMonth + getFirstDayOffset()) % 7)) % 7 }).map((_, i) => (
             <div key={`empty-end-${i}`} className="h-10 rounded-md"></div>
           ))}
         </div>

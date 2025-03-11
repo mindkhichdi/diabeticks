@@ -186,6 +186,13 @@ const MedicineTrendsChart = ({ selectedMonth = new Date() }: MedicineTrendsChart
     );
   }
 
+  // Calculate the offset for the first day of the month
+  // This is crucial for correctly positioning day cells in the calendar grid
+  const getFirstDayOffset = () => {
+    // The getDay() method returns the day of the week (0-6, where 0 is Sunday)
+    return firstDay.getDay();
+  };
+
   return (
     <Card className="w-full shadow-md bg-white/90 backdrop-blur-sm">
       <CardHeader className="pb-2">
@@ -217,7 +224,7 @@ const MedicineTrendsChart = ({ selectedMonth = new Date() }: MedicineTrendsChart
           ))}
           
           {/* Add empty cells for days before the 1st of the month */}
-          {Array.from({ length: firstDay.getDay() }).map((_, i) => (
+          {Array.from({ length: getFirstDayOffset() }).map((_, i) => (
             <div key={`empty-start-${i}`} className="h-10 rounded-md"></div>
           ))}
           
@@ -284,7 +291,7 @@ const MedicineTrendsChart = ({ selectedMonth = new Date() }: MedicineTrendsChart
           </TooltipProvider>
           
           {/* Add empty cells for days after the last day of the month */}
-          {Array.from({ length: 6 - lastDay.getDay() }).map((_, i) => (
+          {Array.from({ length: 6 - ((daysInMonth + getFirstDayOffset()) % 7) }).map((_, i) => (
             <div key={`empty-end-${i}`} className="h-10 rounded-md"></div>
           ))}
         </div>

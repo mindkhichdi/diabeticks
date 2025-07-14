@@ -55,20 +55,34 @@ const Landing = () => {
     title: "User-Friendly",
     description: "Simple and intuitive interface designed for users of all ages. Easy to use, yet powerful enough for comprehensive diabetes management."
   }];
-  return <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-32 left-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute top-80 right-1/3 w-48 h-48 bg-accent/5 rounded-full blur-2xl animate-float" style={{animationDelay: '1s'}}></div>
+        <div className="absolute bottom-32 left-1/2 w-72 h-72 bg-success/5 rounded-full blur-3xl animate-float" style={{animationDelay: '3s'}}></div>
+      </div>
+
       {/* Navigation Bar */}
-      <nav className="border-b">
+      <nav className="glass backdrop-blur-xl border-b border-white/20 sticky top-0 z-40">
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <Logo size={28} />
-            <div className="flex gap-4">
-              <Button variant="ghost" onClick={() => navigate('/auth')} className="flex items-center gap-2 bg-green-600 hover:bg-green-500 text-slate-50">
+            <Logo variant="full" size={28} />
+            <div className="flex gap-3">
+              <Button 
+                variant="ghost" 
+                onClick={() => navigate('/auth')} 
+                className="flex items-center gap-2 hover:bg-primary/10 text-primary border border-primary/20 rounded-full px-6"
+              >
                 <LogIn className="w-4 h-4" />
                 Sign In
               </Button>
-              <Button onClick={() => navigate('/auth')} className="flex items-center gap-2 text-slate-50">
+              <Button 
+                onClick={() => navigate('/auth')} 
+                className="flex items-center gap-2 bg-gradient-primary text-white shadow-glow hover:shadow-float transition-all duration-300 rounded-full px-6"
+              >
                 <UserPlus className="w-4 h-4" />
-                Sign Up
+                Get Started
               </Button>
             </div>
           </div>
@@ -77,44 +91,84 @@ const Landing = () => {
 
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16 md:py-24">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-6xl font-bold text-primary mb-6">
-            Diabeticks
-          </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto text-orange-600">
-            Your personal diabetes management companion. Track medicines, monitor blood sugar, and take control of your health journey.
+        <div className="text-center mb-20 animate-slide-up">
+          <div className="mb-8">
+            <h1 className="text-5xl md:text-7xl font-black bg-gradient-primary bg-clip-text text-transparent mb-4 animate-glow">
+              Diabeticks
+            </h1>
+            <div className="flex items-center justify-center gap-2 text-lg md:text-xl text-muted-foreground">
+              <Pill className="w-5 h-5 text-primary animate-bounce" />
+              <span>Your Health, Your Way</span>
+              <Heart className="w-5 h-5 text-accent animate-pulse" />
+            </div>
+          </div>
+          
+          <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed">
+            Transform your diabetes management with our beautiful, intuitive app. Track medicines, monitor health metrics, and take control of your wellness journey with style.
           </p>
-          <div className="flex gap-4 justify-center">
-            <Button size="lg" className="bg-primary hover:bg-primary-dark text-white" onClick={() => navigate('/auth')}>
-              Get Started
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              size="lg" 
+              className="bg-gradient-primary text-white shadow-glow hover:shadow-float transition-all duration-300 rounded-full px-8 py-4 text-lg font-bold" 
+              onClick={() => navigate('/auth')}
+            >
+              <Pill className="w-5 h-5 mr-2" />
+              Start Your Journey
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/auth')} className="border-primary text-primary hover:bg-primary-light bg-green-600 hover:bg-green-500 text-slate-50">
+            <Button 
+              size="lg" 
+              variant="outline" 
+              onClick={() => navigate('/auth')} 
+              className="border-2 border-primary/30 text-primary hover:bg-primary/5 rounded-full px-8 py-4 text-lg font-bold backdrop-blur"
+            >
+              <LogIn className="w-5 h-5 mr-2" />
               Sign In
             </Button>
           </div>
         </div>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
-          {features.map((feature, index) => <Card key={index} className="p-6 hover:shadow-lg transition-shadow backdrop-blur-sm bg-orange-50">
-              <div className="flex flex-col items-center text-center">
-                <div className="mb-4">
-                  {feature.icon}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-20">
+          {features.map((feature, index) => (
+            <Card 
+              key={index} 
+              className="group p-8 glass border border-white/20 hover:shadow-float transition-all duration-500 rounded-2xl animate-slide-up"
+              style={{animationDelay: `${index * 0.1}s`}}
+            >
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="p-4 bg-gradient-primary rounded-2xl shadow-glow group-hover:scale-110 transition-transform duration-300">
+                  {React.cloneElement(feature.icon, { className: "w-8 h-8 text-white" })}
                 </div>
-                <h3 className="text-xl font-semibold mb-2 text-orange-600">{feature.title}</h3>
-                <p className="text-muted-foreground">{feature.description}</p>
+                <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+                  {feature.title}
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  {feature.description}
+                </p>
               </div>
-            </Card>)}
+            </Card>
+          ))}
         </div>
 
         {/* Call to Action */}
-        <div className="text-center mt-16">
-          <h2 className="text-3xl font-bold mb-6 text-orange-600">
-            Ready to Take Control of Your Diabetes?
-          </h2>
-          <Button size="lg" className="bg-primary hover:bg-primary-dark text-white" onClick={() => navigate('/auth')}>
-            Join Diabeticks Today
-          </Button>
+        <div className="text-center mt-20 animate-slide-up">
+          <div className="glass border border-white/20 rounded-3xl p-12 max-w-2xl mx-auto">
+            <h2 className="text-4xl font-black bg-gradient-accent bg-clip-text text-transparent mb-6">
+              Ready to Transform Your Health?
+            </h2>
+            <p className="text-lg text-muted-foreground mb-8">
+              Join thousands of users who are already managing their diabetes with confidence and style.
+            </p>
+            <Button 
+              size="lg" 
+              className="bg-gradient-accent text-white shadow-glow hover:shadow-float transition-all duration-300 rounded-full px-10 py-4 text-lg font-bold" 
+              onClick={() => navigate('/auth')}
+            >
+              <Heart className="w-5 h-5 mr-2 animate-pulse" />
+              Join Diabeticks Today
+            </Button>
+          </div>
         </div>
       </div>
     </div>;

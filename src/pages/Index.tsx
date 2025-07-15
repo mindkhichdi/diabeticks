@@ -82,127 +82,75 @@ const Index = () => {
       toast.error('Error signing out');
     }
   };
-  return <div className="min-h-screen flex flex-col w-full relative overflow-hidden">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute top-60 right-20 w-24 h-24 bg-accent/10 rounded-full blur-2xl animate-float" style={{animationDelay: '2s'}}></div>
-        <div className="absolute bottom-40 left-1/4 w-40 h-40 bg-success/10 rounded-full blur-3xl animate-float" style={{animationDelay: '4s'}}></div>
+  return <div className="min-h-screen flex flex-col w-full">
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
+          <Logo />
+          <Button variant="ghost" onClick={handleSignOut} className="flex items-center gap-2 text-slate-50 bg-red-600 hover:bg-red-500">
+            <LogOut className="w-4 h-4" />
+            Sign Out
+          </Button>
+        </div>
       </div>
 
-      {/* Header */}
-      <header className="glass backdrop-blur-xl border-b border-white/20 sticky top-0 z-40">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <Logo variant="full" />
-            <Button 
-              onClick={handleSignOut} 
-              className="flex items-center gap-2 bg-gradient-to-r from-destructive to-destructive/80 hover:from-destructive/90 hover:to-destructive/70 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-6 py-2"
-            >
-              <LogOut className="w-4 h-4" />
-              Sign Out
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex-1 container mx-auto px-4 pt-8 pb-24">
+      <div className="flex-1 container mx-auto px-4 pb-20">
         {showConfetti && <ConfettiAnimation onComplete={() => setShowConfetti(false)} />}
         
         <Tabs defaultValue="medicine" className="w-full">
-          <div className="space-y-8 animate-slide-up">
-            <TabsContent value="medicine" className="space-y-6">
-              <div className="text-center">
-                <h1 className="text-3xl md:text-4xl font-black bg-gradient-primary bg-clip-text text-transparent mb-2">
-                  Daily Medicine Tracker
-                </h1>
-                <p className="text-muted-foreground">Stay on track with your medication schedule</p>
-              </div>
-              <MedicineTracker />
+          <div className="overflow-x-hidden mb-16">
+            <TabsContent value="medicine">
+              <section>
+                <h2 className="text-xl md:text-2xl font-semibold mb-4 text-orange-600">Daily Medicine Tracker</h2>
+                <MedicineTracker />
+              </section>
             </TabsContent>
             
-            <TabsContent value="readings" className="space-y-6">
-              <div className="text-center">
-                <h1 className="text-3xl md:text-4xl font-black bg-gradient-primary bg-clip-text text-transparent mb-2">
-                  Health Readings
-                </h1>
-                <p className="text-muted-foreground">Monitor your vital health metrics</p>
-              </div>
+            <TabsContent value="readings">
               <ReadingsLog />
             </TabsContent>
 
-            <TabsContent value="prescriptions" className="space-y-6">
-              <div className="text-center">
-                <h1 className="text-3xl md:text-4xl font-black bg-gradient-primary bg-clip-text text-transparent mb-2">
-                  Prescriptions
-                </h1>
-                <p className="text-muted-foreground">Manage your prescription documents</p>
-              </div>
+            <TabsContent value="prescriptions">
               <PrescriptionManager />
             </TabsContent>
 
-            <TabsContent value="food" className="space-y-6">
-              <div className="text-center">
-                <h1 className="text-3xl md:text-4xl font-black bg-gradient-primary bg-clip-text text-transparent mb-2">
-                  Nutrition Tracker
-                </h1>
-                <p className="text-muted-foreground">Track your daily food intake and goals</p>
-              </div>
-              <FoodTracker />
+            <TabsContent value="food">
+              <section>
+                <h2 className="text-xl md:text-2xl font-semibold mb-4 text-orange-600">Food Intake Tracker</h2>
+                <FoodTracker />
+              </section>
             </TabsContent>
 
-            <TabsContent value="fitness" className="space-y-6">
-              <div className="text-center">
-                <h1 className="text-3xl md:text-4xl font-black bg-gradient-primary bg-clip-text text-transparent mb-2">
-                  Fitness Journey
-                </h1>
-                <p className="text-muted-foreground">Track your physical activity and progress</p>
-              </div>
-              <FitnessTracker />
+            <TabsContent value="fitness">
+              <section>
+                <FitnessTracker />
+              </section>
             </TabsContent>
           </div>
 
-          {/* Bottom Navigation */}
-          <TabsList className="fixed bottom-6 left-1/2 transform -translate-x-1/2 w-auto flex justify-center gap-2 glass backdrop-blur-xl border border-white/20 p-2 rounded-2xl shadow-float z-50">
-            <TabsTrigger 
-              value="medicine" 
-              className="flex flex-col items-center gap-1 px-4 py-3 rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-glow transition-all duration-300"
-            >
+          <TabsList className="fixed bottom-0 left-0 right-0 w-full flex justify-around bg-white border-t border-gray-200 p-2 z-50">
+            <TabsTrigger value="medicine" className="flex flex-col items-center gap-1">
               <Pill className="w-5 h-5" />
-              <span className="text-xs font-medium">Medicine</span>
+              <span className="text-xs">Medicine</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="readings" 
-              className="flex flex-col items-center gap-1 px-4 py-3 rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-glow transition-all duration-300"
-            >
+            <TabsTrigger value="readings" className="flex flex-col items-center gap-1">
               <Heart className="w-5 h-5" />
-              <span className="text-xs font-medium">Readings</span>
+              <span className="text-xs">Readings</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="prescriptions" 
-              className="flex flex-col items-center gap-1 px-4 py-3 rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-glow transition-all duration-300"
-            >
+            <TabsTrigger value="prescriptions" className="flex flex-col items-center gap-1">
               <FileText className="w-5 h-5" />
-              <span className="text-xs font-medium">Scripts</span>
+              <span className="text-xs">Scripts</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="food" 
-              className="flex flex-col items-center gap-1 px-4 py-3 rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-glow transition-all duration-300"
-            >
+            <TabsTrigger value="food" className="flex flex-col items-center gap-1">
               <Utensils className="w-5 h-5" />
-              <span className="text-xs font-medium">Food</span>
+              <span className="text-xs">Food</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="fitness" 
-              className="flex flex-col items-center gap-1 px-4 py-3 rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-glow transition-all duration-300"
-            >
+            <TabsTrigger value="fitness" className="flex flex-col items-center gap-1">
               <Activity className="w-5 h-5" />
-              <span className="text-xs font-medium">Fitness</span>
+              <span className="text-xs">Fitness</span>
             </TabsTrigger>
           </TabsList>
         </Tabs>
-      </main>
+      </div>
     </div>;
 };
 export default Index;

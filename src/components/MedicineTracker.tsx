@@ -6,12 +6,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import confetti from 'canvas-confetti';
 import MedicineTimeSlot from './medicine/MedicineTimeSlot';
 import MedicineHistoryTable from './medicine/MedicineHistoryTable';
-import MedicineTrendsChart from './medicine/MedicineTrendsChart';
 import { TimeSlot, MedicineLog } from '@/types/medicine';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
 const timeSlots: TimeSlot[] = [{
   id: 'morning',
   icon: <Sun className="w-6 h-6" />,
@@ -28,7 +26,6 @@ const timeSlots: TimeSlot[] = [{
   label: 'Night Medicine',
   time: '20:00'
 }];
-
 const triggerConfetti = () => {
   const count = 200;
   const defaults = {
@@ -67,11 +64,9 @@ const triggerConfetti = () => {
     startVelocity: 45
   });
 };
-
 const MedicineTracker = () => {
   const queryClient = useQueryClient();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-
   const {
     data: medicineLogs = []
   } = useQuery<MedicineLog[]>({
@@ -103,7 +98,6 @@ const MedicineTracker = () => {
       return data || [];
     }
   });
-
   const logMedicine = useMutation({
     mutationFn: async (slotId: string) => {
       const {
@@ -139,12 +133,10 @@ const MedicineTracker = () => {
       toast.error('Failed to log medicine. Please try again.');
     }
   });
-
   const handleMedicineTaken = (slotId: string) => {
     logMedicine.mutate(slotId);
     toast.success(`${slotId.charAt(0).toUpperCase() + slotId.slice(1)} medicine marked as taken!`);
   };
-
   const isTaken = (slotId: string) => {
     if (!Array.isArray(medicineLogs)) {
       console.warn('medicineLogs is not an array:', medicineLogs);
@@ -159,7 +151,6 @@ const MedicineTracker = () => {
     console.log(`Medicine status for ${slotId}:`, taken);
     return taken;
   };
-
   useEffect(() => {
     const allTaken = timeSlots.every(slot => isTaken(slot.id));
     if (allTaken) {
@@ -168,7 +159,6 @@ const MedicineTracker = () => {
       toast.success('Congratulations! You\'ve taken all your medicines for the day! 🎉');
     }
   }, [medicineLogs]);
-
   return <div className="space-y-4">
       <Card className="p-6 shadow-lg bg-white/90 backdrop-blur-sm">
         <div className="flex flex-col space-y-4">
@@ -190,8 +180,6 @@ const MedicineTracker = () => {
         </div>
       </Card>
 
-      <MedicineTrendsChart selectedMonth={selectedDate} />
-
       <div className="grid gap-4 md:grid-cols-3 backdrop-blur-sm p-6 rounded-lg shadow-lg bg-orange-50">
         {timeSlots.map(slot => <MedicineTimeSlot key={slot.id} icon={slot.icon} time={slot.time} label={slot.label} isTaken={isTaken(slot.id)} onMedicineTaken={() => handleMedicineTaken(slot.id)} colorClass={`text-diabetic-${slot.id}`} disabled={false} slotId={slot.id} />)}
       </div>
@@ -201,5 +189,4 @@ const MedicineTracker = () => {
       </Card>
     </div>;
 };
-
 export default MedicineTracker;

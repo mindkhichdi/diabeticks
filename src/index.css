@@ -1,86 +1,79 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 24 100% 98%;
-    --foreground: 24 10% 10%;
+    --background: 220 27% 98%;
+    --foreground: 220 9% 9%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 24 10% 10%;
+    --card: 0 0% 100% / 0.8;
+    --card-foreground: 220 9% 9%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 24 10% 10%;
+    --popover: 0 0% 100% / 0.95;
+    --popover-foreground: 220 9% 9%;
 
-    --primary: 24 94% 53%;
-    --primary-foreground: 24 10% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 24 30% 96%;
-    --secondary-foreground: 24 10% 10%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 9% 15%;
 
-    --muted: 24 30% 96%;
-    --muted-foreground: 24 10% 54%;
+    --muted: 220 14% 96% / 0.5;
+    --muted-foreground: 220 9% 46%;
 
-    --accent: 24 30% 96%;
-    --accent-foreground: 24 10% 10%;
+    --accent: 220 14% 96% / 0.8;
+    --accent-foreground: 220 9% 15%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 24 10% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 24 20% 92%;
-    --input: 24 20% 92%;
-    --ring: 24 90% 53%;
+    --border: 220 13% 91% / 0.2;
+    --input: 220 13% 91% / 0.3;
+    --ring: 217 91% 60%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
 
-    --sidebar-background: 24 100% 98%;
-    --sidebar-foreground: 24 10% 26%;
-    --sidebar-primary: 24 10% 10%;
-    --sidebar-primary-foreground: 24 100% 98%;
-    --sidebar-accent: 24 5% 96%;
-    --sidebar-accent-foreground: 24 10% 10%;
-    --sidebar-border: 24 13% 91%;
-    --sidebar-ring: 24 91% 60%;
+    /* Glassmorphism specific variables */
+    --glass-bg: 255 255 255 / 0.1;
+    --glass-border: 255 255 255 / 0.2;
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
   }
 
   .dark {
-    --background: 24 25% 10%;
-    --foreground: 24 10% 98%;
+    --background: 220 27% 6%;
+    --foreground: 220 9% 91%;
 
-    --card: 24 25% 10%;
-    --card-foreground: 24 10% 98%;
+    --card: 220 27% 10% / 0.8;
+    --card-foreground: 220 9% 91%;
 
-    --popover: 24 25% 10%;
-    --popover-foreground: 24 10% 98%;
+    --popover: 220 27% 8% / 0.95;
+    --popover-foreground: 220 9% 91%;
 
-    --primary: 24 90% 53%;
-    --primary-foreground: 24 10% 10%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 24 30% 18%;
-    --secondary-foreground: 24 10% 98%;
+    --secondary: 220 27% 12%;
+    --secondary-foreground: 220 9% 85%;
 
-    --muted: 24 30% 18%;
-    --muted-foreground: 24 20% 65%;
+    --muted: 220 27% 12% / 0.5;
+    --muted-foreground: 220 9% 54%;
 
-    --accent: 24 30% 18%;
-    --accent-foreground: 24 10% 98%;
+    --accent: 220 27% 12% / 0.8;
+    --accent-foreground: 220 9% 85%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 24 10% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 24 30% 18%;
-    --input: 24 30% 18%;
-    --ring: 24 90% 53%;
+    --border: 220 27% 18% / 0.2;
+    --input: 220 27% 18% / 0.3;
+    --ring: 217 91% 60%;
 
-    --sidebar-background: 24 25% 10%;
-    --sidebar-foreground: 24 5% 96%;
-    --sidebar-primary: 24 76% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 24 4% 16%;
-    --sidebar-accent-foreground: 24 5% 96%;
-    --sidebar-border: 24 4% 16%;
-    --sidebar-ring: 24 91% 60%;
+    /* Dark mode glassmorphism */
+    --glass-bg: 0 0 0 / 0.2;
+    --glass-border: 255 255 255 / 0.1;
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   }
 }
 
@@ -91,5 +84,42 @@
 
   body {
     @apply bg-background text-foreground;
+    background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(220 27% 96%) 100%);
+    min-height: 100vh;
   }
-}
+
+  /* Apple-style glassmorphism utilities */
+  .glass {
+    background: rgba(var(--glass-bg));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(var(--glass-border));
+    box-shadow: var(--glass-shadow);
+  }
+
+  .glass-card {
+    @apply glass rounded-2xl;
+  }
+
+  .glass-nav {
+    @apply glass rounded-full;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+  }
+
+  .glass-button {
+    @apply glass rounded-xl transition-all duration-200;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .glass-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+  }
+
+  .glass-button:active {
+    transform: translateY(0);
+  }

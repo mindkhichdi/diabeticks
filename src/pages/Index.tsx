@@ -12,9 +12,11 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import Logo from '@/components/Logo';
 import ConfettiAnimation from '@/components/ConfettiAnimation';
+
 const Index = () => {
   const navigate = useNavigate();
   const [showConfetti, setShowConfetti] = useState(false);
+
   useEffect(() => {
     // Check if this is the user's first visit
     const checkFirstVisit = async () => {
@@ -72,6 +74,7 @@ const Index = () => {
     const interval = setInterval(checkTime, 60000);
     return () => clearInterval(interval);
   }, []);
+
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();
@@ -82,75 +85,115 @@ const Index = () => {
       toast.error('Error signing out');
     }
   };
-  return <div className="min-h-screen flex flex-col w-full">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
+
+  return (
+    <div className="min-h-screen w-full relative overflow-hidden">
+      {/* Background gradient */}
+      <div className="fixed inset-0 bg-gradient-to-br from-blue-50 via-white to-indigo-50 -z-10" />
+      
+      {/* Header */}
+      <header className="glass-nav sticky top-4 mx-4 z-50 p-4">
+        <div className="flex items-center justify-between">
           <Logo />
-          <Button variant="ghost" onClick={handleSignOut} className="flex items-center gap-2 text-slate-50 bg-red-600 hover:bg-red-500">
-            <LogOut className="w-4 h-4" />
+          <Button 
+            variant="ghost" 
+            onClick={handleSignOut} 
+            className="glass-button text-red-600 hover:text-red-700 hover:bg-red-50/50"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
             Sign Out
           </Button>
         </div>
-      </div>
+      </header>
 
-      <div className="flex-1 container mx-auto px-4 pb-20">
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-8 pb-24">
         {showConfetti && <ConfettiAnimation onComplete={() => setShowConfetti(false)} />}
         
         <Tabs defaultValue="medicine" className="w-full">
-          <div className="overflow-x-hidden mb-16">
-            <TabsContent value="medicine">
-              <section>
-                <h2 className="text-xl md:text-2xl font-semibold mb-4 text-orange-600">Daily Medicine Tracker</h2>
+          {/* Tab Content */}
+          <div className="space-y-6 animate-fade-in">
+            <TabsContent value="medicine" className="space-y-0">
+              <div className="glass-card p-6">
+                <h2 className="text-title font-semibold mb-6 text-primary">Daily Medicine Tracker</h2>
                 <MedicineTracker />
-              </section>
+              </div>
             </TabsContent>
             
-            <TabsContent value="readings">
-              <ReadingsLog />
+            <TabsContent value="readings" className="space-y-0">
+              <div className="glass-card p-6">
+                <ReadingsLog />
+              </div>
             </TabsContent>
 
-            <TabsContent value="prescriptions">
-              <PrescriptionManager />
+            <TabsContent value="prescriptions" className="space-y-0">
+              <div className="glass-card p-6">
+                <PrescriptionManager />
+              </div>
             </TabsContent>
 
-            <TabsContent value="food">
-              <section>
-                <h2 className="text-xl md:text-2xl font-semibold mb-4 text-orange-600">Food Intake Tracker</h2>
+            <TabsContent value="food" className="space-y-0">
+              <div className="glass-card p-6">
+                <h2 className="text-title font-semibold mb-6 text-primary">Food Intake Tracker</h2>
                 <FoodTracker />
-              </section>
+              </div>
             </TabsContent>
 
-            <TabsContent value="fitness">
-              <section>
+            <TabsContent value="fitness" className="space-y-0">
+              <div className="glass-card p-6">
                 <FitnessTracker />
-              </section>
+              </div>
             </TabsContent>
           </div>
 
-          <TabsList className="fixed bottom-0 left-0 right-0 w-full flex justify-around bg-white border-t border-gray-200 p-2 z-50">
-            <TabsTrigger value="medicine" className="flex flex-col items-center gap-1">
-              <Pill className="w-5 h-5" />
-              <span className="text-xs">Medicine</span>
-            </TabsTrigger>
-            <TabsTrigger value="readings" className="flex flex-col items-center gap-1">
-              <Heart className="w-5 h-5" />
-              <span className="text-xs">Readings</span>
-            </TabsTrigger>
-            <TabsTrigger value="prescriptions" className="flex flex-col items-center gap-1">
-              <FileText className="w-5 h-5" />
-              <span className="text-xs">Scripts</span>
-            </TabsTrigger>
-            <TabsTrigger value="food" className="flex flex-col items-center gap-1">
-              <Utensils className="w-5 h-5" />
-              <span className="text-xs">Food</span>
-            </TabsTrigger>
-            <TabsTrigger value="fitness" className="flex flex-col items-center gap-1">
-              <Activity className="w-5 h-5" />
-              <span className="text-xs">Fitness</span>
-            </TabsTrigger>
-          </TabsList>
+          {/* Floating Bottom Navigation */}
+          <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
+            <TabsList className="glass-nav p-2 space-x-1">
+              <TabsTrigger 
+                value="medicine" 
+                className="glass-button flex flex-col items-center px-4 py-3 rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white"
+              >
+                <Pill className="w-5 h-5 mb-1" />
+                <span className="text-xs font-medium">Medicine</span>
+              </TabsTrigger>
+              
+              <TabsTrigger 
+                value="readings" 
+                className="glass-button flex flex-col items-center px-4 py-3 rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white"
+              >
+                <Heart className="w-5 h-5 mb-1" />
+                <span className="text-xs font-medium">Readings</span>
+              </TabsTrigger>
+              
+              <TabsTrigger 
+                value="prescriptions" 
+                className="glass-button flex flex-col items-center px-4 py-3 rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white"
+              >
+                <FileText className="w-5 h-5 mb-1" />
+                <span className="text-xs font-medium">Scripts</span>
+              </TabsTrigger>
+              
+              <TabsTrigger 
+                value="food" 
+                className="glass-button flex flex-col items-center px-4 py-3 rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white"
+              >
+                <Utensils className="w-5 h-5 mb-1" />
+                <span className="text-xs font-medium">Food</span>
+              </TabsTrigger>
+              
+              <TabsTrigger 
+                value="fitness" 
+                className="glass-button flex flex-col items-center px-4 py-3 rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white"
+              >
+                <Activity className="w-5 h-5 mb-1" />
+                <span className="text-xs font-medium">Fitness</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
         </Tabs>
-      </div>
-    </div>;
+      </main>
+    </div>
+  );
 };
+
 export default Index;

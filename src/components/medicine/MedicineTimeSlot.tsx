@@ -72,13 +72,7 @@ const MedicineTimeSlot = ({
         onClick={onMedicineTaken}
         disabled={isTaken || disabled}
         variant={isTaken ? "success" : "default"}
-        className={`w-full ${
-          isTaken 
-            ? 'bg-green-500 hover:bg-green-600 cursor-not-allowed' 
-            : disabled
-            ? 'bg-gray-300 cursor-not-allowed'
-            : `bg-diabetic-${slotId} hover:bg-diabetic-${slotId}/90`
-        }`}
+        className="w-full"
       >
         {isTaken ? 'Done' : 'Mark as Taken'}
       </Button>

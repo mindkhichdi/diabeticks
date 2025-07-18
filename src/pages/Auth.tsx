@@ -19,8 +19,8 @@ const AuthPage = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
   return <div className="container mx-auto max-w-md mt-12">
-      <Card className="p-8 bg-orange-50 rounded-2xl">
-        <h1 className="text-2xl font-bold mb-6 text-center text-orange-600">Welcome to Diabeticks</h1>
+      <Card className="p-8 bg-card/70 backdrop-blur-md border-2 border-border/50 rounded-2xl shadow-lg">
+        <h1 className="text-2xl font-bold mb-6 text-center text-primary">Welcome to Diabeticks</h1>
         <Auth supabaseClient={supabase} appearance={{
         theme: ThemeSupa
       }} providers={[]} theme="light" />

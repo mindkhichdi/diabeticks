@@ -52,6 +52,62 @@ export type Database = {
           },
         ]
       }
+      daily_meal_plans: {
+        Row: {
+          calories: number | null
+          carbs: number | null
+          created_at: string
+          day_of_week: number
+          fats: number | null
+          food_item: string
+          id: string
+          meal_type: string
+          notes: string | null
+          proteins: number | null
+          quantity: string
+          updated_at: string
+          weekly_plan_id: string
+        }
+        Insert: {
+          calories?: number | null
+          carbs?: number | null
+          created_at?: string
+          day_of_week: number
+          fats?: number | null
+          food_item: string
+          id?: string
+          meal_type: string
+          notes?: string | null
+          proteins?: number | null
+          quantity: string
+          updated_at?: string
+          weekly_plan_id: string
+        }
+        Update: {
+          calories?: number | null
+          carbs?: number | null
+          created_at?: string
+          day_of_week?: number
+          fats?: number | null
+          food_item?: string
+          id?: string
+          meal_type?: string
+          notes?: string | null
+          proteins?: number | null
+          quantity?: string
+          updated_at?: string
+          weekly_plan_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_meal_plans_weekly_plan_id_fkey"
+            columns: ["weekly_plan_id"]
+            isOneToOne: false
+            referencedRelation: "weekly_diet_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fitness_logs: {
         Row: {
           active_energy_kcal: number | null
@@ -302,6 +358,108 @@ export type Database = {
           email?: string | null
           id?: string
           preferred_language?: string
+        }
+        Relationships: []
+      }
+      user_stats: {
+        Row: {
+          a1c_target: number | null
+          activity_level: string | null
+          age: number | null
+          allergies: string[] | null
+          blood_sugar_target_max: number | null
+          blood_sugar_target_min: number | null
+          created_at: string
+          diabetes_type: string | null
+          dietary_restrictions: string[] | null
+          disliked_foods: string[] | null
+          favorite_foods: string[] | null
+          food_preferences: string[] | null
+          gender: string | null
+          height_cm: number | null
+          id: string
+          medication_affects_appetite: boolean | null
+          updated_at: string
+          user_id: string
+          weight_kg: number | null
+        }
+        Insert: {
+          a1c_target?: number | null
+          activity_level?: string | null
+          age?: number | null
+          allergies?: string[] | null
+          blood_sugar_target_max?: number | null
+          blood_sugar_target_min?: number | null
+          created_at?: string
+          diabetes_type?: string | null
+          dietary_restrictions?: string[] | null
+          disliked_foods?: string[] | null
+          favorite_foods?: string[] | null
+          food_preferences?: string[] | null
+          gender?: string | null
+          height_cm?: number | null
+          id?: string
+          medication_affects_appetite?: boolean | null
+          updated_at?: string
+          user_id: string
+          weight_kg?: number | null
+        }
+        Update: {
+          a1c_target?: number | null
+          activity_level?: string | null
+          age?: number | null
+          allergies?: string[] | null
+          blood_sugar_target_max?: number | null
+          blood_sugar_target_min?: number | null
+          created_at?: string
+          diabetes_type?: string | null
+          dietary_restrictions?: string[] | null
+          disliked_foods?: string[] | null
+          favorite_foods?: string[] | null
+          food_preferences?: string[] | null
+          gender?: string | null
+          height_cm?: number | null
+          id?: string
+          medication_affects_appetite?: boolean | null
+          updated_at?: string
+          user_id?: string
+          weight_kg?: number | null
+        }
+        Relationships: []
+      }
+      weekly_diet_plans: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          plan_name: string
+          status: string | null
+          total_weekly_calories: number | null
+          updated_at: string
+          user_id: string
+          week_start_date: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          plan_name?: string
+          status?: string | null
+          total_weekly_calories?: number | null
+          updated_at?: string
+          user_id: string
+          week_start_date: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          plan_name?: string
+          status?: string | null
+          total_weekly_calories?: number | null
+          updated_at?: string
+          user_id?: string
+          week_start_date?: string
         }
         Relationships: []
       }

@@ -157,6 +157,29 @@ const Landing = () => {
             </Button>
           </div>
         </div>
+        
+        {/* Footer */}
+        <footer className="glass-card mt-16 p-8">
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <div className="text-muted-foreground text-sm">
+              © 2024 Diabeticks. All rights reserved.
+            </div>
+            <div className="flex space-x-6">
+              <button
+                onClick={() => navigate('/privacy')}
+                className="text-muted-foreground hover:text-primary text-sm underline transition-colors"
+              >
+                Privacy Policy
+              </button>
+              <button
+                onClick={() => navigate('/terms')}
+                className="text-muted-foreground hover:text-primary text-sm underline transition-colors"
+              >
+                Terms of Use
+              </button>
+            </div>
+          </div>
+        </footer>
       </div>
     </div>
   );

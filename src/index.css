@@ -12,19 +12,19 @@
     --card-foreground: 157 15% 15%;
     --popover: 0 0% 100%;
     --popover-foreground: 157 15% 15%;
-    --primary: 164 86% 45%;
+    --primary: 217 75% 55%;
     --primary-foreground: 0 0% 98%;
-    --secondary: 152 15% 90%;
-    --secondary-foreground: 157 15% 25%;
-    --muted: 152 15% 93%;
-    --muted-foreground: 157 10% 45%;
-    --accent: 180 40% 85%;
-    --accent-foreground: 157 15% 25%;
+    --secondary: 217 15% 90%;
+    --secondary-foreground: 217 15% 25%;
+    --muted: 217 15% 93%;
+    --muted-foreground: 217 10% 45%;
+    --accent: 220 40% 85%;
+    --accent-foreground: 217 15% 25%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
-    --border: 152 20% 85%;
-    --input: 152 20% 88%;
-    --ring: 164 86% 45%;
+    --border: 217 20% 85%;
+    --input: 217 20% 88%;
+    --ring: 217 75% 55%;
     --chart-1: 152 70% 50%;
     --chart-2: 180 60% 45%;
     --chart-3: 200 55% 40%;
@@ -55,19 +55,19 @@
     --card-foreground: 152 25% 95%;
     --popover: 157 15% 10%;
     --popover-foreground: 152 25% 95%;
-    --primary: 164 80% 60%;
-    --primary-foreground: 157 15% 8%;
-    --secondary: 157 10% 18%;
-    --secondary-foreground: 152 25% 85%;
-    --muted: 157 10% 15%;
-    --muted-foreground: 152 15% 65%;
-    --accent: 180 30% 20%;
-    --accent-foreground: 152 25% 85%;
+    --primary: 217 65% 65%;
+    --primary-foreground: 217 15% 8%;
+    --secondary: 217 10% 18%;
+    --secondary-foreground: 217 25% 85%;
+    --muted: 217 10% 15%;
+    --muted-foreground: 217 15% 65%;
+    --accent: 220 30% 20%;
+    --accent-foreground: 217 25% 85%;
     --destructive: 0 75% 55%;
     --destructive-foreground: 210 40% 98%;
-    --border: 157 10% 20%;
-    --input: 157 10% 18%;
-    --ring: 164 80% 60%;
+    --border: 217 10% 20%;
+    --input: 217 10% 18%;
+    --ring: 217 65% 65%;
     --chart-1: 152 60% 60%;
     --chart-2: 180 50% 55%;
     --chart-3: 200 45% 50%;
@@ -106,18 +106,18 @@
     border-radius: 1rem;
   }
 
-  .glass-button {
+  .flat-button {
     background: hsl(var(--primary) / 0.08);
     border: 1px solid hsl(var(--primary) / 0.25);
-    transition: var(--transition-smooth, all 0.25s cubic-bezier(0.4, 0, 0.2, 1));
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .glass-button:hover {
+  .flat-button:hover {
     background: hsl(var(--primary) / 0.12);
     transform: translateY(-1px);
   }
 
-  .glass-button:active {
+  .flat-button:active {
     transform: translateY(0);
   }
 

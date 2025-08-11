@@ -12,7 +12,7 @@
     --card-foreground: 157 15% 15%;
     --popover: 0 0% 100%;
     --popover-foreground: 157 15% 15%;
-    --primary: 152 80% 35%;
+    --primary: 164 86% 45%;
     --primary-foreground: 0 0% 98%;
     --secondary: 152 15% 90%;
     --secondary-foreground: 157 15% 25%;
@@ -24,7 +24,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 152 20% 85%;
     --input: 152 20% 88%;
-    --ring: 152 80% 35%;
+    --ring: 164 86% 45%;
     --chart-1: 152 70% 50%;
     --chart-2: 180 60% 45%;
     --chart-3: 200 55% 40%;
@@ -55,7 +55,7 @@
     --card-foreground: 152 25% 95%;
     --popover: 157 15% 10%;
     --popover-foreground: 152 25% 95%;
-    --primary: 152 60% 55%;
+    --primary: 164 80% 60%;
     --primary-foreground: 157 15% 8%;
     --secondary: 157 10% 18%;
     --secondary-foreground: 152 25% 85%;
@@ -67,7 +67,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 157 10% 20%;
     --input: 157 10% 18%;
-    --ring: 152 60% 55%;
+    --ring: 164 80% 60%;
     --chart-1: 152 60% 60%;
     --chart-2: 180 50% 55%;
     --chart-3: 200 45% 50%;
@@ -88,38 +88,32 @@
   
   body {
     @apply bg-background text-foreground;
-    background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(152 30% 94%) 100%);
+    background: hsl(var(--background));
     min-height: 100vh;
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   }
 
-  /* Apple-style glassmorphism utilities */
+  /* Flat UI utilities */
   .glass-card {
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-backdrop);
-    -webkit-backdrop-filter: var(--glass-backdrop);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    box-shadow: none;
   }
 
   .glass-nav {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
     border-radius: 1rem;
   }
 
   .glass-button {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: hsl(var(--primary) / 0.08);
+    border: 1px solid hsl(var(--primary) / 0.25);
+    transition: var(--transition-smooth, all 0.25s cubic-bezier(0.4, 0, 0.2, 1));
   }
 
   .glass-button:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: hsl(var(--primary) / 0.12);
     transform: translateY(-1px);
   }
 
@@ -156,5 +150,11 @@
       opacity: 1;
       transform: scale(1);
     }
+  }
+  /* Button completion pulse */
+  .btn-complete { animation: completePulse 600ms ease-out; }
+  @keyframes completePulse {
+    0% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4); }
+    100% { box-shadow: 0 0 0 16px hsl(var(--primary) / 0); }
   }
 }

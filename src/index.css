@@ -6,31 +6,44 @@
 
 @layer base {
   :root {
-    --background: 152 25% 97%;
-    --foreground: 157 15% 15%;
+    --background: 195 100% 98%;
+    --foreground: 213 27% 18%;
     --card: 0 0% 100%;
-    --card-foreground: 157 15% 15%;
+    --card-foreground: 213 27% 18%;
     --popover: 0 0% 100%;
-    --popover-foreground: 157 15% 15%;
-    --primary: 164 86% 45%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 152 15% 90%;
-    --secondary-foreground: 157 15% 25%;
-    --muted: 152 15% 93%;
-    --muted-foreground: 157 10% 45%;
-    --accent: 180 40% 85%;
-    --accent-foreground: 157 15% 25%;
+    --popover-foreground: 213 27% 18%;
+    --primary: 198 93% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 142 69% 85%;
+    --secondary-foreground: 213 27% 18%;
+    --muted: 195 20% 95%;
+    --muted-foreground: 213 16% 46%;
+    --accent: 142 69% 85%;
+    --accent-foreground: 213 27% 18%;
     --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 152 20% 85%;
-    --input: 152 20% 88%;
-    --ring: 164 86% 45%;
-    --chart-1: 152 70% 50%;
-    --chart-2: 180 60% 45%;
-    --chart-3: 200 55% 40%;
-    --chart-4: 120 50% 55%;
-    --chart-5: 160 45% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 195 20% 90%;
+    --input: 195 20% 90%;
+    --ring: 198 93% 60%;
     --radius: 0.75rem;
+    --chart-1: 198 93% 60%;
+    --chart-2: 142 69% 58%;
+    --chart-3: 162 63% 41%;
+    --chart-4: 120 60% 70%;
+    --chart-5: 84 81% 44%;
+    
+    /* Health-focused colors */
+    --primary-hover: 198 93% 55%;
+    --secondary-hover: 142 69% 80%;
+    --success: 142 69% 58%;
+    --success-foreground: 0 0% 100%;
+    --warning: 45 100% 60%;
+    --warning-foreground: 0 0% 100%;
+    
+    /* Interactive states */
+    --pulse-primary: 198 93% 60%;
+    --pulse-success: 142 69% 58%;
+    --ripple: 198 93% 60%;
 
     /* Typography scale */
     --text-display-large: 3.5rem;
@@ -49,35 +62,38 @@
   }
 
   .dark {
-    --background: 157 15% 8%;
-    --foreground: 152 25% 95%;
-    --card: 157 15% 10%;
-    --card-foreground: 152 25% 95%;
-    --popover: 157 15% 10%;
-    --popover-foreground: 152 25% 95%;
-    --primary: 164 80% 60%;
-    --primary-foreground: 157 15% 8%;
-    --secondary: 157 10% 18%;
-    --secondary-foreground: 152 25% 85%;
-    --muted: 157 10% 15%;
-    --muted-foreground: 152 15% 65%;
-    --accent: 180 30% 20%;
-    --accent-foreground: 152 25% 85%;
-    --destructive: 0 75% 55%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 157 10% 20%;
-    --input: 157 10% 18%;
-    --ring: 164 80% 60%;
-    --chart-1: 152 60% 60%;
-    --chart-2: 180 50% 55%;
-    --chart-3: 200 45% 50%;
-    --chart-4: 120 40% 65%;
-    --chart-5: 160 35% 70%;
-
-    /* Dark mode glass effect */
-    --glass-bg: rgba(0, 0, 0, 0.25);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --background: 213 27% 12%;
+    --foreground: 195 20% 95%;
+    --card: 213 27% 15%;
+    --card-foreground: 195 20% 95%;
+    --popover: 213 27% 15%;
+    --popover-foreground: 195 20% 95%;
+    --primary: 198 93% 70%;
+    --primary-foreground: 213 27% 12%;
+    --secondary: 142 69% 25%;
+    --secondary-foreground: 195 20% 95%;
+    --muted: 213 27% 20%;
+    --muted-foreground: 213 16% 65%;
+    --accent: 142 69% 25%;
+    --accent-foreground: 195 20% 95%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 195 20% 95%;
+    --border: 213 27% 25%;
+    --input: 213 27% 25%;
+    --ring: 198 93% 70%;
+    --chart-1: 198 93% 70%;
+    --chart-2: 142 69% 65%;
+    --chart-3: 162 63% 50%;
+    --chart-4: 120 60% 75%;
+    --chart-5: 84 81% 55%;
+    
+    /* Health-focused colors for dark mode */
+    --primary-hover: 198 93% 75%;
+    --secondary-hover: 142 69% 30%;
+    --success: 142 69% 65%;
+    --success-foreground: 213 27% 12%;
+    --warning: 45 100% 65%;
+    --warning-foreground: 213 27% 12%;
   }
 }
 
@@ -93,43 +109,40 @@
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   }
 
-  /* Flat UI utilities */
-  .glass-card {
-    background: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
-    box-shadow: none;
+  /* Health-focused interactive components */
+  .health-card {
+    @apply bg-card border border-border rounded-xl shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1;
+    background: linear-gradient(135deg, hsl(var(--card)), hsl(var(--muted)));
   }
 
-  .glass-nav {
-    background: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
-    border-radius: 1rem;
+  .health-nav {
+    @apply bg-card/95 backdrop-blur-sm border border-border/50 rounded-xl shadow-sm;
   }
 
-  .glass-button {
-    background: hsl(var(--primary) / 0.08);
-    border: 1px solid hsl(var(--primary) / 0.25);
-    transition: var(--transition-smooth, all 0.25s cubic-bezier(0.4, 0, 0.2, 1));
+  .health-button {
+    @apply rounded-lg transition-all duration-200 active:scale-95;
+    position: relative;
+    overflow: hidden;
   }
 
-  .glass-button:hover {
-    background: hsl(var(--primary) / 0.12);
-    transform: translateY(-1px);
+  .health-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, hsl(var(--ripple)) 10%, transparent 10.01%);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
   }
 
-  .glass-button:active {
-    transform: translateY(0);
+  .health-button:active::before {
+    width: 300px;
+    height: 300px;
   }
 
-  /* Animation utilities */
-  .animate-fade-in {
-    animation: fadeIn 0.6s ease-out;
-  }
-
-  .animate-scale-in {
-    animation: scaleIn 0.5s ease-out;
-  }
-
+  /* Health-focused animations */
   @keyframes fadeIn {
     from {
       opacity: 0;
@@ -151,10 +164,66 @@
       transform: scale(1);
     }
   }
-  /* Button completion pulse */
-  .btn-complete { animation: completePulse 600ms ease-out; }
-  @keyframes completePulse {
-    0% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4); }
-    100% { box-shadow: 0 0 0 16px hsl(var(--primary) / 0); }
+
+  @keyframes healthPulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 hsl(var(--pulse-success) / 0.7);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 0 0 10px hsl(var(--pulse-success) / 0);
+    }
+  }
+
+  @keyframes progressFill {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes glow {
+    0%, 100% {
+      box-shadow: 0 0 5px hsl(var(--primary) / 0.5);
+    }
+    50% {
+      box-shadow: 0 0 20px hsl(var(--primary) / 0.8), 0 0 30px hsl(var(--primary) / 0.6);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.5s ease-out;
+  }
+
+  .animate-health-pulse {
+    animation: healthPulse 0.6s ease-in-out;
+  }
+
+  .animate-progress-fill {
+    animation: progressFill 1.5s ease-out;
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite;
   }
 }

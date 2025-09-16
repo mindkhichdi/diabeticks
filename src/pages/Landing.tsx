@@ -121,7 +121,7 @@ const Landing = () => {
             </Button>
             <Button 
               onClick={() => navigate('/auth')} 
-              className="health-button bg-primary hover:bg-primary-hover text-primary-foreground animate-glow"
+              className="health-button bg-primary hover:bg-primary-hover text-primary-foreground"
             >
               <UserPlus className="w-4 h-4 mr-2" />
               Get Started Free

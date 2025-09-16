@@ -318,7 +318,7 @@ const Landing = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 size="lg" 
-                className="health-button bg-primary hover:bg-primary-hover text-primary-foreground px-8 py-4 text-lg font-semibold group animate-glow" 
+                className="health-button bg-primary hover:bg-primary-hover text-primary-foreground px-8 py-4 text-lg font-semibold group" 
                 onClick={() => navigate('/auth')}
               >
                 Start Free Today

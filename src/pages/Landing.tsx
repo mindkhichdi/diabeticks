@@ -183,9 +183,7 @@ const Landing = () => {
             <h2 className="text-4xl font-bold mb-6">
               Ready to unlock better health?
             </h2>
-            <p className="text-lg text-muted-foreground mb-8">
-              Join thousands who are already optimizing their health with DIABETIKS.
-            </p>
+            <p className="text-lg text-muted-foreground mb-8">Join thousands who are already optimizing their health with DIABETICKS.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="whoop-button bg-primary text-primary-foreground px-8 py-4 text-lg font-semibold group" onClick={() => navigate('/auth')}>
                 Join Now

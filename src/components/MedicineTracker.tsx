@@ -160,10 +160,10 @@ const MedicineTracker = () => {
     }
   }, [medicineLogs]);
   return <div className="space-y-4">
-      <Card className="p-6 shadow-lg bg-white/90 backdrop-blur-sm">
+      <Card className="whoop-card p-6">
         <div className="flex flex-col space-y-4">
           <div className="flex items-center justify-between">
-            <div className="text-lg font-semibold text-gray-800">
+            <div className="text-lg font-semibold text-card-foreground">
               {selectedDate.toLocaleDateString('en-US', {
               weekday: 'long',
               year: 'numeric',
@@ -180,11 +180,11 @@ const MedicineTracker = () => {
         </div>
       </Card>
 
-      <div className="grid gap-4 md:grid-cols-3 backdrop-blur-sm p-6 rounded-lg shadow-lg bg-orange-50">
+      <div className="grid gap-4 md:grid-cols-3">
         {timeSlots.map(slot => <MedicineTimeSlot key={slot.id} icon={slot.icon} time={slot.time} label={slot.label} isTaken={isTaken(slot.id)} onMedicineTaken={() => handleMedicineTaken(slot.id)} colorClass={`text-diabetic-${slot.id}`} disabled={false} slotId={slot.id} />)}
       </div>
 
-      <Card className="p-6 shadow-lg backdrop-blur-sm bg-yellow-50">
+      <Card className="whoop-card p-6">
         <MedicineHistoryTable logs={medicineLogs} selectedDate={selectedDate} />
       </Card>
     </div>;

@@ -53,6 +53,13 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        "hover-card": "hsl(var(--hover-card))",
+        "strain-high": "hsl(var(--strain-high))",
+        "strain-medium": "hsl(var(--strain-medium))",
+        "strain-low": "hsl(var(--strain-low))",
+        "recovery-high": "hsl(var(--recovery-high))",
+        "recovery-medium": "hsl(var(--recovery-medium))",
+        "recovery-low": "hsl(var(--recovery-low))",
       },
       borderRadius: {
         lg: "var(--radius)",

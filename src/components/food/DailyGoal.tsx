@@ -50,7 +50,7 @@ const DailyGoal = ({
           onGoalsUpdate={onGoalsUpdate || (() => {})}
         />
       </div>
-      <div className="text-lg">
+      <div className="text-lg text-foreground">
         <span className="font-semibold text-primary">{totalCalories}</span>
         <span className="text-muted-foreground">/{targetCalories} cal</span>
       </div>

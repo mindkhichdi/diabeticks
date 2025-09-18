@@ -114,7 +114,7 @@ const AddFoodForm = ({ onSubmit, mealTypes }: AddFoodFormProps) => {
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 bg-white p-4 rounded-lg shadow-sm border mb-8">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 bg-background border border-border p-4 rounded-lg mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-4">
               <FormField
@@ -122,10 +122,10 @@ const AddFoodForm = ({ onSubmit, mealTypes }: AddFoodFormProps) => {
                 name="meal_type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Meal Type</FormLabel>
+                    <FormLabel className="text-foreground">Meal Type</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger className="bg-white">
+                        <SelectTrigger className="bg-input border-border text-foreground">
                           <SelectValue placeholder="Select meal type" />
                         </SelectTrigger>
                       </FormControl>
@@ -156,9 +156,9 @@ const AddFoodForm = ({ onSubmit, mealTypes }: AddFoodFormProps) => {
                 name="food_item"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Food Item</FormLabel>
+                    <FormLabel className="text-foreground">Food Item</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter food item" {...field} />
+                      <Input placeholder="Enter food item" {...field} className="bg-input border-border text-foreground placeholder:text-muted-foreground" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -170,9 +170,9 @@ const AddFoodForm = ({ onSubmit, mealTypes }: AddFoodFormProps) => {
                 name="quantity"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Quantity</FormLabel>
+                    <FormLabel className="text-foreground">Quantity</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter quantity" {...field} />
+                      <Input placeholder="Enter quantity" {...field} className="bg-input border-border text-foreground placeholder:text-muted-foreground" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -187,13 +187,14 @@ const AddFoodForm = ({ onSubmit, mealTypes }: AddFoodFormProps) => {
                   name="calories"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Calories</FormLabel>
+                      <FormLabel className="text-foreground">Calories</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
                           placeholder="Calories" 
                           {...field}
                           onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                          className="bg-input border-border text-foreground placeholder:text-muted-foreground"
                         />
                       </FormControl>
                       <FormMessage />
@@ -206,13 +207,14 @@ const AddFoodForm = ({ onSubmit, mealTypes }: AddFoodFormProps) => {
                   name="proteins"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Proteins (g)</FormLabel>
+                      <FormLabel className="text-foreground">Proteins (g)</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
                           placeholder="Proteins" 
                           {...field}
                           onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                          className="bg-input border-border text-foreground placeholder:text-muted-foreground"
                         />
                       </FormControl>
                       <FormMessage />
@@ -225,13 +227,14 @@ const AddFoodForm = ({ onSubmit, mealTypes }: AddFoodFormProps) => {
                   name="carbs"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Carbs (g)</FormLabel>
+                      <FormLabel className="text-foreground">Carbs (g)</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
                           placeholder="Carbs" 
                           {...field}
                           onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                          className="bg-input border-border text-foreground placeholder:text-muted-foreground"
                         />
                       </FormControl>
                       <FormMessage />
@@ -244,13 +247,14 @@ const AddFoodForm = ({ onSubmit, mealTypes }: AddFoodFormProps) => {
                   name="fats"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Fats (g)</FormLabel>
+                      <FormLabel className="text-foreground">Fats (g)</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
                           placeholder="Fats" 
                           {...field}
                           onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                          className="bg-input border-border text-foreground placeholder:text-muted-foreground"
                         />
                       </FormControl>
                       <FormMessage />
@@ -262,16 +266,16 @@ const AddFoodForm = ({ onSubmit, mealTypes }: AddFoodFormProps) => {
           </div>
 
           <div className="flex gap-2">
-            <Button type="submit">
+            <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground">
               <Utensils className="w-4 h-4 mr-2" />
               Add Food Log
             </Button>
             <Button
               type="button"
-              variant="secondary"
+              variant="outline"
               onClick={handleImageCapture}
               disabled={isAnalyzing}
-              className="flex-shrink-0"
+              className="flex-shrink-0 border-border text-foreground hover:bg-muted"
             >
               {isAnalyzing ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />

@@ -19,17 +19,17 @@ const MacronutrientProgress: React.FC<MacronutrientProgressProps> = ({
   const calculatePercentage = (current: number, goal: number) => {
     return Math.min(Math.round(current / goal * 100), 100);
   };
-  return <div className="space-y-4 bg-white p-4 rounded-lg shadow-sm border">
-      <h3 className="font-semibold text-lg mb-4 text-orange-600">Macronutrients Progress</h3>
+  return <div className="space-y-4 bg-background border border-border p-4 rounded-lg">
+      <h3 className="font-semibold text-lg mb-4 text-primary">Macronutrients Progress</h3>
       
       <div className="space-y-4">
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="font-medium">Proteins</span>
+            <span className="font-medium text-foreground">Proteins</span>
             <span className="text-muted-foreground">{current.proteins}g / {goals.proteins}g</span>
           </div>
-          <Progress value={calculatePercentage(current.proteins, goals.proteins)} className="bg-blue-100">
-            <div className="h-full bg-blue-500 transition-all" style={{
+          <Progress value={calculatePercentage(current.proteins, goals.proteins)} className="bg-muted">
+            <div className="h-full bg-chart-2 transition-all" style={{
             width: `${calculatePercentage(current.proteins, goals.proteins)}%`
           }} />
           </Progress>
@@ -37,11 +37,11 @@ const MacronutrientProgress: React.FC<MacronutrientProgressProps> = ({
 
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="font-medium">Carbs</span>
+            <span className="font-medium text-foreground">Carbs</span>
             <span className="text-muted-foreground">{current.carbs}g / {goals.carbs}g</span>
           </div>
-          <Progress value={calculatePercentage(current.carbs, goals.carbs)} className="bg-green-100">
-            <div className="h-full bg-green-500 transition-all" style={{
+          <Progress value={calculatePercentage(current.carbs, goals.carbs)} className="bg-muted">
+            <div className="h-full bg-chart-3 transition-all" style={{
             width: `${calculatePercentage(current.carbs, goals.carbs)}%`
           }} />
           </Progress>
@@ -49,11 +49,11 @@ const MacronutrientProgress: React.FC<MacronutrientProgressProps> = ({
 
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="font-medium">Fats</span>
+            <span className="font-medium text-foreground">Fats</span>
             <span className="text-muted-foreground">{current.fats}g / {goals.fats}g</span>
           </div>
-          <Progress value={calculatePercentage(current.fats, goals.fats)} className="bg-yellow-100">
-            <div className="h-full bg-yellow-500 transition-all" style={{
+          <Progress value={calculatePercentage(current.fats, goals.fats)} className="bg-muted">
+            <div className="h-full bg-primary transition-all" style={{
             width: `${calculatePercentage(current.fats, goals.fats)}%`
           }} />
           </Progress>

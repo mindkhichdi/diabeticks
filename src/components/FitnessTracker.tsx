@@ -186,7 +186,7 @@ const FitnessTracker = () => {
                       <Input type="number" value={distance} onChange={e => setDistance(e.target.value)} placeholder="Enter distance" min="0" step="0.1" />
                     </div>
                   </div>
-                  <Button type="submit" className="w-full">Log Workout</Button>
+                  <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">Log Workout</Button>
                 </form>
               </Card>
 

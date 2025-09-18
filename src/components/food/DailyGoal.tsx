@@ -25,8 +25,8 @@ const DailyGoal = ({
   const [isEditingTarget, setIsEditingTarget] = useState(false);
 
   return (
-    <div className="flex justify-between items-center mb-6 bg-white p-4 rounded-lg shadow-sm border">
-      <div className="text-lg font-semibold flex items-center gap-2">
+    <div className="flex justify-between items-center mb-6 whoop-card p-4">
+      <div className="text-lg font-semibold flex items-center gap-2 text-foreground">
         Daily Goal: {' '}
         {isEditingTarget ? (
           <Input

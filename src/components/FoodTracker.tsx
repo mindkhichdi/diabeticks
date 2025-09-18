@@ -44,33 +44,33 @@ const FoodTracker = () => {
       value: 'breakfast', 
       label: 'Breakfast', 
       icon: Coffee, 
-      color: 'bg-gradient-to-r from-orange-400 to-amber-300',
-      textColor: 'text-orange-900',
-      borderColor: 'border-orange-200'
+      color: 'bg-chart-1/20',
+      textColor: 'text-foreground',
+      borderColor: 'border-chart-1/30'
     },
     { 
       value: 'lunch', 
       label: 'Lunch', 
       icon: Utensils, 
-      color: 'bg-gradient-to-r from-sky-400 to-blue-300',
-      textColor: 'text-blue-900',
-      borderColor: 'border-blue-200'
+      color: 'bg-chart-2/20',
+      textColor: 'text-foreground',
+      borderColor: 'border-chart-2/30'
     },
     { 
       value: 'snacks', 
       label: 'Snacks', 
       icon: Apple, 
-      color: 'bg-gradient-to-r from-violet-400 to-purple-300',
-      textColor: 'text-purple-900',
-      borderColor: 'border-purple-200'
+      color: 'bg-chart-5/20',
+      textColor: 'text-foreground',
+      borderColor: 'border-chart-5/30'
     },
     { 
       value: 'dinner', 
       label: 'Dinner', 
       icon: Pizza, 
-      color: 'bg-gradient-to-r from-emerald-400 to-green-300',
-      textColor: 'text-emerald-900',
-      borderColor: 'border-emerald-200'
+      color: 'bg-chart-3/20',
+      textColor: 'text-foreground',
+      borderColor: 'border-chart-3/30'
     },
   ];
 
@@ -302,7 +302,7 @@ const FoodTracker = () => {
           mealTypes={mealTypes}
         />
 
-        <div className="rounded-lg bg-white p-4 shadow-sm border">
+        <div className="whoop-card p-4">
           <div className="grid gap-6">
             {mealTypes.map((meal) => {
               const mealLogs = foodLogs?.filter(log => log.meal_type === meal.value);

@@ -114,23 +114,23 @@ const Landing = () => {
         }}>
             Get insights and guidance on which daily habits impact how fast you're aging — so you can take control, slow it down, and spend more years doing what you love.
           </p>
-          <Button size="lg" className="whoop-button bg-primary text-primary-foreground px-8 py-4 text-lg font-semibold animate-slide-up" style={{
+          <Button size="lg" className="whoop-button bg-primary text-primary-foreground px-8 py-6 text-lg font-semibold animate-slide-up hover:shadow-[0_0_35px_hsl(var(--primary)/0.6)] hover:scale-105 transition-all duration-300" style={{
           animationDelay: '0.2s'
         }} onClick={() => navigate('/auth')}>
-            Join Now
+            Join Now <ArrowRight className="w-5 h-5 ml-2 inline animate-bounce-gentle" />
           </Button>
         </div>
 
         {/* Live Metrics */}
         <div className="grid md:grid-cols-3 gap-6 mb-20">
-          {metrics.map((metric, index) => <Card key={index} className="whoop-card p-8 text-center animate-scale-in hover:scale-105 transition-transform cursor-pointer" style={{
+          {metrics.map((metric, index) => <Card key={index} className="whoop-card p-8 text-center animate-scale-in hover:scale-105 hover:shadow-[0_8px_40px_-8px_hsl(var(--primary)/0.3)] transition-all duration-300 cursor-pointer group" style={{
           animationDelay: `${index * 0.1}s`
         }}>
-              <div className="text-sm text-muted-foreground mb-2 tracking-widest uppercase">{metric.label}</div>
-              <div className={`whoop-metric-large ${metric.color} mb-2 animate-metric-count`}>
+              <div className="text-sm text-muted-foreground mb-2 tracking-widest uppercase group-hover:text-primary transition-colors">{metric.label}</div>
+              <div className={`whoop-metric-large ${metric.color} mb-2 animate-metric-count group-hover:scale-110 transition-transform`}>
                 {metric.value}
               </div>
-              <div className="text-sm font-medium">{metric.status}</div>
+              <div className="text-sm font-medium group-hover:text-foreground transition-colors">{metric.status}</div>
             </Card>)}
         </div>
 
@@ -146,17 +146,17 @@ const Landing = () => {
 
         {/* Features Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
-          {features.map((feature, index) => <Card key={index} className="whoop-card p-6 hover:scale-105 transition-all duration-200 animate-slide-up" style={{
+          {features.map((feature, index) => <Card key={index} className="whoop-card p-6 hover:scale-105 hover:shadow-[0_8px_40px_-8px_hsl(var(--primary)/0.25)] transition-all duration-300 animate-slide-up group cursor-pointer" style={{
           animationDelay: `${index * 0.1}s`
         }}>
               <div className="flex items-center gap-3 mb-4">
-                <div className="text-primary">
+                <div className="text-primary group-hover:scale-110 transition-transform">
                   {feature.icon}
                 </div>
-                <div className="whoop-metric-small">{feature.metric}</div>
+                <div className="whoop-metric-small group-hover:text-primary transition-colors">{feature.metric}</div>
               </div>
-              <h3 className="font-semibold mb-2">{feature.title}</h3>
-              <p className="text-sm text-muted-foreground">{feature.description}</p>
+              <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors">{feature.title}</h3>
+              <p className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">{feature.description}</p>
             </Card>)}
         </div>
 
@@ -185,12 +185,12 @@ const Landing = () => {
             </h2>
             <p className="text-lg text-muted-foreground mb-8">Join thousands who are already optimizing their health with DIABETICKS.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="whoop-button bg-primary text-primary-foreground px-8 py-4 text-lg font-semibold group" onClick={() => navigate('/auth')}>
+              <Button size="lg" className="whoop-button bg-primary text-primary-foreground px-8 py-6 text-lg font-semibold group hover:shadow-[0_0_40px_hsl(var(--primary)/0.6)] hover:scale-105 transition-all duration-300" onClick={() => navigate('/auth')}>
                 Join Now
-                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform duration-300" />
               </Button>
-              <Button size="lg" variant="outline" className="whoop-button border border-border text-foreground hover:bg-secondary px-8 py-4 text-lg" onClick={() => navigate('/auth')}>
-                <PlayCircle className="w-5 h-5 mr-2" />
+              <Button size="lg" variant="outline" className="whoop-button border-2 border-primary/30 text-foreground hover:bg-primary/10 hover:border-primary px-8 py-6 text-lg group transition-all duration-300" onClick={() => navigate('/auth')}>
+                <PlayCircle className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
                 See How It Works
               </Button>
             </div>

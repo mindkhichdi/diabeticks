@@ -147,45 +147,45 @@ const Index = () => {
           </div>
 
           {/* Bottom Navigation */}
-          <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
-            <TabsList className="whoop-nav p-2 gap-1">
+          <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 animate-slide-up">
+            <TabsList className="whoop-nav p-2 gap-1 shadow-2xl">
               <TabsTrigger 
                 value="medicine" 
-                className="whoop-button flex flex-col items-center px-4 py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="whoop-button flex flex-col items-center px-4 py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105"
               >
-                <Pill className="w-4 h-4 mb-1" />
+                <Pill className="w-4 h-4 mb-1 transition-transform group-hover:scale-110" />
                 <span className="text-xs font-medium">Medicine</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="readings" 
-                className="whoop-button flex flex-col items-center px-4 py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="whoop-button flex flex-col items-center px-4 py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105"
               >
-                <Heart className="w-4 h-4 mb-1" />
+                <Heart className="w-4 h-4 mb-1 transition-transform group-hover:scale-110" />
                 <span className="text-xs font-medium">Readings</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="prescriptions" 
-                className="whoop-button flex flex-col items-center px-4 py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="whoop-button flex flex-col items-center px-4 py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105"
               >
-                <FileText className="w-4 h-4 mb-1" />
+                <FileText className="w-4 h-4 mb-1 transition-transform group-hover:scale-110" />
                 <span className="text-xs font-medium">Scripts</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="food" 
-                className="whoop-button flex flex-col items-center px-4 py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="whoop-button flex flex-col items-center px-4 py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105"
               >
-                <Utensils className="w-4 h-4 mb-1" />
+                <Utensils className="w-4 h-4 mb-1 transition-transform group-hover:scale-110" />
                 <span className="text-xs font-medium">Nutrition</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="fitness" 
-                className="whoop-button flex flex-col items-center px-4 py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="whoop-button flex flex-col items-center px-4 py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105"
               >
-                <Activity className="w-4 h-4 mb-1" />
+                <Activity className="w-4 h-4 mb-1 transition-transform group-hover:scale-110" />
                 <span className="text-xs font-medium">Fitness</span>
               </TabsTrigger>
             </TabsList>

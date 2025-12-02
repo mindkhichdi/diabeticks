@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import Logo from '@/components/Logo';
 import ConfettiAnimation from '@/components/ConfettiAnimation';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -92,14 +93,17 @@ const Index = () => {
       <header className="whoop-nav sticky top-6 mx-6 z-50 p-4">
         <div className="flex items-center justify-between">
           <Logo />
-          <Button 
-            variant="ghost" 
-            onClick={handleSignOut} 
-            className="whoop-button text-muted-foreground hover:text-foreground hover:bg-secondary"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Sign Out
-          </Button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Button 
+              variant="ghost" 
+              onClick={handleSignOut} 
+              className="whoop-button text-muted-foreground hover:text-foreground hover:bg-secondary"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
         </div>
       </header>
 

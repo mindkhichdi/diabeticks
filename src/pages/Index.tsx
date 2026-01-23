@@ -151,7 +151,7 @@ const Index = () => {
           </div>
 
           {/* Bottom Navigation */}
-          <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 animate-slide-up">
+          <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 animate-slide-up">
             <TabsList className="whoop-nav p-2 gap-1 shadow-2xl">
               <TabsTrigger 
                 value="medicine" 

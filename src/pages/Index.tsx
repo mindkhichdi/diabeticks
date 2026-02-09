@@ -151,46 +151,46 @@ const Index = () => {
           </div>
 
           {/* Bottom Navigation */}
-          <div className="fixed bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 z-50 animate-slide-up w-[calc(100%-1.5rem)] sm:w-auto max-w-lg">
-            <TabsList className="whoop-nav p-1.5 sm:p-2 gap-0.5 sm:gap-1 shadow-2xl w-full">
+          <div className="fixed bottom-3 sm:bottom-6 left-1/2 transform -translate-x-1/2 z-50 animate-slide-up">
+            <TabsList className="whoop-nav p-1 sm:p-2 gap-0 sm:gap-1 shadow-2xl">
               <TabsTrigger 
                 value="medicine" 
-                className="whoop-button flex flex-col items-center px-2 sm:px-4 py-2 sm:py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105 flex-1"
+                className="whoop-button flex flex-col items-center px-3 sm:px-4 py-1.5 sm:py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105"
               >
-                <Pill className="w-4 h-4 mb-0.5 sm:mb-1" />
-                <span className="text-[10px] sm:text-xs font-medium">Medicine</span>
+                <Pill className="w-3.5 h-3.5 sm:w-4 sm:h-4 mb-0.5" />
+                <span className="text-[9px] sm:text-xs font-medium">Medicine</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="readings" 
-                className="whoop-button flex flex-col items-center px-2 sm:px-4 py-2 sm:py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105 flex-1"
+                className="whoop-button flex flex-col items-center px-3 sm:px-4 py-1.5 sm:py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105"
               >
-                <Heart className="w-4 h-4 mb-0.5 sm:mb-1" />
-                <span className="text-[10px] sm:text-xs font-medium">Readings</span>
+                <Heart className="w-3.5 h-3.5 sm:w-4 sm:h-4 mb-0.5" />
+                <span className="text-[9px] sm:text-xs font-medium">Readings</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="prescriptions" 
-                className="whoop-button flex flex-col items-center px-2 sm:px-4 py-2 sm:py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105 flex-1"
+                className="whoop-button flex flex-col items-center px-3 sm:px-4 py-1.5 sm:py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105"
               >
-                <FileText className="w-4 h-4 mb-0.5 sm:mb-1" />
-                <span className="text-[10px] sm:text-xs font-medium">Scripts</span>
+                <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 mb-0.5" />
+                <span className="text-[9px] sm:text-xs font-medium">Scripts</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="food" 
-                className="whoop-button flex flex-col items-center px-2 sm:px-4 py-2 sm:py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105 flex-1"
+                className="whoop-button flex flex-col items-center px-3 sm:px-4 py-1.5 sm:py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105"
               >
-                <Utensils className="w-4 h-4 mb-0.5 sm:mb-1" />
-                <span className="text-[10px] sm:text-xs font-medium">Nutrition</span>
+                <Utensils className="w-3.5 h-3.5 sm:w-4 sm:h-4 mb-0.5" />
+                <span className="text-[9px] sm:text-xs font-medium">Nutrition</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="fitness" 
-                className="whoop-button flex flex-col items-center px-2 sm:px-4 py-2 sm:py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105 flex-1"
+                className="whoop-button flex flex-col items-center px-3 sm:px-4 py-1.5 sm:py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105"
               >
-                <Activity className="w-4 h-4 mb-0.5 sm:mb-1" />
-                <span className="text-[10px] sm:text-xs font-medium">Fitness</span>
+                <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4 mb-0.5" />
+                <span className="text-[9px] sm:text-xs font-medium">Fitness</span>
               </TabsTrigger>
             </TabsList>
           </div>

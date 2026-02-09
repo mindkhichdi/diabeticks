@@ -156,11 +156,11 @@ const ReadingsLog = () => {
       <div className="space-y-4 mb-6">
         {readings.map(reading => <Card key={reading.id} className="p-4 bg-primary-light">
             <div className="flex justify-between items-start">
-              <div className="grid md:grid-cols-4 gap-4">
-                <p className="font-semibold">{new Date(reading.date).toLocaleDateString()}</p>
-                {reading.hba1c && <p>HbA1c: {reading.hba1c}%</p>}
-                {reading.fasting && <p>Fasting: {reading.fasting} mg/dL</p>}
-                {reading.post_prandial && <p>Post-prandial: {reading.post_prandial} mg/dL</p>}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
+                <p className="font-semibold text-sm sm:text-base">{new Date(reading.date).toLocaleDateString()}</p>
+                {reading.hba1c && <p className="text-sm sm:text-base">HbA1c: {reading.hba1c}%</p>}
+                {reading.fasting && <p className="text-sm sm:text-base">Fasting: {reading.fasting} mg/dL</p>}
+                {reading.post_prandial && <p className="text-sm sm:text-base">PP: {reading.post_prandial} mg/dL</p>}
               </div>
               <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/90" onClick={() => handleDelete(reading)}>
                 <Trash2 className="h-4 w-4" />

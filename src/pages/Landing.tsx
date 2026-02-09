@@ -87,7 +87,7 @@ const Landing = () => {
   const benefits = ["91 more minutes of weekly activity", "2.3 more hours of sleep per week", "10% higher HRV on average", "Better health outcomes across all metrics"];
   return <div className="min-h-screen bg-background text-foreground">
       {/* Navigation Bar */}
-      <nav className="whoop-nav sticky top-6 mx-6 z-50 p-4">
+      <nav className="whoop-nav sticky top-4 sm:top-6 mx-3 sm:mx-6 z-50 p-3 sm:p-4">
         <div className="flex justify-between items-center">
           <Logo size={32} />
           <div className="flex gap-3">
@@ -102,14 +102,14 @@ const Landing = () => {
       </nav>
 
       {/* Hero Section */}
-      <div className="container mx-auto px-6 py-20">
+      <div className="container mx-auto px-4 sm:px-6 py-10 sm:py-20">
         {/* Main Hero */}
         <div className="text-center max-w-4xl mx-auto mb-20">
-          <h1 className="text-6xl md:text-7xl font-bold tracking-tight mb-6 animate-slide-up">
+          <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold tracking-tight mb-4 sm:mb-6 animate-slide-up">
             Unlock better health with the all-new 
             <span className="text-primary"> DIABETICKS</span>
           </h1>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto animate-slide-up" style={{
+          <p className="text-base sm:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-2xl mx-auto animate-slide-up" style={{
           animationDelay: '0.1s'
         }}>
             Get insights and guidance on which daily habits impact how fast you're aging — so you can take control, slow it down, and spend more years doing what you love.
@@ -161,7 +161,7 @@ const Landing = () => {
         </div>
 
         {/* Benefits Section */}
-        <div className="whoop-card p-12 text-center mb-20">
+        <div className="whoop-card p-6 sm:p-12 text-center mb-12 sm:mb-20">
           <h2 className="text-3xl font-bold mb-8">
             Unlock the full picture of your health
           </h2>
@@ -179,7 +179,7 @@ const Landing = () => {
 
         {/* CTA Section */}
         <div className="text-center">
-          <div className="whoop-card p-12 max-w-2xl mx-auto">
+          <div className="whoop-card p-6 sm:p-12 max-w-2xl mx-auto">
             <h2 className="text-4xl font-bold mb-6">
               Ready to unlock better health?
             </h2>

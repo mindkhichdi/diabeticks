@@ -162,8 +162,8 @@ const MedicineTracker = () => {
   return <div className="space-y-4">
       <Card className="whoop-card p-6">
         <div className="flex flex-col space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="text-lg font-semibold text-card-foreground">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
+            <div className="text-sm sm:text-lg font-semibold text-card-foreground">
               {selectedDate.toLocaleDateString('en-US', {
               weekday: 'long',
               year: 'numeric',

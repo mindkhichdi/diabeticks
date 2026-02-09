@@ -90,107 +90,107 @@ const Index = () => {
   return (
     <div className="min-h-screen w-full bg-background">
       {/* Header */}
-      <header className="whoop-nav sticky top-6 mx-6 z-50 p-4">
+      <header className="whoop-nav sticky top-4 sm:top-6 mx-3 sm:mx-6 z-50 p-3 sm:p-4">
         <div className="flex items-center justify-between">
           <Logo />
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <ThemeToggle />
             <Button 
               variant="ghost" 
               onClick={handleSignOut} 
-              className="whoop-button text-muted-foreground hover:text-foreground hover:bg-secondary"
+              className="whoop-button text-muted-foreground hover:text-foreground hover:bg-secondary text-xs sm:text-sm px-2 sm:px-4"
             >
-              <LogOut className="w-4 h-4 mr-2" />
-              Sign Out
+              <LogOut className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Sign Out</span>
             </Button>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-6 py-8 pb-24">
+      <main className="container mx-auto px-3 sm:px-6 py-4 sm:py-8 pb-28 sm:pb-24">
         {showConfetti && <ConfettiAnimation onComplete={() => setShowConfetti(false)} />}
         
         <Tabs defaultValue="medicine" className="w-full">
           {/* Tab Content */}
           <div className="space-y-8 animate-slide-up">
             <TabsContent value="medicine" className="space-y-0">
-              <div className="whoop-card p-8">
-                <h2 className="text-2xl font-bold mb-8 tracking-tight">Medicine</h2>
+              <div className="whoop-card p-4 sm:p-8">
+                <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-8 tracking-tight">Medicine</h2>
                 <MedicineTracker />
               </div>
             </TabsContent>
             
             <TabsContent value="readings" className="space-y-0">
-              <div className="whoop-card p-8">
-                <h2 className="text-2xl font-bold mb-8 tracking-tight">Readings</h2>
+              <div className="whoop-card p-4 sm:p-8">
+                <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-8 tracking-tight">Readings</h2>
                 <ReadingsLog />
               </div>
             </TabsContent>
 
             <TabsContent value="prescriptions" className="space-y-0">
-              <div className="whoop-card p-8">
-                <h2 className="text-2xl font-bold mb-8 tracking-tight">Prescriptions</h2>
+              <div className="whoop-card p-4 sm:p-8">
+                <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-8 tracking-tight">Prescriptions</h2>
                 <PrescriptionManager />
               </div>
             </TabsContent>
 
             <TabsContent value="food" className="space-y-0">
-              <div className="whoop-card p-8">
-                <h2 className="text-2xl font-bold mb-8 tracking-tight">Nutrition</h2>
+              <div className="whoop-card p-4 sm:p-8">
+                <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-8 tracking-tight">Nutrition</h2>
                 <FoodTracker />
               </div>
             </TabsContent>
 
             <TabsContent value="fitness" className="space-y-0">
-              <div className="whoop-card p-8">
-                <h2 className="text-2xl font-bold mb-8 tracking-tight">Fitness</h2>
+              <div className="whoop-card p-4 sm:p-8">
+                <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-8 tracking-tight">Fitness</h2>
                 <FitnessTracker />
               </div>
             </TabsContent>
           </div>
 
           {/* Bottom Navigation */}
-          <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 animate-slide-up">
-            <TabsList className="whoop-nav p-2 gap-1 shadow-2xl">
+          <div className="fixed bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 z-50 animate-slide-up w-[calc(100%-1.5rem)] sm:w-auto max-w-lg">
+            <TabsList className="whoop-nav p-1.5 sm:p-2 gap-0.5 sm:gap-1 shadow-2xl w-full">
               <TabsTrigger 
                 value="medicine" 
-                className="whoop-button flex flex-col items-center px-4 py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105"
+                className="whoop-button flex flex-col items-center px-2 sm:px-4 py-2 sm:py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105 flex-1"
               >
-                <Pill className="w-4 h-4 mb-1 transition-transform group-hover:scale-110" />
-                <span className="text-xs font-medium">Medicine</span>
+                <Pill className="w-4 h-4 mb-0.5 sm:mb-1" />
+                <span className="text-[10px] sm:text-xs font-medium">Medicine</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="readings" 
-                className="whoop-button flex flex-col items-center px-4 py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105"
+                className="whoop-button flex flex-col items-center px-2 sm:px-4 py-2 sm:py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105 flex-1"
               >
-                <Heart className="w-4 h-4 mb-1 transition-transform group-hover:scale-110" />
-                <span className="text-xs font-medium">Readings</span>
+                <Heart className="w-4 h-4 mb-0.5 sm:mb-1" />
+                <span className="text-[10px] sm:text-xs font-medium">Readings</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="prescriptions" 
-                className="whoop-button flex flex-col items-center px-4 py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105"
+                className="whoop-button flex flex-col items-center px-2 sm:px-4 py-2 sm:py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105 flex-1"
               >
-                <FileText className="w-4 h-4 mb-1 transition-transform group-hover:scale-110" />
-                <span className="text-xs font-medium">Scripts</span>
+                <FileText className="w-4 h-4 mb-0.5 sm:mb-1" />
+                <span className="text-[10px] sm:text-xs font-medium">Scripts</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="food" 
-                className="whoop-button flex flex-col items-center px-4 py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105"
+                className="whoop-button flex flex-col items-center px-2 sm:px-4 py-2 sm:py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105 flex-1"
               >
-                <Utensils className="w-4 h-4 mb-1 transition-transform group-hover:scale-110" />
-                <span className="text-xs font-medium">Nutrition</span>
+                <Utensils className="w-4 h-4 mb-0.5 sm:mb-1" />
+                <span className="text-[10px] sm:text-xs font-medium">Nutrition</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="fitness" 
-                className="whoop-button flex flex-col items-center px-4 py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105"
+                className="whoop-button flex flex-col items-center px-2 sm:px-4 py-2 sm:py-3 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:scale-105 flex-1"
               >
-                <Activity className="w-4 h-4 mb-1 transition-transform group-hover:scale-110" />
-                <span className="text-xs font-medium">Fitness</span>
+                <Activity className="w-4 h-4 mb-0.5 sm:mb-1" />
+                <span className="text-[10px] sm:text-xs font-medium">Fitness</span>
               </TabsTrigger>
             </TabsList>
           </div>

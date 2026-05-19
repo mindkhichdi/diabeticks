@@ -13,10 +13,20 @@ import { supabase } from "@/integrations/supabase/client";
 import Logo from '@/components/Logo';
 import ConfettiAnimation from '@/components/ConfettiAnimation';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import MascotNudge from '@/components/MascotNudge';
+
+const nudges: Record<string, string> = {
+  medicine: "Hey friend! Let's tick off today's meds 💊 You've got this!",
+  readings: "Quick check-in — log your sugar reading so we keep your streak alive! 🔥",
+  prescriptions: "Snap a prescription and I'll keep it safe for you 📄",
+  food: "What did you eat? Let's keep those macros happy 🥗",
+  fitness: "Move that body! Even 10 minutes counts 💪",
+};
 
 const Index = () => {
   const navigate = useNavigate();
   const [showConfetti, setShowConfetti] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>('medicine');
 
   useEffect(() => {
     // Check if this is the user's first visit

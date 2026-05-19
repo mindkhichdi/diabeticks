@@ -120,6 +120,8 @@ const Index = () => {
       {/* Main Content */}
       <main className="container mx-auto px-3 sm:px-6 py-4 sm:py-8 pb-24 sm:pb-28">
         {showConfetti && <ConfettiAnimation onComplete={() => setShowConfetti(false)} />}
+        <MascotNudge message={nudges[activeTab]} triggerKey={activeTab} />
+        
         
         <Tabs defaultValue="medicine" value={activeTab} onValueChange={setActiveTab} className="w-full">
           {/* Tab Content */}

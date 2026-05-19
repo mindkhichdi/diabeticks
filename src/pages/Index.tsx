@@ -13,10 +13,20 @@ import { supabase } from "@/integrations/supabase/client";
 import Logo from '@/components/Logo';
 import ConfettiAnimation from '@/components/ConfettiAnimation';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import MascotNudge from '@/components/MascotNudge';
+
+const nudges: Record<string, string> = {
+  medicine: "Hey friend! Let's tick off today's meds 💊 You've got this!",
+  readings: "Quick check-in — log your sugar reading so we keep your streak alive! 🔥",
+  prescriptions: "Snap a prescription and I'll keep it safe for you 📄",
+  food: "What did you eat? Let's keep those macros happy 🥗",
+  fitness: "Move that body! Even 10 minutes counts 💪",
+};
 
 const Index = () => {
   const navigate = useNavigate();
   const [showConfetti, setShowConfetti] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>('medicine');
 
   useEffect(() => {
     // Check if this is the user's first visit
@@ -110,8 +120,10 @@ const Index = () => {
       {/* Main Content */}
       <main className="container mx-auto px-3 sm:px-6 py-4 sm:py-8 pb-24 sm:pb-28">
         {showConfetti && <ConfettiAnimation onComplete={() => setShowConfetti(false)} />}
+        <MascotNudge message={nudges[activeTab]} triggerKey={activeTab} />
         
-        <Tabs defaultValue="medicine" className="w-full">
+        
+        <Tabs defaultValue="medicine" value={activeTab} onValueChange={setActiveTab} className="w-full">
           {/* Tab Content */}
           <div className="space-y-8 animate-slide-up">
             <TabsContent value="medicine" className="space-y-0">

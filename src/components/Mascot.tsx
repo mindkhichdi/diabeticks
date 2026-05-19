@@ -7,7 +7,7 @@ interface MascotProps {
 }
 
 /**
- * "Beanie" — a chubby round bear cub mascot. Pure SVG.
+ * "Pip" — a cute lavender bunny mascot in a scrapbook sketch style.
  */
 const Mascot = ({ className, size = 96, mood = "happy" }: MascotProps) => {
   const waving = mood === "wave" || mood === "cheer";
@@ -15,80 +15,67 @@ const Mascot = ({ className, size = 96, mood = "happy" }: MascotProps) => {
     <svg
       width={size}
       height={size}
-      viewBox="0 0 120 120"
-      className={cn("drop-shadow-md", className)}
+      viewBox="0 0 120 130"
+      className={cn(className)}
       aria-hidden="true"
     >
-      <defs>
-        <radialGradient id="bellyGrad" cx="50%" cy="40%" r="60%">
-          <stop offset="0%" stopColor="hsl(var(--gold) / 0.9)" />
-          <stop offset="100%" stopColor="hsl(var(--streak) / 0.85)" />
-        </radialGradient>
-      </defs>
-
-      {/* Feet */}
-      <ellipse cx="44" cy="112" rx="11" ry="6" fill="hsl(28 50% 35%)" />
-      <ellipse cx="76" cy="112" rx="11" ry="6" fill="hsl(28 50% 35%)" />
-      <ellipse cx="44" cy="110" rx="6" ry="2.5" fill="hsl(var(--gold))" />
-      <ellipse cx="76" cy="110" rx="6" ry="2.5" fill="hsl(28 60% 70%)" />
+      {/* Ears outer */}
+      <ellipse cx="44" cy="22" rx="9" ry="20" fill="hsl(271 50% 78%)" stroke="hsl(271 35% 35%)" strokeWidth="1.6" />
+      <ellipse cx="76" cy="22" rx="9" ry="20" fill="hsl(271 50% 78%)" stroke="hsl(271 35% 35%)" strokeWidth="1.6" />
+      {/* Ears inner */}
+      <ellipse cx="44" cy="24" rx="4" ry="13" fill="hsl(340 75% 88%)" />
+      <ellipse cx="76" cy="24" rx="4" ry="13" fill="hsl(340 75% 88%)" />
 
       {/* Body */}
-      <ellipse cx="60" cy="80" rx="34" ry="30" fill="hsl(28 55% 55%)" />
-      {/* Belly patch */}
-      <ellipse cx="60" cy="84" rx="20" ry="18" fill="url(#bellyGrad)" />
+      <ellipse cx="60" cy="92" rx="32" ry="26" fill="hsl(271 55% 86%)" stroke="hsl(271 35% 35%)" strokeWidth="1.8" />
+      {/* Belly */}
+      <ellipse cx="60" cy="96" rx="18" ry="16" fill="hsl(340 70% 94%)" />
 
       {/* Arms */}
       <ellipse
-        cx="24"
-        cy="74"
-        rx="9"
-        ry="13"
-        fill="hsl(28 55% 50%)"
-        className={waving ? "origin-top animate-wiggle" : ""}
+        cx="28"
+        cy="86"
+        rx="8"
+        ry="12"
+        fill="hsl(271 55% 82%)"
+        stroke="hsl(271 35% 35%)"
+        strokeWidth="1.6"
+        className={waving ? "animate-wiggle" : ""}
         style={{ transformBox: "fill-box", transformOrigin: "50% 10%" }}
       />
-      <ellipse cx="96" cy="80" rx="9" ry="13" fill="hsl(28 55% 50%)" />
+      <ellipse cx="92" cy="92" rx="8" ry="12" fill="hsl(271 55% 82%)" stroke="hsl(271 35% 35%)" strokeWidth="1.6" />
+
+      {/* Feet */}
+      <ellipse cx="46" cy="120" rx="10" ry="5" fill="hsl(340 70% 88%)" stroke="hsl(271 35% 35%)" strokeWidth="1.6" />
+      <ellipse cx="74" cy="120" rx="10" ry="5" fill="hsl(340 70% 88%)" stroke="hsl(271 35% 35%)" strokeWidth="1.6" />
 
       {/* Head */}
-      <circle cx="60" cy="46" r="32" fill="hsl(28 55% 58%)" />
+      <circle cx="60" cy="56" r="30" fill="hsl(271 55% 90%)" stroke="hsl(271 35% 35%)" strokeWidth="1.8" />
 
-      {/* Ears outer */}
-      <circle cx="30" cy="24" r="10" fill="hsl(28 55% 50%)" />
-      <circle cx="90" cy="24" r="10" fill="hsl(28 55% 50%)" />
-      {/* Ears inner */}
-      <circle cx="30" cy="25" r="5" fill="hsl(354 70% 78%)" />
-      <circle cx="90" cy="25" r="5" fill="hsl(354 70% 78%)" />
-
-      {/* Face muzzle */}
-      <ellipse cx="60" cy="56" rx="16" ry="12" fill="hsl(45 60% 88%)" />
+      {/* Cheeks */}
+      <circle cx="40" cy="62" r="5" fill="hsl(340 80% 78%)" opacity="0.75" />
+      <circle cx="80" cy="62" r="5" fill="hsl(340 80% 78%)" opacity="0.75" />
 
       {/* Eyes */}
-      <circle cx="48" cy="42" r="4.5" fill="#1a1a1a" />
-      <circle cx="72" cy="42" r="4.5" fill="#1a1a1a" />
-      <circle cx="49.5" cy="40.5" r="1.6" fill="#fff" />
-      <circle cx="73.5" cy="40.5" r="1.6" fill="#fff" />
+      <circle cx="49" cy="52" r="3.5" fill="hsl(271 35% 22%)" />
+      <circle cx="71" cy="52" r="3.5" fill="hsl(271 35% 22%)" />
+      <circle cx="50" cy="51" r="1.3" fill="#fff" />
+      <circle cx="72" cy="51" r="1.3" fill="#fff" />
 
-      {/* Eyebrows */}
-      <path d="M42 33 Q48 30 54 33" stroke="hsl(28 50% 30%)" strokeWidth="2" strokeLinecap="round" fill="none" />
-      <path d="M66 33 Q72 30 78 33" stroke="hsl(28 50% 30%)" strokeWidth="2" strokeLinecap="round" fill="none" />
-
-      {/* Nose */}
-      <ellipse cx="60" cy="52" rx="3.5" ry="2.5" fill="#1a1a1a" />
+      {/* Tiny nose */}
+      <path d="M57 60 Q60 63 63 60 Q60 64 57 60 Z" fill="hsl(340 75% 65%)" stroke="hsl(271 35% 35%)" strokeWidth="1" />
 
       {/* Smile */}
       <path
-        d="M52 60 Q60 68 68 60"
-        stroke="#1a1a1a"
-        strokeWidth="2.2"
+        d="M54 66 Q60 71 66 66"
+        stroke="hsl(271 35% 25%)"
+        strokeWidth="1.8"
         strokeLinecap="round"
         fill="none"
       />
-      {/* Tongue */}
-      <path d="M57 63 Q60 67 63 63 Z" fill="hsl(354 80% 65%)" />
 
-      {/* Cheeks */}
-      <circle cx="40" cy="54" r="4" fill="hsl(354 80% 70% / 0.55)" />
-      <circle cx="80" cy="54" r="4" fill="hsl(354 80% 70% / 0.55)" />
+      {/* Sketch sparkle */}
+      <path d="M22 40 L24 46 L30 48 L24 50 L22 56 L20 50 L14 48 L20 46 Z" fill="hsl(45 90% 70%)" opacity="0.9" />
     </svg>
   );
 };

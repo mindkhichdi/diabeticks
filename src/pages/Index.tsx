@@ -121,7 +121,7 @@ const Index = () => {
       <main className="container mx-auto px-3 sm:px-6 py-4 sm:py-8 pb-24 sm:pb-28">
         {showConfetti && <ConfettiAnimation onComplete={() => setShowConfetti(false)} />}
         
-        <Tabs defaultValue="medicine" className="w-full">
+        <Tabs defaultValue="medicine" value={activeTab} onValueChange={setActiveTab} className="w-full">
           {/* Tab Content */}
           <div className="space-y-8 animate-slide-up">
             <TabsContent value="medicine" className="space-y-0">

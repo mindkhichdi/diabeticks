@@ -1,0 +1,11 @@
+# Diabeticks
+
+> Your personal diabetes management companion — track medicines, blood sugar readings, prescriptions, food, and fitness in one playful app.
+
+Diabeticks helps people living with diabetes stay on top of daily routines through medicine adherence tracking, blood sugar logging, prescription management, meal planning, and fitness goals.
+
+## Pages
+
+- [Home](/): Landing page introducing Diabeticks and its features.
+- [Privacy Policy](/privacy): How user data is collected, stored, and protected.
+- [Terms of Use](/terms): Terms and conditions for using Diabeticks.

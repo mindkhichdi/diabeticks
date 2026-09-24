@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { Activity, Droplet, House, LogOut, Pill, Plus, Utensils } from 'lucide-react';

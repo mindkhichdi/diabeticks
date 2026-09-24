@@ -1,192 +1,166 @@
-import React, { useState } from 'react';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { useState } from 'react';
+import { format, parseISO, subDays } from 'date-fns';
+import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
-import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Trash2 } from 'lucide-react';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { cn } from '@/lib/utils';
+import { useDeleteReading, useReadings, useTargets } from '@/hooks/use-glucose';
+import {
+  DEFAULT_TARGETS, Reading, ReadingKind, kindLabel, localDateKey, statsFor, toPoints, zoneClass, zoneOf,
+} from '@/lib/glucose';
 import BloodSugarTrendChart from './BloodSugarTrendChart';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-interface Reading {
-  id?: string;
-  date: string;
-  hba1c?: number | null;
-  fasting?: number | null;
-  post_prandial?: number | null;
-  created_at?: string;
-  user_id?: string | null;
+import RangeBar from './glucose/RangeBar';
+
+const periods = [7, 30, 90] as const;
+
+interface Props {
+  onLogSugar: () => void;
 }
-const ReadingsLog = () => {
-  const queryClient = useQueryClient();
-  const [newReading, setNewReading] = useState<Reading>({
-    date: new Date().toISOString().split('T')[0]
-  });
-  const [readingToDelete, setReadingToDelete] = useState<Reading | null>(null);
 
-  // Fetch readings
-  const {
-    data: readings = [],
-    refetch
-  } = useQuery({
-    queryKey: ['blood-sugar-readings'],
-    queryFn: async () => {
-      console.log('Fetching readings...');
-      const {
-        data: {
-          user
-        }
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error('No user found');
-      const {
-        data,
-        error
-      } = await supabase.from('blood_sugar_readings').select('*').eq('user_id', user.id).order('date', {
-        ascending: false
-      });
-      if (error) {
-        console.error('Error fetching readings:', error);
-        throw error;
-      }
-      console.log('Fetched readings:', data);
-      return data;
-    }
-  });
+const ReadingsLog = ({ onLogSugar }: Props) => {
+  const { data: readings = [], isLoading } = useReadings();
+  const { data: targets = DEFAULT_TARGETS } = useTargets();
+  const deleteReading = useDeleteReading();
+  const [days, setDays] = useState<(typeof periods)[number]>(30);
+  const [toDelete, setToDelete] = useState<Reading | null>(null);
 
-  // Create mutation for adding readings
-  const addReading = useMutation({
-    mutationFn: async (reading: Reading) => {
-      const {
-        data: {
-          user
-        }
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error('No user found');
-      const {
-        error
-      } = await supabase.from('blood_sugar_readings').insert([{
-        date: reading.date,
-        hba1c: reading.hba1c ? parseFloat(reading.hba1c.toString()) : null,
-        fasting: reading.fasting ? parseInt(reading.fasting.toString()) : null,
-        post_prandial: reading.post_prandial ? parseInt(reading.post_prandial.toString()) : null,
-        user_id: user.id
-      }]);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['blood-sugar-readings']
-      });
-      setNewReading({
-        date: new Date().toISOString().split('T')[0]
-      });
-      toast.success('Reading added successfully!');
-    },
-    onError: error => {
-      console.error('Error adding reading:', error);
-      toast.error('Failed to add reading. Please try again.');
-    }
-  });
+  const since = localDateKey(subDays(new Date(), days - 1));
+  const inPeriod = readings.filter((r) => r.date >= since);
+  const points = toPoints(inPeriod);
+  const stats = statsFor(points, targets, days);
+  const latestA1c = readings.find((r) => r.hba1c != null);
 
-  // Delete mutation
-  const deleteReading = useMutation({
-    mutationFn: async (readingId: string) => {
-      console.log('Deleting reading with ID:', readingId);
-      const {
-        error
-      } = await supabase.from('blood_sugar_readings').delete().eq('id', readingId);
-      if (error) {
-        console.error('Error deleting reading:', error);
-        throw error;
-      }
-      console.log('Reading deleted successfully');
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['blood-sugar-readings']
-      });
-      refetch(); // Explicitly refetch the data
-      toast.success('Reading deleted successfully!');
-      setReadingToDelete(null);
-    },
-    onError: error => {
-      console.error('Error deleting reading:', error);
-      toast.error('Failed to delete reading. Please try again.');
-    }
-  });
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    addReading.mutate(newReading);
+  const Chip = ({ kind, value }: { kind: ReadingKind; value: number }) => {
+    const zone = zoneOf(value, kind, targets);
+    return (
+      <span className={cn('inline-flex items-baseline gap-1.5 rounded-xl px-3 py-1.5', zoneClass[zone].soft)}>
+        <span className="text-xs text-muted-foreground">{kindLabel[kind]}</span>
+        <span className={cn('font-bold tabular', zoneClass[zone].text)}>{value}</span>
+      </span>
+    );
   };
-  const handleDelete = (reading: Reading) => {
-    console.log('Setting reading to delete:', reading);
-    setReadingToDelete(reading);
-  };
-  const confirmDelete = () => {
-    if (readingToDelete?.id) {
-      console.log('Confirming deletion of reading:', readingToDelete);
-      deleteReading.mutate(readingToDelete.id);
-    }
-  };
-  return <Card className="p-6">
-      <h2 className="text-2xl font-semibold mb-6 text-orange-600">Blood Sugar Readings</h2>
-      
-      <form onSubmit={handleSubmit} className="grid gap-4 mb-6">
-        <div className="grid md:grid-cols-2 gap-4">
-          <Input type="date" value={newReading.date} onChange={e => setNewReading({
-          ...newReading,
-          date: e.target.value
-        })} required />
-          <Input type="number" placeholder="HbA1c (%)" value={newReading.hba1c || ''} onChange={e => setNewReading({
-          ...newReading,
-          hba1c: e.target.value ? parseFloat(e.target.value) : null
-        })} step="0.1" />
-          <Input type="number" placeholder="Fasting (mg/dL)" value={newReading.fasting || ''} onChange={e => setNewReading({
-          ...newReading,
-          fasting: e.target.value ? parseInt(e.target.value) : null
-        })} />
-          <Input type="number" placeholder="Post-prandial (mg/dL)" value={newReading.post_prandial || ''} onChange={e => setNewReading({
-          ...newReading,
-          post_prandial: e.target.value ? parseInt(e.target.value) : null
-        })} />
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div role="radiogroup" aria-label="Time period" className="inline-flex gap-1 p-1 rounded-2xl bg-muted">
+          {periods.map((p) => (
+            <button
+              key={p}
+              role="radio"
+              aria-checked={days === p}
+              onClick={() => setDays(p)}
+              className={cn(
+                'h-10 px-4 rounded-xl text-sm font-bold transition-colors',
+                days === p ? 'bg-card shadow-sm' : 'text-muted-foreground hover:text-foreground',
+              )}
+            >
+              {p} days
+            </button>
+          ))}
         </div>
-        <Button type="submit" className="bg-primary">Add Reading</Button>
-      </form>
-
-      <div className="space-y-4 mb-6">
-        {readings.map(reading => <Card key={reading.id} className="p-4 bg-primary-light">
-            <div className="flex justify-between items-start">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
-                <p className="font-semibold text-sm sm:text-base">{new Date(reading.date).toLocaleDateString()}</p>
-                {reading.hba1c && <p className="text-sm sm:text-base">HbA1c: {reading.hba1c}%</p>}
-                {reading.fasting && <p className="text-sm sm:text-base">Fasting: {reading.fasting} mg/dL</p>}
-                {reading.post_prandial && <p className="text-sm sm:text-base">PP: {reading.post_prandial} mg/dL</p>}
-              </div>
-              <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/90" onClick={() => handleDelete(reading)}>
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          </Card>)}
+        <Button onClick={onLogSugar}>
+          <Plus /> Log blood sugar
+        </Button>
       </div>
 
-      <BloodSugarTrendChart readings={readings} />
+      {isLoading ? (
+        <div className="h-72 rounded-2xl bg-muted animate-pulse" />
+      ) : points.length === 0 ? (
+        <div className="rounded-2xl border-2 border-dashed border-border p-8 text-center">
+          <p className="font-display text-2xl font-bold">No readings in the last {days} days</p>
+          <p className="text-muted-foreground mt-2">Log a reading to start seeing your trend.</p>
+        </div>
+      ) : (
+        <>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="sm:col-span-2">
+              <p className="text-sm text-muted-foreground mb-2">
+                <span className="font-bold text-foreground">{Math.round((stats.inRange / stats.count) * 100)}% in range</span>
+                {' '}across {stats.count} reading{stats.count === 1 ? '' : 's'}
+              </p>
+              <RangeBar stats={stats} />
+            </div>
+            <dl className="grid grid-cols-2 gap-3">
+              <div>
+                <dt className="text-sm text-muted-foreground">Average</dt>
+                <dd className="font-display text-3xl font-bold tabular">{stats.average}</dd>
+              </div>
+              <div>
+                <dt className="text-sm text-muted-foreground">{latestA1c ? 'Lab HbA1c' : 'Est. A1c'}</dt>
+                <dd className="font-display text-3xl font-bold tabular">
+                  {latestA1c ? `${latestA1c.hba1c}%` : stats.estimatedA1c != null ? `${stats.estimatedA1c}%` : '—'}
+                </dd>
+                {latestA1c && (
+                  <dd className="text-xs text-muted-foreground">{format(parseISO(latestA1c.date), 'd MMM yyyy')}</dd>
+                )}
+              </div>
+            </dl>
+          </div>
 
-      <AlertDialog open={!!readingToDelete} onOpenChange={() => setReadingToDelete(null)}>
+          <BloodSugarTrendChart points={points} targets={targets} />
+        </>
+      )}
+
+      {inPeriod.length > 0 && (
+        <section>
+          <h3 className="text-lg font-bold mb-3">History</h3>
+          <ul className="divide-y divide-border rounded-2xl border border-border bg-card">
+            {inPeriod.map((r) => (
+              <li key={r.id} className="flex items-center gap-3 p-3 pl-4">
+                <div className="w-16 shrink-0">
+                  <p className="font-bold">{format(parseISO(r.date), 'd MMM')}</p>
+                  <p className="text-xs text-muted-foreground">{format(parseISO(r.date), 'EEEE')}</p>
+                </div>
+                <div className="flex flex-wrap gap-2 flex-1">
+                  {r.fasting != null && <Chip kind="fasting" value={r.fasting} />}
+                  {r.post_prandial != null && <Chip kind="post_prandial" value={r.post_prandial} />}
+                  {r.hba1c != null && (
+                    <span className="inline-flex items-baseline gap-1.5 rounded-xl px-3 py-1.5 bg-muted">
+                      <span className="text-xs text-muted-foreground">HbA1c</span>
+                      <span className="font-bold tabular">{r.hba1c}%</span>
+                    </span>
+                  )}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground hover:text-destructive"
+                  aria-label={`Delete reading from ${format(parseISO(r.date), 'd MMMM')}`}
+                  onClick={() => setToDelete(r)}
+                >
+                  <Trash2 />
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <AlertDialog open={!!toDelete} onOpenChange={(o) => !o && setToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Reading</AlertDialogTitle>
+            <AlertDialogTitle>Delete this reading?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this reading? This action cannot be undone.
+              {toDelete && `The reading from ${format(parseISO(toDelete.date), 'd MMMM yyyy')} will be removed. This can't be undone.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Delete
+            <AlertDialogCancel>Keep it</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => toDelete && deleteReading.mutate(toDelete.id)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete reading
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </Card>;
+    </div>
+  );
 };
+
 export default ReadingsLog;

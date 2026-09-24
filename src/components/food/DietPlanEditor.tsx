@@ -46,10 +46,10 @@ const DAYS_OF_WEEK = [
 ];
 
 const MEAL_TYPES = [
-  { value: 'breakfast', label: 'Breakfast', color: 'bg-orange-100 text-orange-800' },
-  { value: 'lunch', label: 'Lunch', color: 'bg-blue-100 text-blue-800' },
-  { value: 'snacks', label: 'Snacks', color: 'bg-purple-100 text-purple-800' },
-  { value: 'dinner', label: 'Dinner', color: 'bg-green-100 text-green-800' },
+  { value: 'breakfast', label: 'Breakfast', color: 'bg-primary-soft text-primary hover:bg-primary-soft' },
+  { value: 'lunch', label: 'Lunch', color: 'bg-primary-soft text-primary hover:bg-primary-soft' },
+  { value: 'snacks', label: 'Snacks', color: 'bg-primary-soft text-primary hover:bg-primary-soft' },
+  { value: 'dinner', label: 'Dinner', color: 'bg-primary-soft text-primary hover:bg-primary-soft' },
 ];
 
 const DietPlanEditor: React.FC<DietPlanEditorProps> = ({ plan, onSave, onCancel }) => {

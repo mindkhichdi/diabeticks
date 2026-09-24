@@ -127,10 +127,10 @@ const trainingPlans: TrainingPlan[] = [
 ];
 
 const intensityColors = {
-  easy: 'bg-green-100 text-green-800',
-  moderate: 'bg-yellow-100 text-yellow-800',
-  hard: 'bg-red-100 text-red-800',
-  'race-pace': 'bg-purple-100 text-purple-800'
+  easy: 'bg-muted text-foreground',
+  moderate: 'bg-primary-soft text-primary',
+  hard: 'bg-chart-5/15 text-chart-5',
+  'race-pace': 'bg-chart-3/15 text-chart-3'
 };
 
 const activityIcons = {
@@ -167,7 +167,7 @@ const TrainingPlan = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h2 className="text-xl md:text-2xl font-semibold text-primary">Training Plans</h2>
+        <p className="text-muted-foreground">Pick a plan to see its week-by-week sessions.</p>
         <Select value={selectedPlan} onValueChange={setSelectedPlan}>
           <SelectTrigger className="w-full sm:w-64">
             <SelectValue placeholder="Select a training plan" />

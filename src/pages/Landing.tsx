@@ -1,225 +1,275 @@
-import React, { useEffect, useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { useNavigate } from 'react-router-dom';
-import { Activity, Pill, Heart, TrendingUp, Zap, Clock, Target, ArrowRight, PlayCircle, CheckCircle } from 'lucide-react';
-import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowRight, Check, Moon, Sun, Sunset } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
 import Logo from '@/components/Logo';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import RangeRibbon from '@/components/glucose/RangeRibbon';
+import { cn } from '@/lib/utils';
+import { DEFAULT_TARGETS, ReadingKind, kindLabel, zoneClass, zoneMeta, zoneOf } from '@/lib/glucose';
+
+/** The hero: the app's own range scale, live, for visitors to drag. */
+const TryTheScale = () => {
+  const [value, setValue] = useState(142);
+  const [kind, setKind] = useState<ReadingKind>('post_prandial');
+  const zone = zoneOf(value, kind, DEFAULT_TARGETS);
+
+  return (
+    <div className="rounded-3xl bg-card border border-border p-5 sm:p-7 shadow-xl shadow-primary/5">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Try it</p>
+        <div role="radiogroup" aria-label="Reading type" className="inline-flex gap-1 p-1 rounded-xl bg-muted">
+          {(['fasting', 'post_prandial'] as const).map((k) => (
+            <button
+              key={k}
+              role="radio"
+              aria-checked={kind === k}
+              onClick={() => setKind(k)}
+              className={cn(
+                'h-8 px-3 rounded-lg text-xs font-bold transition-colors',
+                kind === k ? 'bg-card shadow-sm' : 'text-muted-foreground hover:text-foreground',
+              )}
+            >
+              {kindLabel[k]}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex items-end gap-3 mt-4">
+        <span className={cn('font-display font-bold text-[5.5rem] sm:text-8xl leading-[0.85] tabular transition-colors', zoneClass[zone].text)}>
+          {value}
+        </span>
+        <span className="pb-1">
+          <span className="block text-sm text-muted-foreground">mg/dL</span>
+          <span className={cn('inline-flex items-center gap-1.5 font-bold', zoneClass[zone].text)}>
+            <span className={cn('w-2.5 h-2.5 rounded-full', zoneClass[zone].bg)} />
+            {zoneMeta[zone].label}
+          </span>
+        </span>
+      </div>
+
+      <RangeRibbon value={value} kind={kind} targets={DEFAULT_TARGETS} onChange={setValue} className="mt-4" />
+      <p className="text-xs text-muted-foreground text-center">Drag the scale, or focus it and use the arrow keys</p>
+
+      <p aria-live="polite" className={cn('mt-4 rounded-2xl border-l-4 p-4 text-[0.95rem]', zoneClass[zone].soft, zoneClass[zone].border)}>
+        {zoneMeta[zone].advice}
+      </p>
+    </div>
+  );
+};
+
+const MedsPreview = () => (
+  <ul className="space-y-2" aria-hidden="true">
+    {[
+      { icon: Sun, name: 'Morning', status: 'Taken at 8:05', taken: true },
+      { icon: Sunset, name: 'Afternoon', status: 'Due now', taken: false, due: true },
+      { icon: Moon, name: 'Night', status: 'Scheduled 9:00 pm', taken: false },
+    ].map(({ icon: Icon, name, status, taken, due }) => (
+      <li
+        key={name}
+        className={cn(
+          'flex items-center gap-3 rounded-xl border-2 p-2.5',
+          taken ? 'border-transparent bg-in-range/10' : due ? 'border-primary bg-primary-soft' : 'border-border',
+        )}
+      >
+        <span className={cn('grid place-items-center w-8 h-8 rounded-full border-2', taken ? 'bg-in-range border-in-range text-white' : 'border-muted-foreground/40 text-muted-foreground')}>
+          {taken ? <Check className="w-4 h-4" strokeWidth={3} /> : <Icon className="w-4 h-4" />}
+        </span>
+        <span className="text-sm">
+          <span className={cn('block font-bold', taken && 'line-through text-muted-foreground')}>{name}</span>
+          <span className={cn('block text-xs font-bold', taken ? 'text-in-range' : due ? 'text-primary' : 'text-muted-foreground')}>{status}</span>
+        </span>
+      </li>
+    ))}
+  </ul>
+);
+
+const TrendPreview = () => {
+  const pts = [128, 150, 112, 170, 96, 138, 186, 118, 104, 144, 122, 131];
+  const x = (i: number) => 8 + i * (284 / (pts.length - 1));
+  const y = (v: number) => 110 - ((v - 60) / 160) * 100;
+  const color = (v: number) => (v < 70 ? 'var(--low)' : v > 180 ? 'var(--high)' : 'var(--in-range)');
+  return (
+    <svg viewBox="0 0 300 120" className="w-full h-auto" aria-hidden="true">
+      <rect x="0" y={y(180)} width="300" height={y(70) - y(180)} fill="hsl(var(--in-range))" opacity="0.1" rx="6" />
+      <polyline points={pts.map((v, i) => `${x(i)},${y(v)}`).join(' ')} fill="none" stroke="hsl(var(--primary))" strokeWidth="2" />
+      {pts.map((v, i) => <circle key={i} cx={x(i)} cy={y(v)} r="4.5" fill={`hsl(${color(v)})`} stroke="hsl(var(--card))" strokeWidth="1.5" />)}
+    </svg>
+  );
+};
+
+const MealPreview = () => (
+  <div className="space-y-3" aria-hidden="true">
+    {[
+      { label: 'Carbs', value: 142, goal: 200, cls: 'bg-chart-2' },
+      { label: 'Protein', value: 68, goal: 90, cls: 'bg-chart-1' },
+      { label: 'Fat', value: 41, goal: 60, cls: 'bg-chart-3' },
+    ].map((m) => (
+      <div key={m.label}>
+        <div className="flex justify-between text-sm">
+          <span className="font-bold">{m.label}</span>
+          <span className="text-muted-foreground tabular">{m.value} / {m.goal} g</span>
+        </div>
+        <div className="h-2.5 rounded-full bg-muted mt-1 overflow-hidden">
+          <div className={cn('h-full rounded-full', m.cls)} style={{ width: `${(m.value / m.goal) * 100}%` }} />
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+const features = [
+  {
+    title: 'Never miss a dose',
+    body: 'Morning, afternoon and night doses as a simple checklist. Tap to mark one taken, tap again to undo.',
+    preview: <MedsPreview />,
+  },
+  {
+    title: 'See your trends',
+    body: 'Time in range, your average and an estimated A1c over 7, 30 or 90 days, with every reading coloured by zone.',
+    preview: <TrendPreview />,
+  },
+  {
+    title: 'Keep track of meals',
+    body: 'Log what you eat and watch carbs, protein and fat against your daily goals. Snap a photo of a meal to fill in the details.',
+    preview: <MealPreview />,
+  },
+];
+
 const Landing = () => {
   const navigate = useNavigate();
-  const [demoProgress, setDemoProgress] = useState(0);
-  const [activeStat, setActiveStat] = useState(0);
+
   useEffect(() => {
-    const checkSession = async () => {
-      const {
-        data: {
-          session
-        }
-      } = await supabase.auth.getSession();
-      if (session) {
-        navigate('/dashboard');
-      }
-    };
-    checkSession();
-    const {
-      data: {
-        subscription
-      }
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN') {
-        navigate('/dashboard');
-      }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) navigate('/dashboard', { replace: true });
     });
-
-    // Demo animation
-    const progressInterval = setInterval(() => {
-      setDemoProgress(prev => prev >= 100 ? 0 : prev + 1);
-    }, 100);
-
-    // Rotate stats
-    const statsInterval = setInterval(() => {
-      setActiveStat(prev => (prev + 1) % 3);
-    }, 3000);
-    return () => {
-      subscription.unsubscribe();
-      clearInterval(progressInterval);
-      clearInterval(statsInterval);
-    };
   }, [navigate]);
-  const metrics = [{
-    label: "STRAIN",
-    value: "12.8",
-    status: "Moderate",
-    color: "text-primary"
-  }, {
-    label: "RECOVERY",
-    value: "73%",
-    status: "Green",
-    color: "text-accent"
-  }, {
-    label: "SLEEP",
-    value: "7h 42m",
-    status: "Good",
-    color: "text-chart-3"
-  }];
-  const features = [{
-    icon: <Zap className="w-6 h-6" />,
-    title: "Daily Strain",
-    description: "Quantify how hard your body works",
-    metric: "12.8"
-  }, {
-    icon: <Heart className="w-6 h-6" />,
-    title: "Recovery Score",
-    description: "Your body's readiness to perform",
-    metric: "73%"
-  }, {
-    icon: <Clock className="w-6 h-6" />,
-    title: "Sleep Performance",
-    description: "Optimize your sleep for recovery",
-    metric: "7h 42m"
-  }, {
-    icon: <Activity className="w-6 h-6" />,
-    title: "HRV Trends",
-    description: "Track heart rate variability",
-    metric: "48ms"
-  }];
-  const benefits = ["91 more minutes of weekly activity", "2.3 more hours of sleep per week", "10% higher HRV on average", "Better health outcomes across all metrics"];
-  return <div className="min-h-screen bg-background text-foreground">
-      {/* Navigation Bar */}
-      <nav className="whoop-nav sticky top-4 sm:top-6 mx-3 sm:mx-6 z-50 p-3 sm:p-4">
-        <div className="flex justify-between items-center">
+
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-40 bg-background/90 backdrop-blur border-b border-border">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-3 px-4 h-16">
           <Logo size={32} />
-          <div className="flex gap-3">
-            <Button variant="ghost" onClick={() => navigate('/auth')} className="whoop-button text-foreground hover:bg-secondary">
-              Sign In
+          <nav className="flex items-center gap-1 sm:gap-2">
+            <ThemeToggle />
+            <Button variant="ghost" asChild className="px-3">
+              <Link to="/auth">Sign in</Link>
             </Button>
-            <Button onClick={() => navigate('/auth')} className="whoop-button bg-primary text-primary-foreground hover:bg-primary/90">
-              Join Now
+            <Button asChild className="hidden sm:inline-flex">
+              <Link to="/auth?mode=signup">Create account</Link>
             </Button>
-          </div>
+          </nav>
         </div>
-      </nav>
+      </header>
 
-      {/* Hero Section */}
-      <div className="container mx-auto px-4 sm:px-6 py-10 sm:py-20">
-        {/* Main Hero */}
-        <div className="text-center max-w-4xl mx-auto mb-20">
-          <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold tracking-tight mb-4 sm:mb-6 animate-slide-up">
-            Unlock better health with the all-new 
-            <span className="text-primary"> DIABETICKS</span>
-          </h1>
-          <p className="text-base sm:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-2xl mx-auto animate-slide-up" style={{
-          animationDelay: '0.1s'
-        }}>
-            Get insights and guidance on which daily habits impact how fast you're aging — so you can take control, slow it down, and spend more years doing what you love.
-          </p>
-          <Button size="lg" className="whoop-button bg-primary text-primary-foreground px-8 py-6 text-lg font-semibold animate-slide-up hover:shadow-[0_0_35px_hsl(var(--primary)/0.6)] hover:scale-105 transition-all duration-300" style={{
-          animationDelay: '0.2s'
-        }} onClick={() => navigate('/auth')}>
-            Join Now <ArrowRight className="w-5 h-5 ml-2 inline animate-bounce-gentle" />
-          </Button>
-        </div>
-
-        {/* Live Metrics */}
-        <div className="grid md:grid-cols-3 gap-6 mb-20">
-          {metrics.map((metric, index) => <Card key={index} className="whoop-card p-8 text-center animate-scale-in hover:scale-105 hover:shadow-[0_8px_40px_-8px_hsl(var(--primary)/0.3)] transition-all duration-300 cursor-pointer group" style={{
-          animationDelay: `${index * 0.1}s`
-        }}>
-              <div className="text-sm text-muted-foreground mb-2 tracking-widest uppercase group-hover:text-primary transition-colors">{metric.label}</div>
-              <div className={`whoop-metric-large ${metric.color} mb-2 animate-metric-count group-hover:scale-110 transition-transform`}>
-                {metric.value}
-              </div>
-              <div className="text-sm font-medium group-hover:text-foreground transition-colors">{metric.status}</div>
-            </Card>)}
-        </div>
-
-        {/* Wear Daily Section */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-6">
-            Wear DIABETIKS daily, improve your health
-          </h2>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-8">
-            Daily DIABETIKS wear is linked to 91 more minutes of weekly activity, 2.3 more hours of sleep per week, and over 10% higher HRV. Members see faster gains, stronger habits, and better outcomes across their goals.*
-          </p>
-        </div>
-
-        {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
-          {features.map((feature, index) => <Card key={index} className="whoop-card p-6 hover:scale-105 hover:shadow-[0_8px_40px_-8px_hsl(var(--primary)/0.25)] transition-all duration-300 animate-slide-up group cursor-pointer" style={{
-          animationDelay: `${index * 0.1}s`
-        }}>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="text-primary group-hover:scale-110 transition-transform">
-                  {feature.icon}
-                </div>
-                <div className="whoop-metric-small group-hover:text-primary transition-colors">{feature.metric}</div>
-              </div>
-              <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors">{feature.title}</h3>
-              <p className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">{feature.description}</p>
-            </Card>)}
-        </div>
-
-        {/* Benefits Section */}
-        <div className="whoop-card p-6 sm:p-12 text-center mb-12 sm:mb-20">
-          <h2 className="text-3xl font-bold mb-8">
-            Unlock the full picture of your health
-          </h2>
-          <p className="text-lg text-muted-foreground mb-12 max-w-3xl mx-auto">
-            With 24/7 monitoring across sleep, strain, stress, and heart health, DIABETIKS gives you a complete view of your health — so you can make smarter decisions every day.
-          </p>
-          
-          <div className="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto">
-            {benefits.map((benefit, index) => <div key={index} className="flex items-center gap-3 text-left">
-                <CheckCircle className="w-5 h-5 text-accent flex-shrink-0" />
-                <span className="text-sm">{benefit}</span>
-              </div>)}
-          </div>
-        </div>
-
-        {/* CTA Section */}
-        <div className="text-center">
-          <div className="whoop-card p-6 sm:p-12 max-w-2xl mx-auto">
-            <h2 className="text-4xl font-bold mb-6">
-              Ready to unlock better health?
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8">Join thousands who are already optimizing their health with DIABETICKS.</p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="whoop-button bg-primary text-primary-foreground px-8 py-6 text-lg font-semibold group hover:shadow-[0_0_40px_hsl(var(--primary)/0.6)] hover:scale-105 transition-all duration-300" onClick={() => navigate('/auth')}>
-                Join Now
-                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform duration-300" />
+      <main>
+        {/* Hero */}
+        <section className="max-w-6xl mx-auto px-4 pt-10 pb-16 sm:pt-16 sm:pb-24 grid gap-10 lg:grid-cols-[1.05fr_1fr] lg:items-center">
+          <div className="animate-slide-up">
+            <p className="text-sm font-bold text-primary">For people living with diabetes</p>
+            <h1 className="text-[2.6rem] leading-[1.05] sm:text-6xl font-bold mt-3">
+              Know where your sugar stands, and what to do next.
+            </h1>
+            <p className="text-lg text-muted-foreground mt-5 max-w-xl">
+              Diabeticks keeps your readings, medicine, meals and activity in one calm place.
+              Every reading is shown as low, in range or high, with plain advice, so you're never left guessing.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 mt-8">
+              <Button size="lg" asChild>
+                <Link to="/auth?mode=signup">
+                  Create a free account <ArrowRight className="!size-5" />
+                </Link>
               </Button>
-              <Button size="lg" variant="outline" className="whoop-button border-2 border-primary/30 text-foreground hover:bg-primary/10 hover:border-primary px-8 py-6 text-lg group transition-all duration-300" onClick={() => navigate('/auth')}>
-                <PlayCircle className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-                See How It Works
+              <Button size="lg" variant="outline" asChild className="border-2">
+                <Link to="/auth">I already have an account</Link>
               </Button>
             </div>
-            <p className="text-sm text-muted-foreground mt-6">
-              *Results based on member data. Individual results may vary.
+          </div>
+          <div className="animate-slide-up [animation-delay:100ms]">
+            <TryTheScale />
+          </div>
+        </section>
+
+        {/* Features */}
+        <section aria-labelledby="features-heading" className="bg-card border-y border-border">
+          <div className="max-w-6xl mx-auto px-4 py-16 sm:py-24">
+            <h2 id="features-heading" className="text-3xl sm:text-4xl font-bold max-w-2xl">
+              Your whole routine, in one place
+            </h2>
+            <div className="grid gap-5 md:grid-cols-3 mt-10">
+              {features.map((f) => (
+                <article key={f.title} className="rounded-3xl border border-border bg-background p-5 sm:p-6 flex flex-col">
+                  <div className="rounded-2xl bg-card border border-border p-4 min-h-[180px] flex flex-col justify-center">
+                    {f.preview}
+                  </div>
+                  <h3 className="text-xl font-bold mt-5">{f.title}</h3>
+                  <p className="text-muted-foreground mt-2">{f.body}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Readability */}
+        <section className="max-w-6xl mx-auto px-4 py-16 sm:py-24 grid gap-8 md:grid-cols-2 md:items-center">
+          <div>
+            <h2 className="text-3xl sm:text-4xl font-bold">Easy to read, easy to tap</h2>
+            <p className="text-lg text-muted-foreground mt-4">
+              Diabetes can affect your eyesight, so Diabeticks is built to be read at a glance.
             </p>
           </div>
-        </div>
+          <ul className="grid gap-3">
+            {[
+              'Large text in Atkinson Hyperlegible, a typeface designed for low vision',
+              'Colours always come with words, so nothing depends on colour alone',
+              'Big buttons you can hit first time',
+              'Light and dark modes that follow your device',
+            ].map((t) => (
+              <li key={t} className="flex gap-3 items-start rounded-2xl bg-card border border-border p-4">
+                <span className="grid place-items-center w-7 h-7 rounded-full bg-in-range text-white shrink-0">
+                  <Check className="w-4 h-4" strokeWidth={3} />
+                </span>
+                <span className="font-bold">{t}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
 
-        {/* Footer */}
-        <footer className="mt-20 pt-12 border-t border-border">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <div className="flex items-center space-x-4">
-              <Logo size={24} />
-              <div className="text-muted-foreground text-sm">
-                © 2024 DIABETIKS. All rights reserved.
-              </div>
+        {/* Closing call to action */}
+        <section className="max-w-6xl mx-auto px-4 pb-16 sm:pb-24">
+          <div className="rounded-3xl bg-primary text-primary-foreground p-8 sm:p-12 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-bold">Start with today's reading</h2>
+              <p className="mt-2 text-primary-foreground/80 text-lg">It's free, and setting up takes under a minute.</p>
             </div>
-            <div className="flex items-center space-x-6">
-              <button onClick={() => navigate('/privacy')} className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-                Privacy Policy
-              </button>
-              <button onClick={() => navigate('/terms')} className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-                Terms of Service
-              </button>
-            </div>
+            <Button size="lg" variant="secondary" asChild className="shrink-0">
+              <Link to="/auth?mode=signup">
+                Create a free account <ArrowRight className="!size-5" />
+              </Link>
+            </Button>
           </div>
-        </footer>
-      </div>
-    </div>;
+          <p className="text-sm text-muted-foreground mt-6 max-w-2xl">
+            Diabeticks helps you keep track of your health. It doesn't replace advice from your doctor or diabetes care team.
+          </p>
+        </section>
+      </main>
+
+      <footer className="border-t border-border">
+        <div className="max-w-6xl mx-auto px-4 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+          <div className="flex items-center gap-3">
+            <Logo size={24} />
+            <span>© {new Date().getFullYear()} Diabeticks</span>
+          </div>
+          <nav className="flex gap-6">
+            <Link to="/privacy" className="hover:text-foreground">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-foreground">Terms of Use</Link>
+          </nav>
+        </div>
+      </footer>
+    </div>
+  );
 };
+
 export default Landing;

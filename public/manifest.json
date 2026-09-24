@@ -1,11 +1,11 @@
 {
   "name": "Diabeticks",
   "short_name": "Diabeticks",
-  "description": "Your personal diabetes management companion",
+  "description": "Track blood sugar, medicine, meals and activity in one calm place",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#F97316",
+  "background_color": "#F2F5F3",
+  "theme_color": "#0F5C55",
   "icons": [
     {
       "src": "/icon-192x192.png",

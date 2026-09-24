@@ -134,7 +134,7 @@ const PrescriptionManager = () => {
   }
   return <div className="space-y-4 md:space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h2 className="text-xl md:text-2xl font-semibold text-orange-600">Prescriptions</h2>
+        <p className="text-muted-foreground">Keep photos of your prescriptions in one place.</p>
         <UploadButton onFileSelect={handleFileSelect} isUploading={uploadMutation.isPending} />
       </div>
 

@@ -1,192 +1,112 @@
-import React, { useState, useEffect } from 'react';
-import { Sun, Sunset, Moon } from 'lucide-react';
-import { toast } from 'sonner';
-import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import confetti from 'canvas-confetti';
-import MedicineTimeSlot from './medicine/MedicineTimeSlot';
-import MedicineHistoryTable from './medicine/MedicineHistoryTable';
-import { TimeSlot, MedicineLog } from '@/types/medicine';
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-const timeSlots: TimeSlot[] = [{
-  id: 'morning',
-  icon: <Sun className="w-6 h-6" />,
-  label: 'Morning Medicine',
-  time: '08:00'
-}, {
-  id: 'afternoon',
-  icon: <Sunset className="w-6 h-6" />,
-  label: 'Afternoon Medicine',
-  time: '14:00'
-}, {
-  id: 'night',
-  icon: <Moon className="w-6 h-6" />,
-  label: 'Night Medicine',
-  time: '20:00'
-}];
-const triggerConfetti = () => {
-  const count = 200;
-  const defaults = {
-    origin: {
-      y: 0.7
-    },
-    zIndex: 999
-  };
-  function fire(particleRatio: number, opts: confetti.Options) {
-    confetti({
-      ...defaults,
-      ...opts,
-      particleCount: Math.floor(count * particleRatio)
-    });
-  }
-  fire(0.25, {
-    spread: 26,
-    startVelocity: 55
-  });
-  fire(0.2, {
-    spread: 60
-  });
-  fire(0.35, {
-    spread: 100,
-    decay: 0.91,
-    scalar: 0.8
-  });
-  fire(0.1, {
-    spread: 120,
-    startVelocity: 25,
-    decay: 0.92,
-    scalar: 1.2
-  });
-  fire(0.1, {
-    spread: 120,
-    startVelocity: 45
-  });
-};
-const MedicineTracker = () => {
-  const queryClient = useQueryClient();
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const {
-    data: medicineLogs = []
-  } = useQuery<MedicineLog[]>({
-    queryKey: ['medicine-logs', selectedDate.toISOString().split('T')[0]],
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { addDays, format, isToday, startOfDay, subDays } from 'date-fns';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { localDateKey } from '@/lib/glucose';
+import MedicineChecklist from './medicine/MedicineChecklist';
+import PrescriptionManager from './PrescriptionManager';
+
+const SLOTS_PER_DAY = 3;
+
+/** Doses taken per day for the last 7 days. */
+const useWeekAdherence = () =>
+  useQuery({
+    queryKey: ['medicine-logs', 'week', localDateKey()],
     queryFn: async () => {
-      const {
-        data: {
-          user
-        }
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
-      const startOfDay = new Date(selectedDate);
-      startOfDay.setHours(0, 0, 0, 0);
-      const endOfDay = new Date(selectedDate);
-      endOfDay.setHours(23, 59, 59, 999);
-      console.log('Fetching medicine logs for date:', {
-        start: startOfDay.toISOString(),
-        end: endOfDay.toISOString()
-      });
-      const {
-        data,
-        error
-      } = await supabase.from('medicine_logs').select('*').eq('user_id', user.id).gte('taken_at', startOfDay.toISOString()).lte('taken_at', endOfDay.toISOString());
-      if (error) {
-        console.error('Error fetching medicine logs:', error);
-        throw error;
+      const from = startOfDay(subDays(new Date(), 6));
+      const { data, error } = await supabase
+        .from('medicine_logs')
+        .select('medicine_time, taken_at')
+        .eq('user_id', user.id)
+        .gte('taken_at', from.toISOString());
+      if (error) throw error;
+      const perDay: Record<string, Set<string>> = {};
+      for (const l of data) {
+        const k = localDateKey(new Date(l.taken_at));
+        (perDay[k] ??= new Set()).add(l.medicine_time);
       }
-      console.log('Raw medicine logs data:', data);
-      return data || [];
-    }
-  });
-  const logMedicine = useMutation({
-    mutationFn: async (slotId: string) => {
-      const {
-        data: {
-          user
-        }
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error('No user found');
-      console.log('Logging medicine for user:', user.id);
-      const now = selectedDate.toISOString();
-      const {
-        error,
-        data
-      } = await supabase.from('medicine_logs').insert([{
-        medicine_time: slotId,
-        user_id: user.id,
-        taken_at: now
-      }]).select().single();
-      if (error) {
-        console.error('Error inserting medicine log:', error);
-        throw error;
-      }
-      console.log('Successfully logged medicine:', data);
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['medicine-logs']
+      return Array.from({ length: 7 }, (_, i) => {
+        const d = addDays(from, i);
+        return { day: d, taken: perDay[localDateKey(d)]?.size ?? 0 };
       });
     },
-    onError: error => {
-      console.error('Error logging medicine:', error);
-      toast.error('Failed to log medicine. Please try again.');
-    }
   });
-  const handleMedicineTaken = (slotId: string) => {
-    logMedicine.mutate(slotId);
-    toast.success(`${slotId.charAt(0).toUpperCase() + slotId.slice(1)} medicine marked as taken!`);
-  };
-  const isTaken = (slotId: string) => {
-    if (!Array.isArray(medicineLogs)) {
-      console.warn('medicineLogs is not an array:', medicineLogs);
-      return false;
-    }
-    const taken = medicineLogs.some(log => {
-      const logDate = new Date(log.taken_at).toISOString().split('T')[0];
-      const selectedDateStr = selectedDate.toISOString().split('T')[0];
-      const result = log.medicine_time === slotId && logDate === selectedDateStr;
-      return result;
-    });
-    console.log(`Medicine status for ${slotId}:`, taken);
-    return taken;
-  };
-  useEffect(() => {
-    const allTaken = timeSlots.every(slot => isTaken(slot.id));
-    if (allTaken) {
-      console.log('All medicines taken for the day! Triggering confetti...');
-      triggerConfetti();
-      toast.success('Congratulations! You\'ve taken all your medicines for the day! 🎉');
-    }
-  }, [medicineLogs]);
-  return <div className="space-y-4">
-      <Card className="whoop-card p-6">
-        <div className="flex flex-col space-y-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
-            <div className="text-sm sm:text-lg font-semibold text-card-foreground">
-              {selectedDate.toLocaleDateString('en-US', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })}
-            </div>
-            <Input type="date" value={selectedDate.toISOString().split('T')[0]} onChange={e => {
-            const newDate = new Date(e.target.value);
-            setSelectedDate(newDate);
-            toast.info("Date selected: " + newDate.toLocaleDateString());
-          }} max={new Date().toISOString().split('T')[0]} className="w-auto" />
+
+const MedicineTracker = () => {
+  const [day, setDay] = useState(new Date());
+  const { data: week = [] } = useWeekAdherence();
+  const today = isToday(day);
+
+  return (
+    <div className="space-y-8">
+      <section className="space-y-4">
+        <div className="flex items-center justify-between gap-2">
+          <Button variant="ghost" size="icon" aria-label="Previous day" onClick={() => setDay((d) => subDays(d, 1))}>
+            <ChevronLeft className="!size-5" />
+          </Button>
+          <div className="text-center">
+            <p className="font-display text-xl font-bold">{today ? 'Today' : format(day, 'EEEE')}</p>
+            <p className="text-sm text-muted-foreground">{format(day, 'd MMMM yyyy')}</p>
           </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Next day"
+            disabled={today}
+            onClick={() => setDay((d) => addDays(d, 1))}
+          >
+            <ChevronRight className="!size-5" />
+          </Button>
         </div>
-      </Card>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        {timeSlots.map(slot => <MedicineTimeSlot key={slot.id} icon={slot.icon} time={slot.time} label={slot.label} isTaken={isTaken(slot.id)} onMedicineTaken={() => handleMedicineTaken(slot.id)} colorClass={`text-diabetic-${slot.id}`} disabled={false} slotId={slot.id} />)}
-      </div>
+        <MedicineChecklist day={day} editable />
+        <p className="text-sm text-muted-foreground">
+          Tap a dose to mark it taken, tap again to undo. Use the gear to rename a dose or change its time.
+        </p>
+      </section>
 
-      <Card className="whoop-card p-6">
-        <MedicineHistoryTable logs={medicineLogs} selectedDate={selectedDate} />
-      </Card>
-    </div>;
+      <section>
+        <h3 className="text-lg font-bold mb-3">Last 7 days</h3>
+        <div className="grid grid-cols-7 gap-2">
+          {week.map(({ day: d, taken }) => {
+            const selected = localDateKey(d) === localDateKey(day);
+            return (
+              <button
+                key={d.toISOString()}
+                onClick={() => setDay(d)}
+                aria-label={`${format(d, 'EEEE d MMMM')}: ${taken} of ${SLOTS_PER_DAY} doses`}
+                className={cn(
+                  'flex flex-col items-center gap-2 rounded-xl py-2 border-2 transition-colors',
+                  selected ? 'border-primary' : 'border-transparent hover:bg-muted',
+                )}
+              >
+                <span className="text-xs font-bold text-muted-foreground">{format(d, 'EEEEE')}</span>
+                <span className="flex flex-col-reverse gap-1" aria-hidden="true">
+                  {Array.from({ length: SLOTS_PER_DAY }, (_, i) => (
+                    <span
+                      key={i}
+                      className={cn('w-5 h-2.5 rounded-full', i < taken ? 'bg-in-range' : 'bg-muted-foreground/20')}
+                    />
+                  ))}
+                </span>
+                <span className="text-xs tabular">{format(d, 'd')}</span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      <section>
+        <h3 className="text-lg font-bold mb-3">Prescriptions</h3>
+        <PrescriptionManager />
+      </section>
+    </div>
+  );
 };
+
 export default MedicineTracker;

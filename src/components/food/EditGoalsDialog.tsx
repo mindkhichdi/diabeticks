@@ -41,23 +41,29 @@ const EditGoalsDialog = ({ currentGoals, onGoalsUpdate }: EditGoalsDialogProps) 
 
       onGoalsUpdate(goals);
       setIsOpen(false);
-      toast.success('Goals updated successfully');
+      toast.success('Goals saved');
     } catch (error) {
       console.error('Error updating goals:', error);
-      toast.error('Failed to update goals');
+      toast.error("Couldn't save your goals. Try again.");
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (open) setGoals(currentGoals);
+        setIsOpen(open);
+      }}
+    >
       <DialogTrigger asChild>
-        <Button variant="outline" size="icon">
-          <Settings2 className="h-4 w-4" />
+        <Button variant="outline" size="sm">
+          <Settings2 /> Edit goals
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Daily Goals</DialogTitle>
+          <DialogTitle>Daily goals</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">

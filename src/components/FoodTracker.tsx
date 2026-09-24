@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Coffee, Utensils, Apple, Pizza, User, Calendar } from 'lucide-react';
+import { Coffee, Utensils, Apple, Soup } from 'lucide-react';
 import { format } from 'date-fns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import DailyGoal from './food/DailyGoal';
-import AddFoodForm from './food/AddFoodForm';
+import AddFoodForm, { MealType } from './food/AddFoodForm';
+import FoodSummary from './food/FoodSummary';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import MealSection from './food/MealSection';
 import UserStatsForm from './food/UserStatsForm';
 import WeeklyDietPlan from './food/WeeklyDietPlan';
 import { toast } from 'sonner';
-import MacronutrientProgress from './food/MacronutrientProgress';
 
 interface FoodLog {
   id: string;
@@ -39,40 +39,13 @@ const FoodTracker = () => {
   const today = format(new Date(), 'yyyy-MM-dd');
   const [targetCalories, setTargetCalories] = useState(1780);
 
-  const mealTypes = [
-    { 
-      value: 'breakfast', 
-      label: 'Breakfast', 
-      icon: Coffee, 
-      color: 'bg-chart-1/20',
-      textColor: 'text-foreground',
-      borderColor: 'border-chart-1/30'
-    },
-    { 
-      value: 'lunch', 
-      label: 'Lunch', 
-      icon: Utensils, 
-      color: 'bg-chart-2/20',
-      textColor: 'text-foreground',
-      borderColor: 'border-chart-2/30'
-    },
-    { 
-      value: 'snacks', 
-      label: 'Snacks', 
-      icon: Apple, 
-      color: 'bg-chart-5/20',
-      textColor: 'text-foreground',
-      borderColor: 'border-chart-5/30'
-    },
-    { 
-      value: 'dinner', 
-      label: 'Dinner', 
-      icon: Pizza, 
-      color: 'bg-chart-3/20',
-      textColor: 'text-foreground',
-      borderColor: 'border-chart-3/30'
-    },
+  const mealTypes: MealType[] = [
+    { value: 'breakfast', label: 'Breakfast', icon: Coffee },
+    { value: 'lunch', label: 'Lunch', icon: Utensils },
+    { value: 'snacks', label: 'Snacks', icon: Apple },
+    { value: 'dinner', label: 'Dinner', icon: Soup },
   ];
+  const [addingTo, setAddingTo] = useState<string | null>(null);
 
   const { data: foodLogs, isLoading } = useQuery({
     queryKey: ['foodLogs', today],
@@ -143,11 +116,12 @@ const FoodTracker = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['foodLogs'] });
-      toast.success('Food log added successfully');
+      setAddingTo(null);
+      toast.success('Food saved');
     },
     onError: (error) => {
       console.error('Error adding food log:', error);
-      toast.error('Failed to add food log');
+      toast.error("Couldn't save that food. Try again.");
     },
   });
 
@@ -162,11 +136,11 @@ const FoodTracker = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['foodLogs'] });
-      toast.success('Food log deleted successfully');
+      toast.success('Food deleted');
     },
     onError: (error) => {
       console.error('Error deleting food log:', error);
-      toast.error('Failed to delete food log');
+      toast.error("Couldn't delete that food. Try again.");
     },
   });
 
@@ -244,11 +218,12 @@ const FoodTracker = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['userStats'] });
-      toast.success('Health profile updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['glucose-targets'] });
+      toast.success('Health profile saved');
     },
     onError: (error) => {
       console.error('Error updating user stats:', error);
-      toast.error('Failed to update health profile');
+      toast.error("Couldn't save your health profile. Try again.");
     },
   });
 
@@ -257,69 +232,65 @@ const FoodTracker = () => {
     queryClient.invalidateQueries({ queryKey: ['userProfile'] });
   };
 
+  const goals = {
+    calories: targetCalories,
+    proteins: userProfile?.daily_protein_goal || 150,
+    carbs: userProfile?.daily_carbs_goal || 200,
+    fats: userProfile?.daily_fats_goal || 70,
+  };
+
   return (
     <Tabs defaultValue="tracker" className="w-full">
       <TabsList className="grid w-full grid-cols-3">
-        <TabsTrigger value="tracker" className="flex items-center gap-2">
-          <Utensils className="w-4 h-4" />
-          Food Tracker
-        </TabsTrigger>
-        <TabsTrigger value="profile" className="flex items-center gap-2">
-          <User className="w-4 h-4" />
-          Health Profile
-        </TabsTrigger>
-        <TabsTrigger value="diet-plan" className="flex items-center gap-2">
-          <Calendar className="w-4 h-4" />
-          Diet Plan
-        </TabsTrigger>
+        <TabsTrigger value="tracker">Today</TabsTrigger>
+        <TabsTrigger value="profile">Health profile</TabsTrigger>
+        <TabsTrigger value="diet-plan">Meal plan</TabsTrigger>
       </TabsList>
 
-      <TabsContent value="tracker" className="space-y-6 mt-6">
-        <DailyGoal
-          targetCalories={targetCalories}
-          totalCalories={totalCalories}
-          onTargetChange={setTargetCalories}
+      <TabsContent value="tracker" className="space-y-4 mt-6">
+        <FoodSummary
+          totals={{ calories: totalCalories, ...macroTotals }}
+          goals={goals}
           onGoalsUpdate={handleGoalsUpdate}
-          currentGoals={{
-            calories: targetCalories,
-            proteins: userProfile?.daily_protein_goal || 150,
-            carbs: userProfile?.daily_carbs_goal || 200,
-            fats: userProfile?.daily_fats_goal || 70,
-          }}
         />
 
-        <MacronutrientProgress
-          current={macroTotals}
-          goals={{
-            proteins: userProfile?.daily_protein_goal || 150,
-            carbs: userProfile?.daily_carbs_goal || 200,
-            fats: userProfile?.daily_fats_goal || 70,
-          }}
-        />
+        {isLoading ? (
+          <div className="h-40 rounded-2xl bg-muted animate-pulse" />
+        ) : (
+          mealTypes.map((meal) => {
+            const mealLogs = foodLogs?.filter((log) => log.meal_type === meal.value) || [];
+            const totalMealCalories = mealLogs.reduce((sum, log) => sum + parseInt(log.calories || '0', 10), 0);
+            return (
+              <MealSection
+                key={meal.value}
+                meal={meal}
+                logs={mealLogs}
+                totalCalories={totalMealCalories}
+                onAdd={() => setAddingTo(meal.value)}
+                onDelete={deleteFoodLogMutation.mutate}
+              />
+            );
+          })
+        )}
 
-        <AddFoodForm
-          onSubmit={addFoodLogMutation.mutate}
-          mealTypes={mealTypes}
-        />
-
-        <div className="whoop-card p-4">
-          <div className="grid gap-6">
-            {mealTypes.map((meal) => {
-              const mealLogs = foodLogs?.filter(log => log.meal_type === meal.value);
-              const totalMealCalories = mealLogs?.reduce((sum, log) => sum + (parseInt(log.calories || '0', 10)), 0) || 0;
-
-              return (
-                <MealSection
-                  key={meal.value}
-                  meal={meal}
-                  logs={mealLogs || []}
-                  totalCalories={totalMealCalories}
-                  onDelete={deleteFoodLogMutation.mutate}
+        <Drawer open={!!addingTo} onOpenChange={(open) => !open && setAddingTo(null)}>
+          <DrawerContent className="max-w-lg mx-auto max-h-[92vh]">
+            <DrawerHeader className="text-left">
+              <DrawerTitle className="font-display text-2xl">Add food</DrawerTitle>
+            </DrawerHeader>
+            <div className="px-4 pb-6 overflow-y-auto">
+              {addingTo && (
+                <AddFoodForm
+                  key={addingTo}
+                  onSubmit={addFoodLogMutation.mutate}
+                  mealTypes={mealTypes}
+                  defaultMealType={addingTo}
+                  isSaving={addFoodLogMutation.isPending}
                 />
-              );
-            })}
-          </div>
-        </div>
+              )}
+            </div>
+          </DrawerContent>
+        </Drawer>
       </TabsContent>
 
       <TabsContent value="profile" className="mt-6">

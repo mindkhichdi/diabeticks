@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { addMonths, format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from 'date-fns';
+import { addMonths, format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameDay, isToday, parseISO } from 'date-fns';
 import { ChevronLeft, ChevronRight, Activity, Bike, PersonStanding, Dumbbell } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
@@ -64,14 +64,14 @@ const ActivityHeatmap = () => {
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'cycling':
-        return <Bike className="w-2 h-2" />;
+        return <Bike className="w-4 h-4" />;
       case 'running':
       case 'walking':
-        return <PersonStanding className="w-2 h-2" />;
+        return <PersonStanding className="w-4 h-4" />;
       case 'strength':
-        return <Dumbbell className="w-2 h-2" />;
+        return <Dumbbell className="w-4 h-4" />;
       default:
-        return <Activity className="w-2 h-2" />;
+        return <Activity className="w-4 h-4" />;
     }
   };
 
@@ -99,46 +99,48 @@ const ActivityHeatmap = () => {
   });
 
   const selectedDateActivities = activities?.filter(a => 
-    selectedDate && isSameDay(new Date(a.date), selectedDate)
+    selectedDate && isSameDay(parseISO(a.date), selectedDate)
   ) || [];
 
   return (
-    <div className="container mx-auto max-w-5xl space-y-6 pb-8">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="bg-white p-3 rounded-lg shadow-md border border-primary/20">
-          <div className="text-sm font-medium text-muted-foreground">Total Activities</div>
-          <div className="text-2xl font-bold text-primary">{monthStats?.totalActivities || 0}</div>
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-2xl border border-border bg-card p-4">
+          <div className="text-sm text-muted-foreground">Activities this month</div>
+          <div className="font-display text-2xl font-bold tabular">{monthStats?.totalActivities || 0}</div>
         </div>
-        <div className="bg-white p-3 rounded-lg shadow-md border border-primary/20">
-          <div className="text-sm font-medium text-muted-foreground">Calories Burned</div>
-          <div className="text-2xl font-bold text-primary">{monthStats?.totalCalories || 0}</div>
+        <div className="rounded-2xl border border-border bg-card p-4">
+          <div className="text-sm text-muted-foreground">Calories burned</div>
+          <div className="font-display text-2xl font-bold tabular">{monthStats?.totalCalories || 0}</div>
         </div>
-        <div className="bg-white p-3 rounded-lg shadow-md border border-primary/20">
-          <div className="text-sm font-medium text-muted-foreground">Active Minutes</div>
-          <div className="text-2xl font-bold text-primary">{monthStats?.totalMinutes || 0}</div>
+        <div className="rounded-2xl border border-border bg-card p-4">
+          <div className="text-sm text-muted-foreground">Active minutes</div>
+          <div className="font-display text-2xl font-bold tabular">{monthStats?.totalMinutes || 0}</div>
         </div>
-        <div className="bg-white p-3 rounded-lg shadow-md border border-primary/20">
-          <div className="text-sm font-medium text-muted-foreground">Distance (km)</div>
-          <div className="text-2xl font-bold text-primary">{monthStats?.totalDistance.toFixed(1) || 0}</div>
+        <div className="rounded-2xl border border-border bg-card p-4">
+          <div className="text-sm text-muted-foreground">Distance (km)</div>
+          <div className="font-display text-2xl font-bold tabular">{monthStats?.totalDistance.toFixed(1) || 0}</div>
         </div>
       </div>
 
-      <div className="bg-white p-4 rounded-lg shadow-md">
+      <div className="rounded-3xl border border-border bg-card p-5">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">
+          <h3 className="text-xl font-bold">
             {format(currentMonth, 'MMMM yyyy')}
           </h3>
           <div className="flex gap-1">
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon"
+              aria-label="Previous month"
               onClick={() => setCurrentMonth(prev => addMonths(prev, -1))}
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon"
+              aria-label="Next month"
               onClick={() => setCurrentMonth(prev => addMonths(prev, 1))}
             >
               <ChevronRight className="w-4 h-4" />
@@ -146,18 +148,20 @@ const ActivityHeatmap = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-7 text-center text-sm mb-1">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <div key={day} className="text-muted-foreground">
+        <div className="grid grid-cols-7 text-center text-xs font-bold mb-1">
+          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
+            <div key={i} className="text-muted-foreground">
               {day}
             </div>
           ))}
         </div>
         
         <div className="grid grid-cols-7 gap-1">
+          {/* Line the first day up under its weekday */}
+          {Array.from({ length: getDay(startOfMonth(currentMonth)) }, (_, i) => <span key={`pad-${i}`} aria-hidden="true" />)}
           {daysInMonth.map(day => {
             const dayActivities = activities?.filter(a => 
-              isSameDay(new Date(a.date), day)
+              isSameDay(parseISO(a.date), day)
             ) || [];
             
             const totalCalories = dayActivities.reduce((sum, a) => 
@@ -170,20 +174,15 @@ const ActivityHeatmap = () => {
                   <button
                     onClick={() => setSelectedDate(day)}
                     className={cn(
-                      "aspect-square w-full rounded-sm flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all relative",
-                      dayActivities.length > 0 
-                        ? getActivityIntensity(totalCalories)
-                        : "bg-muted hover:bg-muted/80"
+                      "aspect-square w-full rounded-lg grid place-items-center text-xs font-bold tabular cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all",
+                      dayActivities.length > 0
+                        ? cn(getActivityIntensity(totalCalories), totalCalories > 100 ? 'text-primary-foreground' : 'text-foreground')
+                        : "bg-muted text-muted-foreground",
+                      isToday(day) && "ring-2 ring-foreground"
                     )}
+                    aria-label={`${format(day, 'd MMMM')}: ${dayActivities.length ? `${dayActivities.length} activit${dayActivities.length === 1 ? 'y' : 'ies'}` : 'no activity'}`}
                   >
-                    <span className="absolute top-0.5 left-1 text-[10px] text-muted-foreground/80">
-                      {format(day, 'd')}
-                    </span>
-                    {dayActivities.length > 0 && (
-                      <span className="mt-2">
-                        {getActivityIcon(dayActivities[0].activity_type)}
-                      </span>
-                    )}
+                    {format(day, 'd')}
                   </button>
                 </HoverCardTrigger>
                 <HoverCardContent className="w-64 p-2">
@@ -216,6 +215,11 @@ const ActivityHeatmap = () => {
               </HoverCard>
             );
           })}
+        </div>
+        <div className="flex items-center justify-end gap-1.5 mt-3 text-xs text-muted-foreground" aria-hidden="true">
+          Less
+          {['bg-muted', 'bg-primary/30', 'bg-primary/50', 'bg-primary/70', 'bg-primary/90'].map(c => <span key={c} className={cn('w-3.5 h-3.5 rounded', c)} />)}
+          More
         </div>
       </div>
 

@@ -58,14 +58,14 @@ const MedicineChecklist = ({ day = new Date(), editable = false }: Props) => {
           || (undoTaken.isPending && undoTaken.variables?.id === slot.id);
         const isDue = due?.slot.id === slot.id;
         return (
-          <li key={slot.id} className="flex items-center gap-2">
+          <li key={slot.id} className="flex min-w-0 items-center gap-2">
             <button
               onClick={() => toggle(slot)}
               disabled={busy}
               aria-pressed={taken}
               aria-label={`${slot.name}, ${status.text}. ${taken ? 'Tap to undo' : 'Tap to mark as taken'}`}
               className={cn(
-                'flex-1 flex items-center gap-4 rounded-2xl border-2 p-3 pr-4 text-left transition-colors min-h-[72px]',
+                'flex min-w-0 flex-1 items-center gap-3 rounded-2xl border-2 p-3 text-left transition-colors min-h-[72px] sm:gap-4 sm:pr-4',
                 taken ? 'border-transparent bg-in-range/10' : isDue ? 'border-primary bg-primary-soft' : 'border-border bg-card hover:border-primary/50',
                 busy && 'opacity-60',
               )}
@@ -78,11 +78,11 @@ const MedicineChecklist = ({ day = new Date(), editable = false }: Props) => {
               >
                 {taken ? <Check className="w-6 h-6 animate-pop" strokeWidth={3} /> : <Icon className="w-5 h-5" />}
               </span>
-              <span className="min-w-0 flex-1">
-                <span className={cn('block font-bold text-base truncate', taken && 'line-through decoration-2 decoration-in-range/60 text-muted-foreground')}>
+              <span className="min-w-0 flex-1 overflow-hidden">
+                <span className={cn('block break-words text-base font-bold leading-tight [overflow-wrap:anywhere]', taken && 'line-through decoration-2 decoration-in-range/60 text-muted-foreground')}>
                   {slot.name}
                 </span>
-                <span className={cn('block text-sm font-bold', status.cls)}>{status.text}</span>
+                <span className={cn('mt-1 block break-words text-sm font-bold leading-tight', status.cls)}>{status.text}</span>
               </span>
               {!taken && (
                 <span className={cn('text-sm font-bold shrink-0', isDue ? 'text-primary' : 'text-muted-foreground')}>

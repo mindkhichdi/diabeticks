@@ -13,6 +13,7 @@ import {
 } from '@/lib/glucose';
 import BloodSugarTrendChart from './BloodSugarTrendChart';
 import RangeBar from './glucose/RangeBar';
+import AiInsights from './glucose/AiInsights';
 
 const periods = [7, 30, 90] as const;
 
@@ -104,6 +105,8 @@ const ReadingsLog = ({ onLogSugar }: Props) => {
           <BloodSugarTrendChart points={points} targets={targets} />
         </>
       )}
+
+      <AiInsights hasReadings={readings.length > 0} />
 
       {inPeriod.length > 0 && (
         <section>

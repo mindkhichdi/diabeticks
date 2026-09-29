@@ -65,51 +65,58 @@ const AddFoodForm = ({ onSubmit, mealTypes, defaultMealType, isSaving }: AddFood
     }
   };
 
+  const toDataUrl = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, 1280 / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = img.width * scale;
+        c.height = img.height * scale;
+        c.getContext('2d')!.drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(img.src);
+        resolve(c.toDataURL('image/jpeg', 0.85));
+      };
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
+
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    event.target.value = '';
     if (!file) return;
 
     try {
       setIsAnalyzing(true);
-
-      const formData = new FormData();
-      formData.append('image', file);
-
-      const { data, error } = await supabase.functions.invoke('analyze-food-image', {
-        body: formData,
-      });
-
-      if (error) throw error;
-
-      if (data) {
-        setAnalysisResults({
-          food_item: data.food_item || 'Unknown Food',
-          calories: data.calories,
-          proteins: data.proteins,
-          carbs: data.carbs,
-          fats: data.fats,
-        });
-        setShowAnalysisModal(true);
+      const image = await toDataUrl(file);
+      const { data, error } = await supabase.functions.invoke('analyze-food-image', { body: { image } });
+      if (error) {
+        const ctx = (error as { context?: Response }).context;
+        const body = ctx ? await ctx.json().catch(() => null) : null;
+        throw new Error(body?.error ?? "Couldn't read that photo.");
       }
+      setAnalysisResults(data);
+      setShowAnalysisModal(true);
     } catch (error) {
       console.error('Error analyzing image:', error);
-      toast.error("Couldn't read that photo. Try again or enter the details yourself.");
+      toast.error(`${(error as Error).message} Try again or enter the details yourself.`);
     } finally {
       setIsAnalyzing(false);
     }
   };
 
   const handleSaveAnalysis = () => {
-    if (analysisResults) {
-      form.setValue('food_item', analysisResults.food_item);
-      form.setValue('calories', analysisResults.calories);
-      form.setValue('proteins', analysisResults.proteins);
-      form.setValue('carbs', analysisResults.carbs);
-      form.setValue('fats', analysisResults.fats);
-      form.setValue('quantity', '1 serving');
-      setShowAnalysisModal(false);
-      toast.success('Details filled in from your photo');
-    }
+    if (!analysisResults) return;
+    onSubmit({
+      meal_type: form.getValues('meal_type'),
+      food_item: analysisResults.food_item,
+      quantity: analysisResults.quantity ?? '1 serving',
+      calories: analysisResults.calories,
+      proteins: analysisResults.proteins,
+      carbs: analysisResults.carbs,
+      fats: analysisResults.fats,
+    });
+    setShowAnalysisModal(false);
   };
 
   const submit = (values: FoodLogForm) => {

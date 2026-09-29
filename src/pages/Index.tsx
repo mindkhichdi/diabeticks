@@ -14,6 +14,7 @@ import MedicineTracker from '@/components/MedicineTracker';
 import FoodTracker from '@/components/FoodTracker';
 import FitnessTracker from '@/components/FitnessTracker';
 import LogSugarSheet from '@/components/glucose/LogSugarSheet';
+import MedicineReminder from '@/components/medicine/MedicineReminder';
 
 type Tab = 'today' | 'sugar' | 'meds' | 'food' | 'move';
 
@@ -184,6 +185,7 @@ const Index = () => {
       </nav>
 
       <LogSugarSheet open={logOpen} onOpenChange={setLogOpen} />
+      <MedicineReminder onOpenMeds={() => goTo('meds')} />
     </div>
   );
 };

@@ -1,105 +1,68 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from "npm:@supabase/supabase-js@2";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+const cors = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+const json = (body: unknown, status = 200) =>
+  new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
 
-serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
-  }
+const PROMPT = `Identify the food in this photo and estimate its nutrition for the portion shown.
+Respond with ONLY a JSON object, no markdown:
+{"food_item": string, "quantity": string (e.g. "1 plate", "2 rotis"), "calories": number (kcal), "proteins": number (g), "carbs": number (g), "fats": number (g)}
+If the photo shows no food, respond {"error": "no_food"}.`;
 
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response(null, { headers: cors });
   try {
-    const formData = await req.formData()
-    const image = formData.get('image')
+    const apiKey = Deno.env.get("LOVABLE_API_KEY");
+    if (!apiKey) return json({ error: "AI is not configured." }, 500);
 
-    if (!image) {
-      throw new Error('No image provided')
+    const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, {
+      global: { headers: { Authorization: req.headers.get("Authorization") ?? "" } },
+    });
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return json({ error: "Please sign in again." }, 401);
+
+    const { image } = await req.json().catch(() => ({}));
+    if (typeof image !== "string" || !/^data:image\/(jpeg|png|webp);base64,/.test(image) || image.length > 8_000_000) {
+      return json({ error: "Please upload a food photo." }, 400);
     }
 
-    console.log('Received image, sending to OpenAI...')
-
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
-        'Content-Type': 'application/json',
-      },
+    const upstream = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "fetch" },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "user",
-            content: [
-              {
-                type: "text",
-                text: "Analyze this food image and extract the following information in JSON format: food_item (name of the food), calories (numeric), proteins (in g), carbs (in g), and fats (in g). Return ONLY the JSON object with these 5 values, nothing else.",
-              },
-              {
-                type: "image_url",
-                image_url: {
-                  url: `data:image/jpeg;base64,${await image.text()}`,
-                },
-              },
-            ],
-          },
-        ],
+        model: "openai/gpt-6-astra",
+        input: [{ role: "user", content: [{ type: "input_text", text: PROMPT }, { type: "input_image", image_url: image }] }],
+        store: false,
+        reasoning: { effort: "low" },
       }),
-    })
+    });
 
-    console.log('Received response from OpenAI')
-
-    if (!response.ok) {
-      const error = await response.text()
-      console.error('OpenAI API error:', error)
-      throw new Error(`OpenAI API error: ${error}`)
+    if (!upstream.ok) {
+      console.error("gateway", upstream.status, await upstream.text());
+      const msg = upstream.status === 429 ? "Too many requests right now. Try again in a minute."
+        : upstream.status === 402 ? "AI credits have run out."
+        : "Couldn't read that photo right now.";
+      return json({ error: msg }, upstream.status);
     }
 
-    const data = await response.json()
-    console.log('OpenAI response data:', data)
-
-    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-      console.error('Unexpected OpenAI response format:', data)
-      throw new Error('Invalid response format from OpenAI')
-    }
-
-    const content = data.choices[0].message.content
-    console.log('Extracted content:', content)
-
-    let nutritionInfo
-    try {
-      nutritionInfo = JSON.parse(content)
-    } catch (error) {
-      console.error('Error parsing OpenAI response as JSON:', error)
-      console.error('Raw content:', content)
-      throw new Error('Failed to parse nutrition information from OpenAI response')
-    }
-
-    // Validate the required fields
-    const requiredFields = ['food_item', 'calories', 'proteins', 'carbs', 'fats']
-    for (const field of requiredFields) {
-      if (!(field in nutritionInfo)) {
-        console.error('Missing required field in nutrition info:', field)
-        console.error('Received nutrition info:', nutritionInfo)
-        throw new Error(`Missing required field: ${field}`)
-      }
-    }
-
-    return new Response(
-      JSON.stringify(nutritionInfo),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
-  } catch (error) {
-    console.error('Error in analyze-food-image function:', error)
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
-        status: 500 
-      }
-    )
+    const data = await upstream.json();
+    const text: string = data.output_text ?? (data.output ?? [])
+      .flatMap((o: any) => o.content ?? []).filter((c: any) => c.type === "output_text").map((c: any) => c.text).join("");
+    const m = text.match(/\{[\s\S]*\}/);
+    if (!m) return json({ error: "Couldn't read that photo. Try a clearer shot." }, 502);
+    const r = JSON.parse(m[0]);
+    if (r.error) return json({ error: "No food found in that photo." }, 422);
+    const num = (v: unknown) => Math.max(0, Math.round(Number(v) || 0));
+    return json({
+      food_item: String(r.food_item ?? "Food").slice(0, 120),
+      quantity: String(r.quantity ?? "1 serving").slice(0, 60),
+      calories: num(r.calories), proteins: num(r.proteins), carbs: num(r.carbs), fats: num(r.fats),
+    });
+  } catch (e) {
+    console.error(e);
+    return json({ error: "Couldn't read that photo right now." }, 500);
   }
-})
+});

@@ -53,6 +53,7 @@ const AddFoodForm = ({ onSubmit, mealTypes, defaultMealType, isSaving }: AddFood
   const [showAnalysisModal, setShowAnalysisModal] = useState(false);
   const [analysisResults, setAnalysisResults] = useState<{
     food_item: string;
+    quantity?: string;
     calories: number;
     proteins: number;
     carbs: number;

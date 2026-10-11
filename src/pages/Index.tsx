@@ -15,6 +15,7 @@ import FoodTracker from '@/components/FoodTracker';
 import FitnessTracker from '@/components/FitnessTracker';
 import LogSugarSheet from '@/components/glucose/LogSugarSheet';
 import MedicineReminder from '@/components/medicine/MedicineReminder';
+import InstallPrompt from '@/components/InstallPrompt';
 
 type Tab = 'today' | 'sugar' | 'meds' | 'food' | 'move';
 
@@ -96,7 +97,7 @@ const Index = () => {
         Skip to content
       </a>
 
-      <header className="sticky top-0 z-40 bg-background/90 backdrop-blur border-b border-border">
+      <header className="sticky top-0 z-40 bg-background/90 backdrop-blur border-b border-border pt-[env(safe-area-inset-top)]">
         <div className="max-w-5xl mx-auto flex items-center justify-between gap-4 px-4 h-16">
           <button onClick={() => goTo('today')} aria-label="Diabeticks, go to Today">
             <Logo size={32} />
@@ -137,6 +138,8 @@ const Index = () => {
             {active === 'today' ? `${greeting}${userName ? `, ${userName}` : ''}` : current.title}
           </h1>
         </div>
+
+        <InstallPrompt className="mb-6" />
 
         <div key={active} className="animate-slide-up">
           {active === 'today' && <TodayView onLogSugar={() => setLogOpen(true)} onNavigate={goTo} />}

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import Logo from '@/components/Logo';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import RangeRibbon from '@/components/glucose/RangeRibbon';
+import InstallPrompt from '@/components/InstallPrompt';
 import { cn } from '@/lib/utils';
 import { DEFAULT_TARGETS, ReadingKind, kindLabel, zoneClass, zoneMeta, zoneOf } from '@/lib/glucose';
 
@@ -149,7 +150,7 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-40 bg-background/90 backdrop-blur border-b border-border">
+      <header className="sticky top-0 z-40 bg-background/90 backdrop-blur border-b border-border pt-[env(safe-area-inset-top)]">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-3 px-4 h-16">
           <Logo size={32} />
           <nav className="flex items-center gap-1 sm:gap-2">
@@ -255,6 +256,8 @@ const Landing = () => {
           </p>
         </section>
       </main>
+
+      <InstallPrompt className="fixed z-50 inset-x-4 bottom-[calc(1rem+env(safe-area-inset-bottom))]" />
 
       <footer className="border-t border-border">
         <div className="max-w-6xl mx-auto px-4 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">

@@ -15,8 +15,19 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 
 // Register Service Worker for PWA functionality
 if ('serviceWorker' in navigator) {
+  // When an updated worker takes control, reload once so the page isn't
+  // left running stale HTML that points at old build assets.
+  if (navigator.serviceWorker.controller) {
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (reloaded) return;
+      reloaded = true;
+      window.location.reload();
+    });
+  }
+
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })
       .then(registration => {
         console.log('ServiceWorker registration successful with scope:', registration.scope);
       })

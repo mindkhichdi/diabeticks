@@ -15,6 +15,7 @@ import BloodSugarTrendChart from './BloodSugarTrendChart';
 import RangeBar from './glucose/RangeBar';
 import AiInsights from './glucose/AiInsights';
 import CgmSyncHub from './glucose/CgmSyncHub';
+import ClinicalReportButton from './glucose/ClinicalReportButton';
 
 const periods = [7, 30, 90] as const;
 
@@ -64,9 +65,12 @@ const ReadingsLog = ({ onLogSugar }: Props) => {
             </button>
           ))}
         </div>
-        <Button onClick={onLogSugar}>
-          <Plus /> Log blood sugar
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <ClinicalReportButton />
+          <Button onClick={onLogSugar}>
+            <Plus /> Log blood sugar
+          </Button>
+        </div>
       </div>
 
       {isLoading ? (

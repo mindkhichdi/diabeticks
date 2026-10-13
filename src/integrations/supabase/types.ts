@@ -52,6 +52,33 @@ export type Database = {
           },
         ]
       }
+      cgm_readings: {
+        Row: {
+          created_at: string
+          id: string
+          recorded_at: string
+          source: string
+          user_id: string
+          value_mgdl: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          recorded_at: string
+          source?: string
+          user_id: string
+          value_mgdl: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          recorded_at?: string
+          source?: string
+          user_id?: string
+          value_mgdl?: number
+        }
+        Relationships: []
+      }
       daily_meal_plans: {
         Row: {
           calories: number | null
@@ -219,6 +246,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      health_sync_tokens: {
+        Row: {
+          created_at: string
+          last_synced_at: string | null
+          token_hash: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          last_synced_at?: string | null
+          token_hash: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          last_synced_at?: string | null
+          token_hash?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       medicine_logs: {
         Row: {

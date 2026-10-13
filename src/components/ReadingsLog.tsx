@@ -14,6 +14,7 @@ import {
 import BloodSugarTrendChart from './BloodSugarTrendChart';
 import RangeBar from './glucose/RangeBar';
 import AiInsights from './glucose/AiInsights';
+import CgmSyncHub from './glucose/CgmSyncHub';
 
 const periods = [7, 30, 90] as const;
 
@@ -105,6 +106,8 @@ const ReadingsLog = ({ onLogSugar }: Props) => {
           <BloodSugarTrendChart points={points} targets={targets} />
         </>
       )}
+
+      <CgmSyncHub />
 
       <AiInsights hasReadings={readings.length > 0} />
 

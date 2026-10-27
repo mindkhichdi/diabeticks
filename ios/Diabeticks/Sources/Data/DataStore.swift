@@ -11,6 +11,7 @@ final class DataStore {
     private(set) var foodToday: [FoodLog] = []
     private(set) var fitnessWeek: [FitnessLog] = []
     private(set) var prescriptions: [Prescription] = []
+    private(set) var medications: [Medication] = []
     private(set) var isLoading = false
     var errorMessage: String?
 
@@ -24,9 +25,14 @@ final class DataStore {
         try await supabase.auth.session.user.id.uuidString.lowercased()
     }
 
+    /// Daily finger-prick / meter readings (everything except HbA1c lab results).
+    var glucoseReadings: [Reading] { readings.filter { !$0.isHbA1c } }
+    /// HbA1c results, newest first.
+    var hba1cReadings: [Reading] { readings.filter(\.isHbA1c) }
+
     func reset() {
         readings = []; foodToday = []; medicineSlots = []; targets = Targets()
-        fitnessWeek = []; prescriptions = []
+        fitnessWeek = []; prescriptions = []; medications = []
     }
 
     func load() async {
@@ -70,16 +76,19 @@ final class DataStore {
         targets = t
     }
 
-    func addReading(kind: ReadingKind?, value: Double, hba1c: Bool = false) async {
+    @discardableResult
+    func addReading(kind: ReadingKind?, value: Double, hba1c: Bool = false, date: Date = .now) async -> Bool {
         do {
-            var row = NewReading(userId: try await userId(), date: DateKey.string())
+            var row = NewReading(userId: try await userId(), date: DateKey.string(date))
             if hba1c { row.hba1c = value }
             else if kind == .fasting { row.fasting = value }
             else { row.postPrandial = value }
             try await supabase.from("blood_sugar_readings").insert(row).execute()
             try await loadReadings()
+            return true
         } catch {
             errorMessage = "Couldn't save the reading. Check your connection and try again."
+            return false
         }
     }
 
@@ -104,6 +113,11 @@ final class DataStore {
             .select("slot_id, custom_name, custom_time")
             .eq("user_id", value: id)
             .execute().value
+        async let medsReq: [Medication]? = try? supabase.from("medications")
+            .select()
+            .eq("user_id", value: id)
+            .order("created_at")
+            .execute().value
         async let logsReq: [MedicineLog] = supabase.from("medicine_logs")
             .select("id, medicine_time, taken_at")
             .eq("user_id", value: id)
@@ -112,6 +126,19 @@ final class DataStore {
             .order("taken_at")
             .execute().value
         let (prefs, logs) = try await (prefsReq, logsReq)
+        // The medications table may not exist yet on older backends; fall back to the built-in slots.
+        medications = await medsReq ?? []
+
+        if !medications.isEmpty {
+            medicineSlots = medications.flatMap { med in
+                med.times.sorted().map { t in
+                    let key = "med:\(med.id):\(t)"
+                    return MedicineSlot(id: key, name: med.name, time: t,
+                                        log: logs.first { $0.medicineTime == key }, dosage: med.dosage)
+                }
+            }.sorted { $0.time < $1.time }
+            return
+        }
 
         medicineSlots = Self.defaultSlots.map { slot in
             let pref = prefs.first { $0.slotId == slot.id }
@@ -172,6 +199,36 @@ final class DataStore {
             foodToday.removeAll { $0.id == log.id }
         } catch {
             errorMessage = "Couldn't delete that food. Try again."
+        }
+    }
+
+    // MARK: Medications
+
+    func saveMedication(id: String?, name: String, dosage: String, times: [String], notes: String) async {
+        do {
+            func clean(_ s: String) -> String? {
+                let t = s.trimmingCharacters(in: .whitespacesAndNewlines)
+                return t.isEmpty ? nil : t
+            }
+            let row = MedicationWrite(userId: try await userId(), name: name.trimmingCharacters(in: .whitespaces),
+                                      dosage: clean(dosage), times: Array(Set(times)).sorted(), notes: clean(notes))
+            if let id {
+                try await supabase.from("medications").update(row).eq("id", value: id).execute()
+            } else {
+                try await supabase.from("medications").insert(row).execute()
+            }
+            try await loadMedicine()
+        } catch {
+            errorMessage = "Couldn't save that medicine. Make sure you're online and try again."
+        }
+    }
+
+    func deleteMedication(_ med: Medication) async {
+        do {
+            try await supabase.from("medications").delete().eq("id", value: med.id).execute()
+            try await loadMedicine()
+        } catch {
+            errorMessage = "Couldn't delete that medicine. Try again."
         }
     }
 
@@ -245,14 +302,17 @@ final class DataStore {
             .execute().value
     }
 
-    func uploadPrescription(data: Data, contentType: String, fileExtension: String) async {
+    @discardableResult
+    func uploadPrescription(data: Data, contentType: String, fileExtension: String,
+                            details: PrescriptionDetails? = nil) async -> Bool {
         do {
             let id = try await userId()
             // Files live under the user's own folder, matching the bucket's per-user policies.
             let path = "\(id)/\(Int(Date().timeIntervalSince1970 * 1000))_\(UUID().uuidString.lowercased()).\(fileExtension)"
             try await supabase.storage.from("prescriptions")
                 .upload(path, data: data, options: FileOptions(contentType: contentType))
-            let row = NewPrescription(id: UUID().uuidString.lowercased(), userId: id, filePath: path, fileType: contentType)
+            let row = NewPrescription(id: UUID().uuidString.lowercased(), userId: id, filePath: path, fileType: contentType,
+                                      medicineName: details?.medicineName, dosage: details?.dosage, schedule: details?.schedule)
             do {
                 try await supabase.from("prescriptions").insert(row).execute()
             } catch {
@@ -260,8 +320,19 @@ final class DataStore {
                 throw error
             }
             try await loadPrescriptions()
+            return true
         } catch {
             errorMessage = "Couldn't upload that prescription. Try again."
+            return false
+        }
+    }
+
+    func updatePrescription(_ rx: Prescription, details: PrescriptionDetails) async {
+        do {
+            try await supabase.from("prescriptions").update(details).eq("id", value: rx.id).execute()
+            try await loadPrescriptions()
+        } catch {
+            errorMessage = "Couldn't save those details. Try again."
         }
     }
 

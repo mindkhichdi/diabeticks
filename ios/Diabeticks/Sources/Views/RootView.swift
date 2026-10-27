@@ -1,5 +1,18 @@
 import SwiftUI
 
+enum AppTab: Hashable { case today, glucose, medicine, food, more }
+
+private struct SelectTabKey: EnvironmentKey {
+    static let defaultValue: (AppTab) -> Void = { _ in }
+}
+extension EnvironmentValues {
+    /// Lets any screen jump to another tab (e.g. a Today card opening Glucose).
+    var selectTab: (AppTab) -> Void {
+        get { self[SelectTabKey.self] }
+        set { self[SelectTabKey.self] = newValue }
+    }
+}
+
 struct RootView: View {
     @Environment(AuthStore.self) private var auth
     @Environment(DataStore.self) private var store
@@ -32,13 +45,23 @@ struct RootView: View {
 }
 
 struct MainTabs: View {
+    @AppStorage("hasSeenOnboarding") private var seenOnboarding = false
+    @State private var selection: AppTab = .today
+
     var body: some View {
-        TabView {
-            TodayView().tabItem { Label("Today", systemImage: "sun.max.fill") }
-            GlucoseView().tabItem { Label("Glucose", systemImage: "drop.fill") }
-            MedicineView().tabItem { Label("Medicine", systemImage: "pills.fill") }
-            FoodView().tabItem { Label("Food", systemImage: "fork.knife") }
-            MoreView().tabItem { Label("More", systemImage: "ellipsis.circle") }
+        TabView(selection: $selection) {
+            TodayView().tabItem { Label("Today", systemImage: "sun.max.fill") }.tag(AppTab.today)
+            GlucoseView().tabItem { Label("Glucose", systemImage: "drop.fill") }.tag(AppTab.glucose)
+            MedicineView().tabItem { Label("Medicine", systemImage: "pills.fill") }.tag(AppTab.medicine)
+            FoodView().tabItem { Label("Food", systemImage: "fork.knife") }.tag(AppTab.food)
+            MoreView().tabItem { Label("More", systemImage: "ellipsis.circle") }.tag(AppTab.more)
+        }
+        .environment(\.selectTab, { selection = $0 })
+        .fullScreenCover(isPresented: .init(get: { !seenOnboarding }, set: { seenOnboarding = !$0 })) {
+            OnboardingView { destination in
+                seenOnboarding = true
+                if let destination { selection = destination }
+            }
         }
     }
 }

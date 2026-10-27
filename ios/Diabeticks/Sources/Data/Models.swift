@@ -20,6 +20,7 @@ struct Reading: Codable, Identifiable, Hashable {
         return nil
     }
     var value: Double? { fasting ?? postPrandial ?? hba1c }
+    var isHbA1c: Bool { hba1c != nil && fasting == nil && postPrandial == nil }
 }
 
 struct NewReading: Encodable {
@@ -130,7 +131,10 @@ struct MedicineSlot: Identifiable {
     let name: String
     let time: String        // HH:mm
     let log: MedicineLog?
+    var dosage: String? = nil
     var taken: Bool { log != nil }
+    /// The three built-in slots; user-added medicines use `med:<id>:<HH:mm>` ids.
+    var isBuiltIn: Bool { !id.hasPrefix("med:") }
 
     var displayTime: String {
         let parts = time.split(separator: ":").compactMap { Int($0) }
@@ -138,6 +142,50 @@ struct MedicineSlot: Identifiable {
         guard let d = Calendar.current.date(from: c) else { return time }
         return d.formatted(date: .omitted, time: .shortened)
     }
+}
+
+// MARK: Medications
+
+struct Medication: Decodable, Identifiable, Hashable {
+    let id: String
+    let name: String
+    let dosage: String?
+    let times: [String]
+    let notes: String?
+}
+
+struct MedicationWrite: Encodable {
+    let userId: String
+    let name: String
+    let dosage: String?
+    let times: [String]
+    let notes: String?
+    enum CodingKeys: String, CodingKey {
+        case name, dosage, times, notes
+        case userId = "user_id"
+    }
+    // Explicit nulls so clearing a field really clears it on update.
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(userId, forKey: .userId)
+        try c.encode(name, forKey: .name)
+        try c.encode(dosage, forKey: .dosage)
+        try c.encode(times, forKey: .times)
+        try c.encode(notes, forKey: .notes)
+    }
+}
+
+enum TimeOfDay {
+    /// "HH:mm" -> a Date today, for DatePicker.
+    static func date(_ hhmm: String) -> Date {
+        let parts = hhmm.split(separator: ":").compactMap { Int($0) }
+        return Calendar.current.date(from: DateComponents(hour: parts.first ?? 8, minute: parts.count > 1 ? parts[1] : 0)) ?? .now
+    }
+    static func string(_ date: Date) -> String {
+        let c = Calendar.current.dateComponents([.hour, .minute], from: date)
+        return String(format: "%02d:%02d", c.hour ?? 0, c.minute ?? 0)
+    }
+    static func display(_ hhmm: String) -> String { date(hhmm).formatted(date: .omitted, time: .shortened) }
 }
 
 // MARK: Fitness
@@ -220,13 +268,33 @@ struct Prescription: Decodable, Identifiable {
     var isPDF: Bool { fileType == "application/pdf" }
 }
 
+struct PrescriptionDetails: Encodable {
+    let medicineName: String?
+    let dosage: String?
+    let schedule: String?
+    enum CodingKeys: String, CodingKey {
+        case dosage, schedule
+        case medicineName = "medicine_name"
+    }
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(medicineName, forKey: .medicineName)
+        try c.encode(dosage, forKey: .dosage)
+        try c.encode(schedule, forKey: .schedule)
+    }
+}
+
 struct NewPrescription: Encodable {
     let id: String
     let userId: String
     let filePath: String
     let fileType: String
+    var medicineName: String?
+    var dosage: String?
+    var schedule: String?
     enum CodingKeys: String, CodingKey {
-        case id
+        case id, dosage, schedule
+        case medicineName = "medicine_name"
         case userId = "user_id"
         case filePath = "file_path"
         case fileType = "file_type"

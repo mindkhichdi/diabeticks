@@ -1,12 +1,18 @@
 import SwiftUI
 
 struct MoreView: View {
+    @AppStorage("hasSeenOnboarding") private var seenOnboarding = true
+
     var body: some View {
         NavigationStack {
             List {
-                NavigationLink { FitnessView() } label: { Label("Fitness", systemImage: "figure.run") }
-                NavigationLink { PrescriptionsView() } label: { Label("Prescriptions", systemImage: "doc.text.fill") }
-                NavigationLink { SettingsView() } label: { Label("Account", systemImage: "person.crop.circle") }
+                Section {
+                    NavigationLink { FitnessView() } label: { Label("Fitness", systemImage: "figure.run") }
+                }
+                Section {
+                    NavigationLink { SettingsView() } label: { Label("Account", systemImage: "person.crop.circle") }
+                    Button { seenOnboarding = false } label: { Label("Replay welcome tour", systemImage: "sparkles") }
+                }
             }
             .navigationTitle("More")
         }

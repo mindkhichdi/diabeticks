@@ -223,6 +223,29 @@ final class DataStore {
         }
     }
 
+    /// Adds several medicines in one request, then refreshes the checklist.
+    @discardableResult
+    func addMedications(_ drafts: [MedicineDraft]) async -> Bool {
+        do {
+            let id = try await userId()
+            func clean(_ s: String) -> String? {
+                let t = s.trimmingCharacters(in: .whitespacesAndNewlines)
+                return t.isEmpty ? nil : t
+            }
+            let rows = drafts.map {
+                MedicationWrite(userId: id, name: $0.name.trimmingCharacters(in: .whitespaces),
+                                dosage: clean($0.dosage),
+                                times: Array(Set($0.times.map(TimeOfDay.string))).sorted(), notes: clean($0.notes))
+            }
+            try await supabase.from("medications").insert(rows).execute()
+            try await loadMedicine()
+            return true
+        } catch {
+            errorMessage = "Couldn't add those medicines. Make sure you're online and try again."
+            return false
+        }
+    }
+
     func deleteMedication(_ med: Medication) async {
         do {
             try await supabase.from("medications").delete().eq("id", value: med.id).execute()
@@ -302,9 +325,10 @@ final class DataStore {
             .execute().value
     }
 
+    /// Returns the new prescription's id, or nil if the upload failed.
     @discardableResult
     func uploadPrescription(data: Data, contentType: String, fileExtension: String,
-                            details: PrescriptionDetails? = nil) async -> Bool {
+                            details: PrescriptionDetails? = nil) async -> String? {
         do {
             let id = try await userId()
             // Files live under the user's own folder, matching the bucket's per-user policies.
@@ -320,10 +344,10 @@ final class DataStore {
                 throw error
             }
             try await loadPrescriptions()
-            return true
+            return row.id
         } catch {
             errorMessage = "Couldn't upload that prescription. Try again."
-            return false
+            return nil
         }
     }
 

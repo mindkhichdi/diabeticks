@@ -81,10 +81,28 @@ private struct MedicationsList: View {
     @Environment(DataStore.self) private var store
     @State private var editing: Medication?
     @State private var adding = false
+    @State private var fromPrescription: Prescription?
+    @State private var editingSlot: MedicineSlot?
+
+    /// Prescriptions that name a medicine and aren't already in the daily list.
+    private var prescribed: [Prescription] {
+        let known = Set(store.medications.map { $0.name.lowercased() })
+        return store.prescriptions.filter {
+            guard let n = $0.medicineName?.trimmingCharacters(in: .whitespaces), !n.isEmpty else { return false }
+            return !known.contains(n.lowercased())
+        }
+    }
+
+    /// Built-in dose slots the user renamed (the original way to add a medicine).
+    private var renamedSlots: [MedicineSlot] {
+        guard store.medications.isEmpty else { return [] }
+        let defaults = ["Morning medicine", "Afternoon medicine", "Night medicine"]
+        return store.medicineSlots.filter { $0.isBuiltIn && !defaults.contains($0.name) }
+    }
 
     var body: some View {
         List {
-            if store.medications.isEmpty {
+            if store.medications.isEmpty && prescribed.isEmpty && renamedSlots.isEmpty {
                 ContentUnavailableView {
                     Label("No medicines yet", systemImage: "pills")
                 } description: {
@@ -93,7 +111,49 @@ private struct MedicationsList: View {
                     Button("Add a medicine") { adding = true }.buttonStyle(.borderedProminent)
                 }
             }
-            ForEach(store.medications) { med in
+            if !store.medications.isEmpty {
+                Section("Daily medicines") { medicationRows }
+            }
+            if !renamedSlots.isEmpty {
+                Section {
+                    ForEach(renamedSlots) { slot in
+                        Button { editingSlot = slot } label: {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(slot.name).foregroundStyle(.primary)
+                                Text(slot.displayTime).font(.footnote).foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                } header: { Text("Named dose slots") }
+            }
+            if !prescribed.isEmpty {
+                Section {
+                    ForEach(prescribed) { rx in
+                        Button { fromPrescription = rx } label: {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(rx.medicineName ?? "").foregroundStyle(.primary)
+                                Text([rx.dosage, rx.schedule].compactMap { $0 }.joined(separator: " · "))
+                                    .font(.footnote).foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                } header: { Text("From your prescriptions") } footer: {
+                    Text("Tap one to add it to your daily checklist.")
+                }
+            }
+        }
+        .refreshable { await store.load() }
+        .toolbar { Button { adding = true } label: { Label("Add medicine", systemImage: "plus") } }
+        .sheet(isPresented: $adding) { MedicationEditSheet(medication: nil) }
+        .sheet(item: $editing) { MedicationEditSheet(medication: $0) }
+        .sheet(item: $fromPrescription) {
+            MedicationEditSheet(medication: nil, prefillName: $0.medicineName ?? "", prefillDosage: $0.dosage ?? "")
+        }
+        .sheet(item: $editingSlot) { MedicineEditSheet(slot: $0) }
+    }
+
+    @ViewBuilder private var medicationRows: some View {
+        ForEach(store.medications) { med in
                 Button { editing = med } label: {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(med.name).foregroundStyle(.primary)
@@ -107,11 +167,6 @@ private struct MedicationsList: View {
                 let doomed = offsets.map { store.medications[$0] }
                 Task { for m in doomed { await store.deleteMedication(m) } }
             }
-        }
-        .refreshable { await store.load() }
-        .toolbar { Button { adding = true } label: { Label("Add medicine", systemImage: "plus") } }
-        .sheet(isPresented: $adding) { MedicationEditSheet(medication: nil) }
-        .sheet(item: $editing) { MedicationEditSheet(medication: $0) }
     }
 }
 
@@ -126,10 +181,10 @@ struct MedicationEditSheet: View {
     @State private var times: [Date]
     @State private var saving = false
 
-    init(medication: Medication?) {
+    init(medication: Medication?, prefillName: String = "", prefillDosage: String = "") {
         self.medication = medication
-        _name = State(initialValue: medication?.name ?? "")
-        _dosage = State(initialValue: medication?.dosage ?? "")
+        _name = State(initialValue: medication?.name ?? prefillName)
+        _dosage = State(initialValue: medication?.dosage ?? prefillDosage)
         _notes = State(initialValue: medication?.notes ?? "")
         let existing = medication?.times.sorted().map(TimeOfDay.date) ?? []
         _times = State(initialValue: existing.isEmpty ? [TimeOfDay.date("08:00")] : existing)

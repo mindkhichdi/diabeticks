@@ -188,6 +188,39 @@ enum TimeOfDay {
     static func display(_ hhmm: String) -> String { date(hhmm).formatted(date: .omitted, time: .shortened) }
 }
 
+// MARK: Prescription scan
+
+struct ScannedMedicine: Decodable {
+    let name: String
+    let dosage: String?
+    let schedule: String?
+    let times: [String]?
+    let notes: String?
+}
+struct ScanResult: Decodable { let medicines: [ScannedMedicine] }
+
+/// An editable medicine in the review screen.
+struct MedicineDraft: Identifiable {
+    let id = UUID()
+    var include = true
+    var name = ""
+    var dosage = ""
+    var notes = ""
+    var times: [Date] = [TimeOfDay.date("08:00")]
+    /// What the prescription said, shown as a hint while editing.
+    var schedule = ""
+    var needsTimeCheck = false
+
+    init() {}
+    init(_ s: ScannedMedicine) {
+        name = s.name
+        dosage = s.dosage ?? ""
+        schedule = s.schedule ?? ""
+        notes = s.notes ?? ""
+        if let t = s.times, !t.isEmpty { times = t.sorted().map(TimeOfDay.date) } else { needsTimeCheck = true }
+    }
+}
+
 // MARK: Fitness
 
 struct FitnessLog: Decodable, Identifiable {

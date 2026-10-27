@@ -14,7 +14,7 @@ struct MedicineView: View {
                 switch mode {
                 case .today: DosesList(goToMedicines: { mode = .medicines })
                 case .medicines: MedicationsList()
-                case .prescriptions: PrescriptionsView()
+                case .prescriptions: PrescriptionsView(onMedicinesAdded: { mode = .medicines })
                 }
             }
             .safeAreaInset(edge: .top, spacing: 0) {

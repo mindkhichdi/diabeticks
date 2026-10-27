@@ -3,14 +3,25 @@ import QuickLook
 import SwiftUI
 import UniformTypeIdentifiers
 
+struct ScanReview: Identifiable {
+    let id = UUID()
+    let prescriptionId: String?
+    var drafts: [MedicineDraft]
+    let note: String?
+}
+
 struct PrescriptionsView: View {
+    /// Called after scanned medicines are confirmed, so the parent can show them.
+    var onMedicinesAdded: () -> Void = {}
+
     @Environment(DataStore.self) private var store
     @State private var photoItem: PhotosPickerItem?
     @State private var pickingFile = false
     @State private var showCamera = false
     @State private var uploading = false
     @State private var preview: URL?
-    @State private var pending: PendingFile?
+    @State private var scanning = false
+    @State private var review: ScanReview?
     @State private var editing: Prescription?
 
     var body: some View {
@@ -36,6 +47,7 @@ struct PrescriptionsView: View {
                     }
                     .contextMenu {
                         Button { editing = rx } label: { Label("Edit details", systemImage: "pencil") }
+                        Button { Task { await scanExisting(rx) } } label: { Label("Find medicines", systemImage: "text.viewfinder") }
                     }
                     .swipeActions(edge: .leading) {
                         Button { editing = rx } label: { Label("Edit", systemImage: "pencil") }.tint(.accentColor)
@@ -46,7 +58,7 @@ struct PrescriptionsView: View {
                     Task { for rx in doomed { await store.deletePrescription(rx) } }
                 }
             } footer: {
-                Text("Tap to view. Press and hold to add the medicine name, dose and schedule. Swipe to delete.")
+                Text("Uploads are scanned for medicines you can review and add. Tap to view, press and hold to edit or rescan, swipe to delete.")
             }
         }
         .refreshable { await store.load() }
@@ -84,18 +96,35 @@ struct PrescriptionsView: View {
                 let scoped = url.startAccessingSecurityScopedResource()
                 defer { if scoped { url.stopAccessingSecurityScopedResource() } }
                 guard let data = try? Data(contentsOf: url) else { return }
-                pending = PendingFile(data: data, contentType: "application/pdf", fileExtension: "pdf", isPDF: true)
+                await process(PendingFile(data: data, contentType: "application/pdf", fileExtension: "pdf", isPDF: true))
             }
         }
         .fullScreenCover(isPresented: $showCamera) {
             CameraPicker { image in stage(image) }.ignoresSafeArea()
         }
-        .sheet(item: $pending) { file in
-            PrescriptionDetailsSheet(title: "New prescription", file: file, existing: nil) { details in
-                uploading = true
-                await store.uploadPrescription(data: file.data, contentType: file.contentType,
-                                               fileExtension: file.fileExtension, details: details)
-                uploading = false
+        .overlay {
+            if scanning {
+                VStack(spacing: 12) {
+                    ProgressView().controlSize(.large)
+                    Text("Reading your prescription…").font(.subheadline.weight(.medium))
+                    Text("Finding medicines, doses and times").font(.footnote).foregroundStyle(.secondary)
+                }
+                .padding(24)
+                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+            }
+        }
+        .sheet(item: $review) { r in
+            ReviewMedicinesSheet(review: r) { drafts in
+                guard await store.addMedications(drafts) else { return false }
+                if let id = r.prescriptionId, let rx = store.prescriptions.first(where: { $0.id == id }) {
+                    let first = drafts.count == 1 ? drafts.first : nil
+                    await store.updatePrescription(rx, details: PrescriptionDetails(
+                        medicineName: drafts.map(\.name).joined(separator: ", "),
+                        dosage: first.flatMap { $0.dosage.isEmpty ? nil : $0.dosage },
+                        schedule: first.flatMap { $0.schedule.isEmpty ? nil : $0.schedule }))
+                }
+                onMedicinesAdded()
+                return true
             }
         }
         .sheet(item: $editing) { rx in
@@ -106,10 +135,39 @@ struct PrescriptionsView: View {
         .quickLookPreview($preview)
     }
 
-    /// Holds the picked file while the user adds details, then uploads on save.
     private func stage(_ image: UIImage) {
         guard let data = image.downscaled(maxSide: 2400).jpegData(compressionQuality: 0.8) else { return }
-        pending = PendingFile(data: data, contentType: "image/jpeg", fileExtension: "jpg", isPDF: false)
+        Task { await process(PendingFile(data: data, contentType: "image/jpeg", fileExtension: "jpg", isPDF: false)) }
+    }
+
+    /// Saves the file first (so it's kept even if reading fails), then scans it for medicines.
+    private func process(_ file: PendingFile) async {
+        uploading = true
+        let id = await store.uploadPrescription(data: file.data, contentType: file.contentType, fileExtension: file.fileExtension)
+        uploading = false
+        guard let id else { return }
+        await scan(file, prescriptionId: id)
+    }
+
+    private func scanExisting(_ rx: Prescription) async {
+        guard let url = await store.localFile(for: rx), let data = try? Data(contentsOf: url) else { return }
+        await scan(PendingFile(data: data, contentType: rx.fileType, fileExtension: "", isPDF: rx.isPDF), prescriptionId: rx.id)
+    }
+
+    private func scan(_ file: PendingFile, prescriptionId: String) async {
+        scanning = true
+        defer { scanning = false }
+        let images = file.isPDF ? UIImage.pages(ofPDF: file.data) : [UIImage(data: file.data)].compactMap { $0 }
+        var drafts: [MedicineDraft] = []
+        var note: String?
+        do {
+            drafts = try await AIService.scanPrescription(images).map(MedicineDraft.init)
+            if drafts.isEmpty { note = "We couldn't find any medicines on that prescription. You can add them yourself below." }
+        } catch {
+            note = error.localizedDescription + " You can add the medicines yourself below."
+        }
+        if drafts.isEmpty { drafts = [MedicineDraft()] }
+        review = ScanReview(prescriptionId: prescriptionId, drafts: drafts, note: note)
     }
 
     private func subtitle(_ rx: Prescription) -> String {
